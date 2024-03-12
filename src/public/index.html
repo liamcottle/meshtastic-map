@@ -505,9 +505,8 @@
                 var icon = iconOnline; // todo status
 
                 var tooltip = `<b>${node.long_name}</b>` +
-                    `<br/>ID: ${node.node_id_hex}` +
-                    `<br/>Role: ${node.role_name}` +
                     `<br/>Short Name: ${node.short_name}` +
+                    `<br/>Role: ${node.role_name}` +
                     `<br/>Hardware: ${node.hardware_model_name}`;
 
                 if(node.battery_level){
@@ -530,8 +529,10 @@
                     tooltip += `<br/>Air Util: ${Number(node.air_util_tx).toFixed(2)}%`;
                 }
 
-                // updated ago
-                tooltip += `<br/><br/>Updated: ${moment(new Date(node.updated_at)).fromNow()}`;
+                // bottom info
+                tooltip += `<br/><br/>ID: ${node.node_id}`;
+                tooltip += `<br/>Hex ID: ${node.node_id_hex}`;
+                tooltip += `<br/>Updated: ${moment(new Date(node.updated_at)).fromNow()}`;
 
                 // create node marker
                 var marker = L.marker([node.latitude, node.longitude], {
