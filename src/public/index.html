@@ -1,0 +1,603 @@
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Interactive Meshtastic Map</title>
+    <meta name="title" content="Interactive Meshtastic Map">
+    <meta name="description" content="An interactive map of all Meshtastic nodes.">
+    <link rel="icon" type="image/png" href="https://meshtastic.liamcottle.net/icon.png"/>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://meshtastic.liamcottle.net">
+    <meta property="og:title" content="Interactive Meshtastic Map">
+    <meta property="og:description" content="An interactive map of all Meshtastic nodes and their status.">
+    <meta property="og:image" content="https://meshtastic.liamcottle.net/icon-banner.png">
+    <meta property="og:image:width" content="1600">
+    <meta property="og:image:height" content="800">
+
+    <!-- tailwind css -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- leaflet map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+
+    <!-- moment -->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+
+    <style>
+
+        .icon-online {
+            background-color: #16a34a;
+            border-radius: 25px;
+            border: 1px solid white;
+        }
+
+        .link {
+            color: #2563eb;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 80px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            padding: 4px 0;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 10000;
+            top: 100%;
+            left: 50%;
+            margin-top: 8px;
+            margin-left: -40px; /* Use half of the width (120/2 = 60), to center the tooltip */
+        }
+
+        .tooltip .tooltip-text::after {
+            content: " ";
+            position: absolute;
+            bottom: 100%;  /* At the top of the tooltip */
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent black transparent;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+        }
+
+        .z-sidebar {
+            z-index: 1000;
+        }
+
+    </style>
+
+</head>
+<body class="h-full bg-gray-200">
+<div class="flex flex-col h-full w-full overflow-hidden">
+    <div class="flex flex-col h-full">
+
+        <!-- header -->
+        <div class="flex bg-white p-2 border-gray-300 border-b">
+            <div class="hidden sm:block my-auto mr-3">
+                <img class="w-10 h-10 rounded" src="icon.png"/>
+            </div>
+            <div class="my-auto">
+                <div class="font-bold">Interactive Meshtastic Map</div>
+                <div class="text-sm">
+                    <div class="hidden sm:inline-block">
+                        <span>Created by</span>
+                        <a class="link" target="_blank" href="https://liamcottle.com">Liam Cottle</a>
+                        <a class="link" target="_blank" href="https://www.qrz.com/db/zl2dev">ZL2DEV</a>
+                    </div>
+                    <div class="inline-block sm:hidden">
+                        <span>Created by</span>
+                        <a class="link" target="_blank" href="https://liamcottle.com">Liam</a>
+                        <a class="link" target="_blank" href="https://www.qrz.com/db/zl2dev">ZL2DEV</a>
+                    </div>
+                </div>
+            </div>
+            <div class="flex my-auto ml-auto mr-0 sm:mr-2 space-x-1 sm:space-x-2">
+                <a href="#" class="tooltip rounded-full" onclick="searchNodes()">
+                    <div id="search-button" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path>
+                            <path d="M21 21l-6 -6"></path>
+                        </svg>
+                    </div>
+                    <div class="hidden sm:block">
+                        <span class="tooltip-text">Search</span>
+                    </div>
+                </a>
+                <a href="#" class="tooltip rounded-full" onclick="toggleFavourites()">
+                    <div id="favourites-button" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"></path>
+                        </svg>
+                    </div>
+                    <div class="hidden sm:block">
+                        <span class="tooltip-text">Favourites</span>
+                    </div>
+                </a>
+                <a href="#" class="tooltip rounded-full" onclick="goToRandomNode()">
+                    <div id="random-button" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                        <svg class="w-6 h-6"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M18 4l3 3l-3 3"></path>
+                            <path d="M18 20l3 -3l-3 -3"></path>
+                            <path d="M3 7h3a5 5 0 0 1 5 5a5 5 0 0 0 5 5h5"></path>
+                            <path d="M21 7h-5a4.978 4.978 0 0 0 -3 1m-4 8a4.984 4.984 0 0 1 -3 1h-3"></path>
+                        </svg>
+                    </div>
+                    <div class="hidden sm:block">
+                        <span class="tooltip-text">Random</span>
+                    </div>
+                </a>
+                <a href="#" class="tooltip rounded-full" onclick="reload()">
+                    <div id="reload-button" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M19.933 13.041a8 8 0 1 1 -9.925 -8.788c3.899 -1 7.935 1.007 9.425 4.747"></path>
+                            <path d="M20 4v5h-5"></path>
+                        </svg>
+                    </div>
+                    <div class="hidden sm:block">
+                        <span class="tooltip-text">Reload</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- map -->
+        <div id="map" style="width:100%;height:100%;"></div>
+
+    </div>
+</div>
+
+<!-- favourites slideover -->
+<div id="favourites" class="hidden relative z-sidebar" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+    <div id="favourites-backdrop" onclick="toggleFavourites()" class="fixed inset-0 bg-gray-900 bg-opacity-50"></div>
+    <div class="fixed top-0 right-0 overflow-hidden">
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="fixed inset-y-0 right-0 flex max-w-full ml-10 sm:ml-16">
+                <div id="favourites-inner" class="translate-x-full pointer-events-auto w-screen max-w-md transform transition ease-in-out duration-500 sm:duration-700">
+                    <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+
+                        <!-- slideover header -->
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex items-start justify-between">
+                                <h2 class="text-base font-semibold leading-6 text-gray-900" id="slide-over-title">Favourites</h2>
+                                <div class="ml-3 flex h-7 items-center">
+                                    <a href="#" class="rounded-full" onclick="toggleFavourites()">
+                                        <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M18 6l-12 12"></path>
+                                                <path d="M6 6l12 12"></path>
+                                            </svg>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- list of favourites -->
+                        <ul role="list" class="flex-1 divide-y divide-gray-200 overflow-y-auto">
+
+                            <!-- !da5c85b8 -->
+                            <li>
+                                <div class="group relative flex items-center">
+                                    <a href="#" onclick="toggleFavourites(); goToNode('!da5c85b8');" class="-m-1 block flex-1 p-4">
+                                        <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                        <div class="relative flex min-w-0 flex-1 items-center">
+                                            <span class="relative inline-block flex-shrink-0">
+                                                <img class="h-10 w-10 rounded-full" src="https://hatscripts.github.io/circle-flags/flags/nz.svg" alt="">
+                                            </span>
+                                            <div class="ml-4 truncate">
+                                                <p class="truncate text-sm font-medium text-gray-900">ZL4NT-E [Mt. Towai Router]</p>
+                                                <p class="truncate text-sm text-gray-500">!da5c85b8 - Wellington, New Zealand</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </li>
+
+                        </ul>
+
+                        <!-- info -->
+                        <div class="flex text-small text-gray-500 p-3">
+                            <div class="my-auto mr-2">
+                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
+                                    <path d="M12 9h.01"></path>
+                                    <path d="M11 12h1v4h1"></path>
+                                </svg>
+                            </div>
+                            <div class="my-auto">These will eventually be customizable.</div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    // global state
+    var nodes = [];
+    var nodeMarkers = {};
+    var selectedNodeOutlineCircle = null;
+
+    // set map bounds to be a little more than full size to prevent panning off screen
+    var bounds = [
+        [-100, 70], // top left
+        [100, 500], // bottom right
+    ];
+
+    // create map positioned over AU and NZ
+    var map = L.map('map', {
+        maxBounds: bounds,
+    }).setView([
+        -15,
+        150,
+    ], 3);
+
+    // remove leaflet link
+    map.attributionControl.setPrefix('');
+
+    var openStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Data from <a target="_blank" href="https://meshtastic.org/docs/software/integrations/mqtt/">Meshtastic</a>',
+    }).addTo(map);
+
+    // create layer groups
+    var nodesLayerGroup = new L.LayerGroup();
+    var connectionsLayerGroup = new L.LayerGroup();
+
+    // create icons
+    var iconOnline = L.divIcon({ className: 'icon-online'});
+
+    // create legend
+    var legend = L.control({position: 'bottomleft'});
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'info legend');
+        div.style.backgroundColor = 'white';
+        div.style.padding = '12px';
+        div.innerHTML = `<div style="margin-bottom:6px;"><strong>Legend</strong></div>`
+            + `<div style="display:flex"><div class="icon-online" style="width:12px;height:12px;margin-right:4px;margin-top:auto;margin-bottom:auto;"></div> ONLINE</div>`;
+        return div;
+    };
+
+    var baseLayers = {
+
+    };
+
+    var overlays = {
+        "Nodes": nodesLayerGroup,
+        "Connections": connectionsLayerGroup,
+    };
+
+    // add layers to control ui
+    L.control.layers(baseLayers, overlays).addTo(map);
+
+    // add layers to map that should be enabled by default
+    nodesLayerGroup.addTo(map);
+    connectionsLayerGroup.addTo(map);
+    legend.addTo(map);
+
+    // remove outline when map clicked
+    map.on('click', function() {
+        clearNodeOutline();
+    });
+
+    function isValidLatLng(lat, lng) {
+
+        if(isNaN(lat) || isNaN(lng)){
+            return false;
+        }
+
+        if(lat == 0 && lng == 0){
+            return false;
+        }
+
+        if(lat < -90 || lat > 90){
+            return false;
+        }
+
+        if(lng < -180 || lng > 180){
+            return false;
+        }
+
+        return true;
+
+    }
+
+    function searchNodes() {
+
+        // ask user for input
+        var search = prompt('Find by Node ID');
+        if(search === null || search === ""){
+            return;
+        }
+
+        // find node
+        var nodeId = findNodeId(search);
+        if(!nodeId){
+            alert("Could not find node: " + search);
+            return;
+        }
+
+        goToNode(nodeId);
+
+    }
+
+    function findNodeId(search) {
+
+        // make sure search is a string
+        search = search.toString();
+
+        // find node id from existing marker
+        var nodeMarker = findNodeMarkerById(search);
+        if(nodeMarker){
+            return nodeMarker.options.tagName;
+        }
+
+        // otherwise search nodes on map
+        for(var node of nodes){
+
+            // find by id
+            if(node.id.toString().toLowerCase() === search.toLowerCase()){
+                return node.id;
+            }
+
+        }
+
+        return null;
+
+    }
+
+    function findNodeMarkerById(id) {
+
+        // find node marker by id
+        var nodeMarker = nodeMarkers[id];
+        if(nodeMarker){
+            return nodeMarker;
+        }
+
+        return null;
+
+    }
+
+    function goToNode(id){
+
+        // find node marker by id
+        var nodeMarker = findNodeMarkerById(id);
+        if(!nodeMarker){
+            alert("Could not find node on map: " + id);
+            return;
+        }
+
+        // close all popups and tooltips
+        closeAllPopups();
+        closeAllTooltips();
+
+        // select node
+        showNodeOutline(id);
+
+        // fly to node marker
+        map.flyTo(nodeMarker.getLatLng(), 10, {
+            animate: true,
+        });
+
+        // open tooltip
+        nodeMarker.openTooltip();
+
+    }
+
+    function goToRandomNode() {
+        if(nodes.length > 0){
+            const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
+            if(randomNode){
+                goToNode(randomNode.id);
+            }
+        }
+    }
+
+    function clearAllNodes() {
+        nodesLayerGroup.clearLayers();
+    }
+
+    function clearAllConnections() {
+        connectionsLayerGroup.clearLayers();
+    }
+
+    function closeAllPopups() {
+        map.eachLayer(function(layer) {
+            if(layer.options.pane === "popupPane"){
+                layer.removeFrom(map);
+            }
+        });
+    }
+
+    function closeAllTooltips() {
+        map.eachLayer(function(layer) {
+            if(layer.options.pane === "tooltipPane"){
+                layer.removeFrom(map);
+            }
+        });
+    }
+
+    function clearNodeOutline() {
+        if(selectedNodeOutlineCircle){
+            selectedNodeOutlineCircle.removeFrom(map);
+            selectedNodeOutlineCircle = null;
+        }
+    }
+
+    function showNodeOutline(id) {
+
+        // remove any existing node circle
+        clearNodeOutline();
+
+        // find node marker by id
+        var nodeMarker = nodeMarkers[id];
+        if(!nodeMarker){
+            return;
+        }
+
+        // add circle around node
+        selectedNodeOutlineCircle = L.circle(nodeMarker.getLatLng(), {
+            radius: 10000, // 10km
+        }).addTo(map);
+
+    }
+
+    function clearMap() {
+        closeAllPopups();
+        closeAllTooltips();
+        clearAllNodes();
+        clearAllConnections();
+        clearNodeOutline();
+    }
+
+    function onNodesUpdated(updatedNodes) {
+
+        // clear previous data
+        clearMap();
+
+        // clear nodes cache
+        nodes = [];
+
+        // add nodes
+        for(var node of updatedNodes){
+
+            // fix lat long
+            node.latitude = node.latitude / 10000000;
+            node.longitude = node.longitude / 10000000;
+
+            var hasLocation = isValidLatLng(node.latitude, node.longitude);
+
+            if(hasLocation){
+
+                // wrap longitude for shortest path, everything to left of australia should be shown on the right
+                var longitude = parseFloat(node.longitude);
+                if(longitude <= 100){
+                    node.longitude = (longitude += 360);
+                }
+
+                var icon = iconOnline; // todo status
+
+                var tooltip = `<b>${node.longName}</b>` +
+                    `<br/>ID: ${node.id}` +
+                    `<br/>Role: ${node.role}` +
+                    `<br/>Short Name: ${node.shortName}` +
+                    `<br/>Hardware: ${node.hwModel}`;
+
+                // create node marker
+                var marker = L.marker([node.latitude, node.longitude], {
+                    icon: icon,
+                    tagName: node.id,
+                })
+                    .bindTooltip(tooltip, {
+                        interactive: true,
+                    })
+                    .bindPopup(tooltip)
+                    .on('click', function(event) {
+                        // close tooltip on click to prevent tooltip and popup showing at same time
+                        event.target.closeTooltip();
+                    })
+                    .addTo(nodesLayerGroup);
+
+                // add to cache
+                nodes.push(node);
+                nodeMarkers[node.id] = marker;
+
+            }
+
+        }
+
+    }
+
+    function setLoading(loading){
+        var reloadButton = document.getElementById("reload-button");
+        if(loading){
+            reloadButton.classList.add("animate-spin");
+        } else {
+            reloadButton.classList.remove("animate-spin");
+        }
+    }
+
+    function reload(goToNodeId) {
+
+        // show loading
+        setLoading(true);
+
+        // fetch nodes
+        fetch('/api/v1/nodes').then(async (response) => {
+
+            // update nodes
+            var json = await response.json();
+            onNodesUpdated(Object.values(json.nodes));
+
+            // hide loading
+            setLoading(false);
+
+            // go to node id if provided
+            if(goToNodeId){
+                goToNode(goToNodeId);
+            }
+
+        });
+
+    }
+
+    function toggleFavourites() {
+
+        var favourites = document.getElementById("favourites");
+        var favouritesInner = document.getElementById("favourites-inner");
+
+        favourites.classList.toggle("hidden");
+        favouritesInner.classList.toggle("translate-x-full");
+        favouritesInner.classList.toggle("translate-x-0");
+
+    }
+
+    function timeAgo(timestamp) {
+
+        // default if invalid timestamp
+        if(!timestamp){
+            return "-";
+        }
+
+        // time from now
+        return moment(timestamp * 1000).fromNow();
+
+    }
+
+    // parse url params
+    var queryParams = new URLSearchParams(location.search);
+    var queryNodeId = queryParams.get('node_id');
+
+    // reload and go to provided node id
+    reload(queryNodeId);
+
+</script>
+</body>
+</html>
