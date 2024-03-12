@@ -510,6 +510,26 @@
                     `<br/>Short Name: ${node.short_name}` +
                     `<br/>Hardware: ${node.hardware_model_name}`;
 
+                if(node.battery_level){
+                    if(node.battery_level > 100){
+                        tooltip += `<br/>Battery: ${node.battery_level > 100 ? 'Plugged In' : node.battery_level}`;
+                    } else {
+                        tooltip += `<br/>Battery: ${node.battery_level}%`;
+                    }
+                }
+
+                if(node.voltage){
+                    tooltip += `<br/>Voltage: ${Number(node.voltage).toFixed(2)}V`;
+                }
+
+                if(node.channel_utilization){
+                    tooltip += `<br/>Ch Util: ${Number(node.channel_utilization).toFixed(2)}%`;
+                }
+
+                if(node.air_util_tx){
+                    tooltip += `<br/>Air Util: ${Number(node.air_util_tx).toFixed(2)}%`;
+                }
+
                 // create node marker
                 var marker = L.marker([node.latitude, node.longitude], {
                     icon: icon,
