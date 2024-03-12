@@ -347,9 +347,19 @@
         // otherwise search nodes on map
         for(var node of nodes){
 
-            // find by id
-            if(node.id.toString().toLowerCase() === search.toLowerCase()){
-                return node.id;
+            // find by node_id
+            if(node.node_id.toString().toLowerCase() === search.toLowerCase()){
+                return node.node_id;
+            }
+
+            // find by node_id_hex
+            if(node.node_id_hex.toString().toLowerCase() === search.toLowerCase()){
+                return node.node_id;
+            }
+
+            // find by node_id_hex (without "!")
+            if(node.node_id_hex.toString().toLowerCase().replaceAll("!", "") === search.toLowerCase()){
+                return node.node_id;
             }
 
         }
@@ -503,7 +513,7 @@
                 // create node marker
                 var marker = L.marker([node.latitude, node.longitude], {
                     icon: icon,
-                    tagName: node.id,
+                    tagName: node.node_id,
                 })
                     .bindTooltip(tooltip, {
                         interactive: true,
@@ -517,7 +527,7 @@
 
                 // add to cache
                 nodes.push(node);
-                nodeMarkers[node.id] = marker;
+                nodeMarkers[node.node_id] = marker;
 
             }
 
