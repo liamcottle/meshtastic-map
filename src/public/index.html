@@ -530,6 +530,9 @@
                     tooltip += `<br/>Air Util: ${Number(node.air_util_tx).toFixed(2)}%`;
                 }
 
+                // updated ago
+                tooltip += `<br/><br/>Updated: ${moment(new Date(node.updated_at)).fromNow()}`;
+
                 // create node marker
                 var marker = L.marker([node.latitude, node.longitude], {
                     icon: icon,
