@@ -26,6 +26,11 @@ model Node {
   longitude Int?
   altitude  Int?
 
+  battery_level       Int?
+  voltage             Decimal?
+  channel_utilization Decimal?
+  air_util_tx         Decimal?
+
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
 

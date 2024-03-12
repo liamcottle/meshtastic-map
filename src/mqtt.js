@@ -20,6 +20,7 @@ root.loadSync('meshtastic/mqtt.proto');
 const Data = root.lookupType("Data");
 const ServiceEnvelope = root.lookupType("ServiceEnvelope");
 const Position = root.lookupType("Position");
+const Telemetry = root.lookupType("Telemetry");
 const User = root.lookupType("User");
 
 function createNonce(packetId, fromNode) {
@@ -155,6 +156,42 @@ client.on("message", async (topic, message) => {
                 });
             } catch (e) {
                 console.error(e);
+            }
+
+        }
+
+        if(portnum === 67) {
+
+            const telemetry = Telemetry.decode(envelope.packet.decoded.payload);
+
+            console.log("TELEMETRY_APP", {
+                from: envelope.packet.from.toString(16),
+                telemetry: telemetry,
+            });
+
+            // data to update
+            const data = {};
+
+            // handle device metrics
+            if(telemetry.deviceMetrics){
+                data.battery_level = telemetry.deviceMetrics.batteryLevel !== 0 ? telemetry.deviceMetrics.batteryLevel : null;
+                data.voltage = telemetry.deviceMetrics.voltage !== 0 ? telemetry.deviceMetrics.voltage : null;
+                data.channel_utilization = telemetry.deviceMetrics.channelUtilization !== 0 ? telemetry.deviceMetrics.channelUtilization : null;
+                data.air_util_tx = telemetry.deviceMetrics.airUtilTx !== 0 ? telemetry.deviceMetrics.airUtilTx : null;
+            }
+
+            // update node telemetry in db
+            if(Object.keys(data).length > 0){
+                try {
+                    await prisma.node.updateMany({
+                        where: {
+                            node_id: envelope.packet.from,
+                        },
+                        data: data,
+                    });
+                } catch (e) {
+                    console.error(e);
+                }
             }
 
         }
