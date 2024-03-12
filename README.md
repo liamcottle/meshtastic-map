@@ -9,3 +9,4 @@ A map of all Meshtastic nodes heard via MQTT.
 - ui to view text messages log
 - store x days worth of historical logs
 - be able to go back in time and see how the mesh evolved
+- dedupe packets
