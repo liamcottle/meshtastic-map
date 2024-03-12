@@ -1,0 +1,287 @@
+syntax = "proto3";
+
+package meshtastic;
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "TelemetryProtos";
+option java_package = "com.geeksville.mesh";
+option swift_prefix = "";
+
+/*
+ * Key native device metrics such as battery level
+ */
+message DeviceMetrics {
+  /*
+   * 0-100 (>100 means powered)
+   */
+  uint32 battery_level = 1;
+
+  /*
+   * Voltage measured
+   */
+  float voltage = 2;
+
+  /*
+   * Utilization for the current channel, including well formed TX, RX and malformed RX (aka noise).
+   */
+  float channel_utilization = 3;
+
+  /*
+   * Percent of airtime for transmission used within the last hour.
+   */
+  float air_util_tx = 4;
+}
+
+/*
+ * Weather station or other environmental metrics
+ */
+message EnvironmentMetrics {
+  /*
+   * Temperature measured
+   */
+  float temperature = 1;
+
+  /*
+   * Relative humidity percent measured
+   */
+  float relative_humidity = 2;
+
+  /*
+   * Barometric pressure in hPA measured
+   */
+  float barometric_pressure = 3;
+
+  /*
+   * Gas resistance in MOhm measured
+   */
+  float gas_resistance = 4;
+
+  /*
+   * Voltage measured (To be depreciated in favor of PowerMetrics in Meshtastic 3.x)
+   */
+  float voltage = 5;
+
+  /*
+   * Current measured (To be depreciated in favor of PowerMetrics in Meshtastic 3.x)
+   */
+  float current = 6;
+}
+
+/*
+ * Power Metrics (voltage / current / etc)
+ */
+message PowerMetrics {
+  /*
+   * Voltage (Ch1)
+   */
+  float ch1_voltage = 1;
+
+  /*
+   * Current (Ch1)
+   */
+  float ch1_current = 2;
+
+  /*
+   * Voltage (Ch2)
+   */
+  float ch2_voltage = 3;
+
+  /*
+   * Current (Ch2)
+   */
+  float ch2_current = 4;
+
+  /*
+   * Voltage (Ch3)
+   */
+  float ch3_voltage = 5;
+
+  /*
+   * Current (Ch3)
+   */
+  float ch3_current = 6;
+}
+
+/*
+ * Air quality metrics
+ */
+message AirQualityMetrics {
+  /*
+   * Concentration Units Standard PM1.0
+   */
+  uint32 pm10_standard = 1;
+
+  /*
+   * Concentration Units Standard PM2.5
+   */
+  uint32 pm25_standard = 2;
+
+  /*
+   * Concentration Units Standard PM10.0
+   */
+  uint32 pm100_standard = 3;
+
+  /*
+   * Concentration Units Environmental PM1.0
+   */
+  uint32 pm10_environmental = 4;
+
+  /*
+   * Concentration Units Environmental PM2.5
+   */
+  uint32 pm25_environmental = 5;
+
+  /*
+   * Concentration Units Environmental PM10.0
+   */
+  uint32 pm100_environmental = 6;
+
+  /*
+   * 0.3um Particle Count
+   */
+  uint32 particles_03um = 7;
+
+  /*
+   * 0.5um Particle Count
+   */
+  uint32 particles_05um = 8;
+
+  /*
+   * 1.0um Particle Count
+   */
+  uint32 particles_10um = 9;
+
+  /*
+   * 2.5um Particle Count
+   */
+  uint32 particles_25um = 10;
+
+  /*
+   * 5.0um Particle Count
+   */
+  uint32 particles_50um = 11;
+
+  /*
+   * 10.0um Particle Count
+   */
+  uint32 particles_100um = 12;
+}
+
+/*
+ * Types of Measurements the telemetry module is equipped to handle
+ */
+message Telemetry {
+  /*
+   * Seconds since 1970 - or 0 for unknown/unset
+   */
+  fixed32 time = 1;
+
+  oneof variant {
+    /*
+     * Key native device metrics such as battery level
+     */
+    DeviceMetrics device_metrics = 2;
+
+    /*
+     * Weather station or other environmental metrics
+     */
+    EnvironmentMetrics environment_metrics = 3;
+
+    /*
+     * Air quality metrics
+     */
+    AirQualityMetrics air_quality_metrics = 4;
+
+    /*
+     * Power Metrics 
+     */
+    PowerMetrics power_metrics = 5;
+  }
+}
+
+/*
+ * Supported I2C Sensors for telemetry in Meshtastic
+ */
+enum TelemetrySensorType {
+  /*
+   * No external telemetry sensor explicitly set
+   */
+  SENSOR_UNSET = 0;
+
+  /*
+   * High accuracy temperature, pressure, humidity
+   */
+  BME280 = 1;
+
+  /*
+   * High accuracy temperature, pressure, humidity, and air resistance
+   */
+  BME680 = 2;
+
+  /*
+   * Very high accuracy temperature
+   */
+  MCP9808 = 3;
+
+  /*
+   * Moderate accuracy current and voltage
+   */
+  INA260 = 4;
+
+  /*
+   * Moderate accuracy current and voltage
+   */
+  INA219 = 5;
+
+  /*
+   * High accuracy temperature and pressure
+   */
+  BMP280 = 6;
+
+  /*
+   * High accuracy temperature and humidity
+   */
+  SHTC3 = 7;
+
+  /*
+   * High accuracy pressure
+   */
+  LPS22 = 8;
+
+  /*
+   * 3-Axis magnetic sensor
+   */
+  QMC6310 = 9;
+
+  /*
+   * 6-Axis inertial measurement sensor
+   */
+  QMI8658 = 10;
+
+  /*
+   * 3-Axis magnetic sensor
+   */
+  QMC5883L = 11;
+
+  /*
+   * High accuracy temperature and humidity
+   */
+  SHT31 = 12;
+
+  /*
+   * PM2.5 air quality sensor
+   */
+  PMSA003I = 13;
+
+  /*
+   * INA3221 3 Channel Voltage / Current Sensor
+   */
+  INA3221 = 14;
+
+  /*
+   * BMP085/BMP180 High accuracy temperature and pressure (older Version of BMP280)
+   */
+  BMP085 = 15;
+
+}

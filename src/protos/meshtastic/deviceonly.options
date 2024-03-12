@@ -1,0 +1,19 @@
+# options for nanopb
+# https://jpa.kapsi.fi/nanopb/docs/reference.html#proto-file-options
+
+# FIXME pick a higher number someday? or do dynamic alloc in nanopb?
+*DeviceState.node_db_lite max_count:100
+
+# FIXME - max_count is actually 32 but we save/load this as one long string of preencoded MeshPacket bytes - not a big array in RAM
+*DeviceState.receive_queue max_count:1
+
+*ChannelFile.channels max_count:8
+
+*OEMStore.oem_text max_size:40
+*OEMStore.oem_icon_bits max_size:2048
+*OEMStore.oem_aes_key max_size:32
+
+*DeviceState.node_remote_hardware_pins max_count:12
+
+*NodeInfoLite.channel int_size:8
+*NodeInfoLite.hops_away int_size:8

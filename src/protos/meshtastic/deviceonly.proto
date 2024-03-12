@@ -1,0 +1,262 @@
+syntax = "proto3";
+
+package meshtastic;
+
+import "meshtastic/channel.proto";
+import "meshtastic/localonly.proto";
+import "meshtastic/mesh.proto";
+import "meshtastic/telemetry.proto";
+import "meshtastic/module_config.proto";
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "DeviceOnly";
+option java_package = "com.geeksville.mesh";
+option swift_prefix = "";
+
+/*
+ * This message is never sent over the wire, but it is used for serializing DB
+ * state to flash in the device code
+ * FIXME, since we write this each time we enter deep sleep (and have infinite
+ * flash) it would be better to use some sort of append only data structure for
+ * the receive queue and use the preferences store for the other stuff
+ */
+message DeviceState {
+  /*
+   * Read only settings/info about this node
+   */
+  MyNodeInfo my_node = 2;
+
+  /*
+   * My owner info
+   */
+  User owner = 3;
+
+  /*
+   * Received packets saved for delivery to the phone
+   */
+  repeated MeshPacket receive_queue = 5;
+
+  /*
+   * A version integer used to invalidate old save files when we make
+   * incompatible changes This integer is set at build time and is private to
+   * NodeDB.cpp in the device code.
+   */
+  uint32 version = 8;
+
+  /*
+   * We keep the last received text message (only) stored in the device flash,
+   * so we can show it on the screen.
+   * Might be null
+   */
+  MeshPacket rx_text_message = 7;
+
+  /*
+   * Used only during development.
+   * Indicates developer is testing and changes should never be saved to flash.
+   */
+  bool no_save = 9;
+
+  /*
+   * Some GPS receivers seem to have bogus settings from the factory, so we always do one factory reset.
+   */
+  bool did_gps_reset = 11;
+
+  /*
+   * We keep the last received waypoint stored in the device flash,
+   * so we can show it on the screen.
+   * Might be null
+   */
+  MeshPacket rx_waypoint = 12;
+
+  /*
+   * The mesh's nodes with their available gpio pins for RemoteHardware module
+   */
+  repeated NodeRemoteHardwarePin node_remote_hardware_pins = 13;
+
+  /*
+   * New lite version of NodeDB to decrease memory footprint
+   */
+  repeated NodeInfoLite node_db_lite = 14;
+}
+
+message NodeInfoLite {
+  /*
+   * The node number
+   */
+  uint32 num = 1;
+
+  /*
+   * The user info for this node
+   */
+  User user = 2;
+
+  /*
+   * This position data. Note: before 1.2.14 we would also store the last time we've heard from this node in position.time, that is no longer true.
+   * Position.time now indicates the last time we received a POSITION from that node.
+   */
+  PositionLite position = 3;
+
+  /*
+   * Returns the Signal-to-noise ratio (SNR) of the last received message,
+   * as measured by the receiver. Return SNR of the last received message in dB
+   */
+  float snr = 4;
+
+  /*
+   * Set to indicate the last time we received a packet from this node
+   */
+  fixed32 last_heard = 5;
+  /*
+   * The latest device metrics for the node.
+   */
+  DeviceMetrics device_metrics = 6;
+
+  /*
+   * local channel index we heard that node on. Only populated if its not the default channel.
+   */
+  uint32 channel = 7;
+
+  /*
+   * True if we witnessed the node over MQTT instead of LoRA transport
+   */
+  bool via_mqtt = 8;
+
+  /*
+   * Number of hops away from us this node is (0 if adjacent)
+   */
+  uint32 hops_away = 9;
+}
+
+/*
+ * Position with static location information only for NodeDBLite
+ */
+message PositionLite {
+  /*
+   * The new preferred location encoding, multiply by 1e-7 to get degrees
+   * in floating point
+   */
+  sfixed32 latitude_i = 1;
+
+  /*
+   * TODO: REPLACE
+   */
+  sfixed32 longitude_i = 2;
+
+  /*
+   * In meters above MSL (but see issue #359)
+   */
+  int32 altitude = 3;
+
+  /*
+   * This is usually not sent over the mesh (to save space), but it is sent
+   * from the phone so that the local device can set its RTC If it is sent over
+   * the mesh (because there are devices on the mesh without GPS), it will only
+   * be sent by devices which has a hardware GPS clock.
+   * seconds since 1970
+   */
+  fixed32 time = 4;
+
+  /*
+   * TODO: REPLACE
+   */
+  Position.LocSource location_source = 5;
+}
+
+/*
+ * The on-disk saved channels
+ */
+message ChannelFile {
+  /*
+   * The channels our node knows about
+   */
+  repeated Channel channels = 1;
+
+  /*
+   * A version integer used to invalidate old save files when we make
+   * incompatible changes This integer is set at build time and is private to
+   * NodeDB.cpp in the device code.
+   */
+  uint32 version = 2;
+}
+
+/*
+ * TODO: REPLACE
+ */
+enum ScreenFonts {
+  /*
+   * TODO: REPLACE
+   */
+  FONT_SMALL = 0;
+
+  /*
+   * TODO: REPLACE
+   */
+  FONT_MEDIUM = 1;
+
+  /*
+   * TODO: REPLACE
+   */
+  FONT_LARGE = 2;
+}
+
+/*
+ * This can be used for customizing the firmware distribution. If populated,
+ * show a secondary bootup screen with custom logo and text for 2.5 seconds.
+ */
+message OEMStore {
+  /*
+   * The Logo width in Px
+   */
+  uint32 oem_icon_width = 1;
+
+  /*
+   * The Logo height in Px
+   */
+  uint32 oem_icon_height = 2;
+
+  /*
+   * The Logo in XBM bytechar format
+   */
+  bytes oem_icon_bits = 3;
+
+  /*
+   * Use this font for the OEM text.
+   */
+  ScreenFonts oem_font = 4;
+
+  /*
+   * Use this font for the OEM text.
+   */
+  string oem_text = 5;
+
+  /*
+   * The default device encryption key, 16 or 32 byte
+   */
+  bytes oem_aes_key = 6;
+
+  /*
+   * A Preset LocalConfig to apply during factory reset
+   */
+  LocalConfig oem_local_config = 7;
+
+  /*
+   * A Preset LocalModuleConfig to apply during factory reset
+   */
+  LocalModuleConfig oem_local_module_config = 8;
+}
+
+/*
+ * RemoteHardwarePins associated with a node
+ */
+message NodeRemoteHardwarePin {
+  /*
+   * The node_num exposing the available gpio pin
+   */
+  uint32 node_num = 1;
+
+  /*
+   * The the available gpio pin for usage with RemoteHardware module
+   */
+  RemoteHardwarePin pin = 2;
+}

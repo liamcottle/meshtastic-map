@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package meshtastic;
+
+import "meshtastic/localonly.proto";
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "ClientOnlyProtos";
+option java_package = "com.geeksville.mesh";
+option swift_prefix = "";
+
+/*
+ * This abstraction is used to contain any configuration for provisioning a node on any client.
+ * It is useful for importing and exporting configurations.
+ */
+message DeviceProfile {
+  /*
+   * Long name for the node
+   */
+  optional string long_name = 1;
+
+  /*
+   * Short name of the node
+   */
+  optional string short_name = 2;
+
+  /*
+   * The url of the channels from our node
+   */
+  optional string channel_url = 3;
+
+  /*
+   * The Config of the node
+   */
+  optional LocalConfig config = 4;
+
+  /*
+   * The ModuleConfig of the node
+   */
+  optional LocalModuleConfig module_config = 5;
+}
+
+/* 
+ * A heartbeat message is sent by a node to indicate that it is still alive.
+ * This is currently only needed to keep serial connections alive.
+ */
+message Heartbeat {
+  
+}

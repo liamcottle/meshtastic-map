@@ -1,0 +1,364 @@
+syntax = "proto3";
+
+package meshtastic;
+
+import "meshtastic/channel.proto";
+import "meshtastic/config.proto";
+import "meshtastic/connection_status.proto";
+import "meshtastic/deviceonly.proto";
+import "meshtastic/mesh.proto";
+import "meshtastic/module_config.proto";
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "AdminProtos";
+option java_package = "com.geeksville.mesh";
+option swift_prefix = "";
+
+/*
+ * This message is handled by the Admin module and is responsible for all settings/channel read/write operations.
+ * This message is used to do settings operations to both remote AND local nodes.
+ * (Prior to 1.2 these operations were done via special ToRadio operations)
+ */
+message AdminMessage {
+  /*
+   * TODO: REPLACE
+   */
+  enum ConfigType {
+    /*
+     * TODO: REPLACE
+     */
+    DEVICE_CONFIG = 0;
+
+    /*
+     * TODO: REPLACE
+     */
+    POSITION_CONFIG = 1;
+
+    /*
+     * TODO: REPLACE
+     */
+    POWER_CONFIG = 2;
+
+    /*
+     * TODO: REPLACE
+     */
+    NETWORK_CONFIG = 3;
+
+    /*
+     * TODO: REPLACE
+     */
+    DISPLAY_CONFIG = 4;
+
+    /*
+     * TODO: REPLACE
+     */
+    LORA_CONFIG = 5;
+
+    /*
+     * TODO: REPLACE
+     */
+    BLUETOOTH_CONFIG = 6;
+  }
+
+  /*
+   * TODO: REPLACE
+   */
+  enum ModuleConfigType {
+    /*
+     * TODO: REPLACE
+     */
+    MQTT_CONFIG = 0;
+
+    /*
+     * TODO: REPLACE
+     */
+    SERIAL_CONFIG = 1;
+
+    /*
+     * TODO: REPLACE
+     */
+    EXTNOTIF_CONFIG = 2;
+
+    /*
+     * TODO: REPLACE
+     */
+    STOREFORWARD_CONFIG = 3;
+
+    /*
+     * TODO: REPLACE
+     */
+    RANGETEST_CONFIG = 4;
+
+    /*
+     * TODO: REPLACE
+     */
+    TELEMETRY_CONFIG = 5;
+
+    /*
+     * TODO: REPLACE
+     */
+    CANNEDMSG_CONFIG = 6;
+
+    /*
+     * TODO: REPLACE
+     */
+    AUDIO_CONFIG = 7;
+
+    /*
+     * TODO: REPLACE
+     */
+    REMOTEHARDWARE_CONFIG = 8;
+
+    /*
+     * TODO: REPLACE
+     */
+    NEIGHBORINFO_CONFIG = 9;
+
+    /*
+     * TODO: REPLACE
+     */
+    AMBIENTLIGHTING_CONFIG = 10;
+
+    /*
+     * TODO: REPLACE
+     */
+    DETECTIONSENSOR_CONFIG = 11;
+
+    /*
+     * TODO: REPLACE
+     */
+    PAXCOUNTER_CONFIG = 12;
+  }
+
+  /*
+   * TODO: REPLACE
+   */
+  oneof payload_variant {
+    /*
+     * Send the specified channel in the response to this message
+     * NOTE: This field is sent with the channel index + 1 (to ensure we never try to send 'zero' - which protobufs treats as not present)
+     */
+    uint32 get_channel_request = 1;
+
+    /*
+     * TODO: REPLACE
+     */
+    Channel get_channel_response = 2;
+
+    /*
+     * Send the current owner data in the response to this message.
+     */
+    bool get_owner_request = 3;
+
+    /*
+     * TODO: REPLACE
+     */
+    User get_owner_response = 4;
+
+    /*
+     * Ask for the following config data to be sent
+     */
+    ConfigType get_config_request = 5;
+
+    /*
+     * Send the current Config in the response to this message.
+     */
+    Config get_config_response = 6;
+
+    /*
+     * Ask for the following config data to be sent
+     */
+    ModuleConfigType get_module_config_request = 7;
+
+    /*
+     * Send the current Config in the response to this message.
+     */
+    ModuleConfig get_module_config_response = 8;
+
+    /*
+     * Get the Canned Message Module messages in the response to this message.
+     */
+    bool get_canned_message_module_messages_request = 10;
+
+    /*
+     * Get the Canned Message Module messages in the response to this message.
+     */
+    string get_canned_message_module_messages_response = 11;
+
+    /*
+     * Request the node to send device metadata (firmware, protobuf version, etc)
+     */
+    bool get_device_metadata_request = 12;
+
+    /*
+     * Device metadata response
+     */
+    DeviceMetadata get_device_metadata_response = 13;
+
+    /*
+     * Get the Ringtone in the response to this message.
+     */
+    bool get_ringtone_request = 14;
+
+    /*
+     * Get the Ringtone in the response to this message.
+     */
+    string get_ringtone_response = 15;
+
+    /*
+     * Request the node to send it's connection status
+     */
+    bool get_device_connection_status_request = 16;
+
+    /*
+     * Device connection status response
+     */
+    DeviceConnectionStatus get_device_connection_status_response = 17;
+
+    /*
+     * Setup a node for licensed amateur (ham) radio operation
+     */
+    HamParameters set_ham_mode = 18;
+
+    /*
+     * Get the mesh's nodes with their available gpio pins for RemoteHardware module use
+     */
+    bool get_node_remote_hardware_pins_request = 19;
+
+    /*
+     * Respond with the mesh's nodes with their available gpio pins for RemoteHardware module use
+     */
+    NodeRemoteHardwarePinsResponse get_node_remote_hardware_pins_response = 20;
+
+    /*
+     * Enter (UF2) DFU mode
+     * Only implemented on NRF52 currently
+     */
+    bool enter_dfu_mode_request = 21;
+
+    /*
+     * Delete the file by the specified path from the device
+     */
+    string delete_file_request = 22;
+
+    /*
+     * Set the owner for this node
+     */
+    User set_owner = 32;
+
+    /*
+     * Set channels (using the new API).
+     * A special channel is the "primary channel".
+     * The other records are secondary channels.
+     * Note: only one channel can be marked as primary.
+     * If the client sets a particular channel to be primary, the previous channel will be set to SECONDARY automatically.
+     */
+    Channel set_channel = 33;
+
+    /*
+     * Set the current Config
+     */
+    Config set_config = 34;
+
+    /*
+     * Set the current Config
+     */
+    ModuleConfig set_module_config = 35;
+
+    /*
+     * Set the Canned Message Module messages text.
+     */
+    string set_canned_message_module_messages = 36;
+
+    /*
+     * Set the ringtone for ExternalNotification.
+     */
+    string set_ringtone_message = 37;
+
+    /*
+     * Remove the node by the specified node-num from the NodeDB on the device
+     */
+    uint32 remove_by_nodenum = 38;
+
+    /*
+     * Begins an edit transaction for config, module config, owner, and channel settings changes
+     * This will delay the standard *implicit* save to the file system and subsequent reboot behavior until committed (commit_edit_settings)
+     */
+    bool begin_edit_settings = 64;
+
+    /*
+     * Commits an open transaction for any edits made to config, module config, owner, and channel settings
+     */
+    bool commit_edit_settings = 65;
+
+    /*
+     * Tell the node to reboot into the OTA Firmware in this many seconds (or <0 to cancel reboot)
+     * Only Implemented for ESP32 Devices. This needs to be issued to send a new main firmware via bluetooth.
+     */
+    int32 reboot_ota_seconds = 95;
+
+    /*
+     * This message is only supported for the simulator Portduino build.
+     * If received the simulator will exit successfully.
+     */
+    bool exit_simulator = 96;
+
+    /*
+     * Tell the node to reboot in this many seconds (or <0 to cancel reboot)
+     */
+    int32 reboot_seconds = 97;
+
+    /*
+     * Tell the node to shutdown in this many seconds (or <0 to cancel shutdown)
+     */
+    int32 shutdown_seconds = 98;
+
+    /*
+     * Tell the node to factory reset, all device settings will be returned to factory defaults.
+     */
+    int32 factory_reset = 99;
+
+    /*
+     * Tell the node to reset the nodedb.
+     */
+    int32 nodedb_reset = 100;
+  }
+}
+
+/*
+ * Parameters for setting up Meshtastic for ameteur radio usage
+ */
+message HamParameters {
+  /*
+   * Amateur radio call sign, eg. KD2ABC
+   */
+  string call_sign = 1;
+
+  /*
+   * Transmit power in dBm at the LoRA transceiver, not including any amplification
+   */
+  int32 tx_power = 2;
+
+  /*
+   * The selected frequency of LoRA operation
+   * Please respect your local laws, regulations, and band plans.
+   * Ensure your radio is capable of operating of the selected frequency before setting this.
+   */
+  float frequency = 3;
+
+  /*
+   * Optional short name of user
+   */
+  string short_name = 4;
+}
+
+/*
+ * Response envelope for node_remote_hardware_pins
+ */
+message NodeRemoteHardwarePinsResponse {
+  /*
+   * Nodes and their respective remote hardware GPIO pins
+   */
+  repeated NodeRemoteHardwarePin node_remote_hardware_pins = 1;
+}

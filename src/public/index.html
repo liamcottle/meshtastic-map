@@ -13,9 +13,6 @@
     <meta property="og:url" content="https://meshtastic.liamcottle.net">
     <meta property="og:title" content="Interactive Meshtastic Map">
     <meta property="og:description" content="An interactive map of all Meshtastic nodes and their status.">
-    <meta property="og:image" content="https://meshtastic.liamcottle.net/icon-banner.png">
-    <meta property="og:image:width" content="1600">
-    <meta property="og:image:height" content="800">
 
     <!-- tailwind css -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -313,18 +310,6 @@
             return false;
         }
 
-        if(lat == 0 && lng == 0){
-            return false;
-        }
-
-        if(lat < -90 || lat > 90){
-            return false;
-        }
-
-        if(lng < -180 || lng > 180){
-            return false;
-        }
-
         return true;
 
     }
@@ -488,6 +473,11 @@
         // add nodes
         for(var node of updatedNodes){
 
+            // skip nodes without position
+            if(!node.latitude || !node.longitude){
+                continue;
+            }
+
             // fix lat long
             node.latitude = node.latitude / 10000000;
             node.longitude = node.longitude / 10000000;
@@ -504,11 +494,11 @@
 
                 var icon = iconOnline; // todo status
 
-                var tooltip = `<b>${node.longName}</b>` +
-                    `<br/>ID: ${node.id}` +
-                    `<br/>Role: ${node.role}` +
-                    `<br/>Short Name: ${node.shortName}` +
-                    `<br/>Hardware: ${node.hwModel}`;
+                var tooltip = `<b>${node.long_name}</b>` +
+                    `<br/>ID: ${node.node_id_hex}` +
+                    `<br/>Role: ${node.role_name}` +
+                    `<br/>Short Name: ${node.short_name}` +
+                    `<br/>Hardware: ${node.hardware_model_name}`;
 
                 // create node marker
                 var marker = L.marker([node.latitude, node.longitude], {
@@ -554,7 +544,7 @@
 
             // update nodes
             var json = await response.json();
-            onNodesUpdated(Object.values(json.nodes));
+            onNodesUpdated(json.nodes);
 
             // hide loading
             setLoading(false);
