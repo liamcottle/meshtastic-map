@@ -559,7 +559,8 @@
                         count: 100,
                     },
                 }).then((response) => {
-                    this.selectedNodeDeviceMetrics = response.data.device_metrics;
+                    // reverse response, as it's newest to oldest, but we want oldest to newest
+                    this.selectedNodeDeviceMetrics = response.data.device_metrics.reverse();
                     this.renderDeviceMetricCharts();
                 }).catch(() => {
                     this.selectedNodeDeviceMetrics = [];
