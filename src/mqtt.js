@@ -167,7 +167,6 @@ client.on("message", async (topic, message) => {
 
             console.log("NEIGHBORINFO_APP", {
                 from: envelope.packet.from.toString(16),
-                // envelope: envelope,
                 neighbour_info: neighbourInfo,
             });
 
