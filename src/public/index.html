@@ -173,60 +173,77 @@
     </div>
 
     <!-- hardware models sidebar -->
-    <div class="relative z-sidebar" :class="{ 'hidden': !isShowingHardwareModels }" role="dialog" aria-modal="true">
-        <div @click="isShowingHardwareModels = !isShowingHardwareModels" class="fixed inset-0 bg-gray-900 bg-opacity-50"></div>
-        <div class="fixed top-0 left-0 overflow-hidden">
-            <div class="absolute inset-0 overflow-hidden">
-                <div class="fixed inset-y-0 left-0 flex max-w-full mr-10 sm:mr-16">
-                    <div class="pointer-events-auto w-screen max-w-md transform transition ease-in-out duration-500 sm:duration-700" :class="{ 'translate-x-0': isShowingHardwareModels, 'translate-x-full': !isShowingHardwareModels }">
-                        <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+    <div class="relative z-sidebar" role="dialog" aria-modal="true">
 
-                            <!-- slideover header -->
-                            <div class="p-2 border-b border-gray-200 shadow">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <h2 class="font-bold">Meshtastic Devices</h2>
-                                        <h3 class="text-sm">Ordered by most popular</h3>
-                                    </div>
-                                    <div class="my-auto ml-3 flex h-7 items-center">
-                                        <a href="javascript:void(0)" class="rounded-full" @click="isShowingHardwareModels = !isShowingHardwareModels">
-                                            <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
-                                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                    <path d="M18 6l-12 12"></path>
-                                                    <path d="M6 6l12 12"></path>
-                                                </svg>
-                                            </div>
-                                        </a>
-                                    </div>
+        <!-- overlay -->
+        <transition
+                enter-active-class="transition-opacity duration-300 ease-linear"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition-opacity duration-300 ease-linear"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0">
+            <div v-show="isShowingHardwareModels" @click="isShowingHardwareModels = !isShowingHardwareModels" class="fixed inset-0 bg-gray-900 bg-opacity-75"></div>
+        </transition>
+
+        <!-- sidebar -->
+        <transition
+                enter-active-class="transition duration-300 ease-in-out transform"
+                enter-from-class="-translate-x-full"
+                enter-to-class="translate-x-0"
+                leave-active-class="transition duration-300 ease-in-out transform"
+                leave-from-class="translate-x-0"
+                leave-to-class="-translate-x-full">
+            <div v-show="isShowingHardwareModels" class="fixed top-0 left-0 bottom-0">
+                <div class="w-screen max-w-md overflow-hidden">
+                    <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+
+                        <!-- slideover header -->
+                        <div class="p-2 border-b border-gray-200 shadow">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h2 class="font-bold">Meshtastic Devices</h2>
+                                    <h3 class="text-sm">Ordered by most popular</h3>
+                                </div>
+                                <div class="my-auto ml-3 flex h-7 items-center">
+                                    <a href="javascript:void(0)" class="rounded-full" @click="isShowingHardwareModels = !isShowingHardwareModels">
+                                        <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M18 6l-12 12"></path>
+                                                <path d="M6 6l12 12"></path>
+                                            </svg>
+                                        </div>
+                                    </a>
                                 </div>
                             </div>
-
-                            <!-- list of hardware models -->
-                            <ul role="list" class="flex-1 divide-y divide-gray-200 overflow-y-auto">
-                                <li v-for="hardwareModel of hardwareModelStats">
-                                    <div class="group relative flex items-center">
-                                        <a href="#" class="block flex-1 px-4 py-2">
-                                            <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
-                                            <div class="relative flex min-w-0 flex-1 items-center">
-                                                <span class="relative inline-block flex-shrink-0 mr-4">
-                                                    <img class="h-20 w-20 rounded object-contain" :src="`/images/devices/${hardwareModel.hardware_model_name}.png`" alt="" onerror="if(this.src != 'https://placehold.co/512x512?text=No+Image') this.src = 'https://placehold.co/512x512?text=No+Image';">
-                                                </span>
-                                                <div class="truncate">
-                                                    <p class="truncate text-sm font-medium text-gray-900">{{ hardwareModel.hardware_model_name }}</p>
-                                                    <p class="truncate text-sm text-gray-500">{{ hardwareModel.count }} nodes on the map</p>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
-                                </li>
-                            </ul>
-
                         </div>
+
+                        <!-- list of hardware models -->
+                        <ul role="list" class="flex-1 divide-y divide-gray-200 overflow-y-auto">
+                            <li v-for="hardwareModel of hardwareModelStats">
+                                <div class="group relative flex items-center">
+                                    <a href="#" class="block flex-1 px-4 py-2">
+                                        <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                        <div class="relative flex min-w-0 flex-1 items-center">
+                                            <span class="relative inline-block flex-shrink-0 mr-4">
+                                                <img class="h-20 w-20 rounded object-contain" :src="`/images/devices/${hardwareModel.hardware_model_name}.png`" alt="" onerror="if(this.src != 'https://placehold.co/512x512?text=No+Image') this.src = 'https://placehold.co/512x512?text=No+Image';">
+                                            </span>
+                                            <div class="truncate">
+                                                <p class="truncate text-sm font-medium text-gray-900">{{ hardwareModel.hardware_model_name }}</p>
+                                                <p class="truncate text-sm text-gray-500">{{ hardwareModel.count }} nodes on the map</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+
                     </div>
                 </div>
             </div>
-        </div>
+        </transition>
+
     </div>
 
 </div>
