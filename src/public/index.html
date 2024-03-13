@@ -247,7 +247,7 @@
         },
         methods: {
             loadHardwareModelStats: function() {
-                window.axios.get('/api/v1/stats/hardware').then((response) => {
+                window.axios.get('/api/v1/stats/hardware-models').then((response) => {
                     this.hardwareModelStats = response.data.hardware_model_stats;
                 }).catch((error) => {
                     // do nothing
