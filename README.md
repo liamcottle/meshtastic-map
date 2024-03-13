@@ -5,6 +5,9 @@ A map of all Meshtastic nodes heard via MQTT.
 ## TODO
 
 - show frequency
+- welcome modal
+- not affiliated with meshtastic info
+- donate link
 
 - show connection lines between nodes and the neighbours they have heard directly
 - ui to view realtime events from specific nodes
