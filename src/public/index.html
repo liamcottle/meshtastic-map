@@ -611,7 +611,8 @@
                         + `<br/>SNR: ${neighbour.snr}dB`
                         + `<br/><br/>ID: ${neighbourNode.node_id} -> ${node.node_id}`
                         + `<br/>Hex ID: ${neighbourNode.node_id_hex} -> ${node.node_id_hex}`
-                        + `<br/>Updated: ${moment(new Date(node.neighbour_info.updated_at)).fromNow()}`;
+                        + `<br/>Updated: ${moment(new Date(node.neighbour_info.updated_at)).fromNow()}`
+                        + `<br/><br/><span class="text-red-500">Note: Some of these super long distance 'Neighbours' don't seem right...</span>`
 
                     line.bindTooltip(tooltip, {
                         sticky: true,
