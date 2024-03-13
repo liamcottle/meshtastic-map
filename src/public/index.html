@@ -580,15 +580,20 @@
                     return;
                 }
 
+                // get battery metrics
+                const deviceMetrics = this.selectedNodeDeviceMetrics.filter((deviceMetric) => {
+                    return deviceMetric.battery_level != null;
+                });
+
                 new window.Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                        labels: deviceMetrics.map((deviceMetric) => {
                             return new Date(deviceMetric.created_at).toLocaleTimeString();
                         }),
                         datasets: [{
                             label: 'Battery Level',
-                            data: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                            data: deviceMetrics.map((deviceMetric) => {
                                 return deviceMetric.battery_level;
                             }),
                             borderColor: '#22c55e',
@@ -638,15 +643,20 @@
                     return;
                 }
 
+                // get voltage metrics
+                const voltageMetrics = this.selectedNodeDeviceMetrics.filter((deviceMetric) => {
+                    return deviceMetric.voltage != null;
+                });
+
                 new window.Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                        labels: voltageMetrics.map((deviceMetric) => {
                             return new Date(deviceMetric.created_at).toLocaleTimeString();
                         }),
                         datasets: [{
                             label: 'Voltage',
-                            data: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                            data: voltageMetrics.map((deviceMetric) => {
                                 return deviceMetric.voltage;
                             }),
                             borderColor: '#22c55e',
@@ -696,15 +706,20 @@
                     return;
                 }
 
+                // get channel utilization metrics
+                const channelUtilizationMetrics = this.selectedNodeDeviceMetrics.filter((deviceMetric) => {
+                    return deviceMetric.channel_utilization != null;
+                });
+
                 new window.Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                        labels: channelUtilizationMetrics.map((deviceMetric) => {
                             return new Date(deviceMetric.created_at).toLocaleTimeString();
                         }),
                         datasets: [{
                             label: 'Channel Utilization',
-                            data: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                            data: channelUtilizationMetrics.map((deviceMetric) => {
                                 return deviceMetric.channel_utilization;
                             }),
                             borderColor: '#22c55e',
@@ -754,15 +769,20 @@
                     return;
                 }
 
+                // get air util tx metrics
+                const airUtilTxMetrics = this.selectedNodeDeviceMetrics.filter((deviceMetric) => {
+                    return deviceMetric.air_util_tx != null;
+                });
+
                 new window.Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                        labels: airUtilTxMetrics.map((deviceMetric) => {
                             return new Date(deviceMetric.created_at).toLocaleTimeString();
                         }),
                         datasets: [{
                             label: 'Air Util Tx',
-                            data: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                            data: airUtilTxMetrics.map((deviceMetric) => {
                                 return deviceMetric.air_util_tx;
                             }),
                             borderColor: '#22c55e',
