@@ -223,15 +223,34 @@ client.on("message", async (topic, message) => {
 
                 // create device metric
                 try {
-                    await prisma.deviceMetric.create({
-                        data: {
+
+                    // find an existing metric with duplicate information created in the last 15 seconds
+                    const existingDuplicateDeviceMetric = await prisma.deviceMetric.findFirst({
+                        where: {
                             node_id: envelope.packet.from,
                             battery_level: data.battery_level,
                             voltage: data.voltage,
                             channel_utilization: data.channel_utilization,
                             air_util_tx: data.air_util_tx,
-                        },
-                    });
+                            created_at: {
+                                gte: new Date(Date.now() - 15000), // created in the last 15 seconds
+                            },
+                        }
+                    })
+
+                    // create metric if no duplicates found
+                    if(!existingDuplicateDeviceMetric){
+                        await prisma.deviceMetric.create({
+                            data: {
+                                node_id: envelope.packet.from,
+                                battery_level: data.battery_level,
+                                voltage: data.voltage,
+                                channel_utilization: data.channel_utilization,
+                                air_util_tx: data.air_util_tx,
+                            },
+                        });
+                    }
+
                 } catch (e) {
                     console.error(e);
                 }
