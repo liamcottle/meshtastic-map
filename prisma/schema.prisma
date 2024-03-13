@@ -39,6 +39,33 @@ model Node {
   @@map("nodes")
 }
 
+model MapReport {
+  id               BigInt @id @default(autoincrement())
+  node_id          BigInt
+  long_name        String
+  short_name       String
+  role             Int
+  hardware_model   Int
+  firmware_version String
+
+  region                 Int?
+  modem_preset           Int?
+  has_default_channel    Boolean?
+  latitude               Int?
+  longitude              Int?
+  altitude               Int?
+  position_precision     Int?
+  num_online_local_nodes Int?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@index(created_at)
+  @@index(updated_at)
+  @@index(node_id)
+  @@map("map_reports")
+}
+
 model NeighbourInfo {
   id                           BigInt @id @default(autoincrement())
   node_id                      BigInt

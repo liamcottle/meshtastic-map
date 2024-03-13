@@ -19,6 +19,7 @@ root.resolvePath = (origin, target) => path.join(__dirname, "protos", target);
 root.loadSync('meshtastic/mqtt.proto');
 const Data = root.lookupType("Data");
 const ServiceEnvelope = root.lookupType("ServiceEnvelope");
+const MapReport = root.lookupType("MapReport");
 const NeighborInfo = root.lookupType("NeighborInfo");
 const Position = root.lookupType("Position");
 const RouteDiscovery = root.lookupType("RouteDiscovery");
@@ -94,16 +95,20 @@ client.on("message", async (topic, message) => {
             }
         }
 
+        const logKnownPacketTypes = false;
+        const logUnknownPacketTypes = false;
         const portnum = envelope.packet?.decoded?.portnum;
 
         if(portnum === 3) {
 
             const position = Position.decode(envelope.packet.decoded.payload);
 
-            console.log("POSITION_APP", {
-                from: envelope.packet.from.toString(16),
-                position: position,
-            });
+            if(logKnownPacketTypes){
+                console.log("POSITION_APP", {
+                    from: envelope.packet.from.toString(16),
+                    position: position,
+                });
+            }
 
             // update node position in db
             if(position.latitudeI != null && position.longitudeI){
@@ -129,10 +134,12 @@ client.on("message", async (topic, message) => {
 
             const user = User.decode(envelope.packet.decoded.payload);
 
-            console.log("NODEINFO_APP", {
-                from: envelope.packet.from.toString(16),
-                user: user,
-            });
+            if(logKnownPacketTypes) {
+                console.log("NODEINFO_APP", {
+                    from: envelope.packet.from.toString(16),
+                    user: user,
+                });
+            }
 
             // create or update node in db
             try {
@@ -166,10 +173,12 @@ client.on("message", async (topic, message) => {
 
             const neighbourInfo = NeighborInfo.decode(envelope.packet.decoded.payload);
 
-            console.log("NEIGHBORINFO_APP", {
-                from: envelope.packet.from.toString(16),
-                neighbour_info: neighbourInfo,
-            });
+            if(logKnownPacketTypes) {
+                console.log("NEIGHBORINFO_APP", {
+                    from: envelope.packet.from.toString(16),
+                    neighbour_info: neighbourInfo,
+                });
+            }
 
             try {
                 await prisma.neighbourInfo.create({
@@ -194,10 +203,12 @@ client.on("message", async (topic, message) => {
 
             const telemetry = Telemetry.decode(envelope.packet.decoded.payload);
 
-            console.log("TELEMETRY_APP", {
-                from: envelope.packet.from.toString(16),
-                telemetry: telemetry,
-            });
+            if(logKnownPacketTypes) {
+                console.log("TELEMETRY_APP", {
+                    from: envelope.packet.from.toString(16),
+                    telemetry: telemetry,
+                });
+            }
 
             // data to update
             const data = {};
@@ -230,10 +241,12 @@ client.on("message", async (topic, message) => {
 
             const routeDiscovery = RouteDiscovery.decode(envelope.packet.decoded.payload);
 
-            console.log("TRACEROUTE_APP", {
-                from: envelope.packet.from.toString(16),
-                route_discovery: routeDiscovery,
-            });
+            if(logKnownPacketTypes) {
+                console.log("TRACEROUTE_APP", {
+                    from: envelope.packet.from.toString(16),
+                    route_discovery: routeDiscovery,
+                });
+            }
 
             try {
                 await prisma.traceRoute.create({
@@ -248,8 +261,46 @@ client.on("message", async (topic, message) => {
 
         }
 
+        else if(portnum === 73) {
+
+            const mapReport = MapReport.decode(envelope.packet.decoded.payload);
+
+            if(logKnownPacketTypes) {
+                console.log("MAP_REPORT_APP", {
+                    from: envelope.packet.from.toString(16),
+                    map_report: mapReport,
+                });
+            }
+
+            try {
+                await prisma.mapReport.create({
+                    data: {
+                        node_id: envelope.packet.from,
+                        long_name: mapReport.longName,
+                        short_name: mapReport.shortName,
+                        role: mapReport.role,
+                        hardware_model: mapReport.hwModel,
+                        firmware_version: mapReport.firmwareVersion,
+                        region: mapReport.region,
+                        modem_preset: mapReport.modemPreset,
+                        has_default_channel: mapReport.hasDefaultChannel,
+                        latitude: mapReport.latitudeI,
+                        longitude: mapReport.longitudeI,
+                        altitude: mapReport.altitude,
+                        position_precision: mapReport.positionPrecision,
+                        num_online_local_nodes: mapReport.numOnlineLocalNodes,
+                    },
+                });
+            } catch (e) {
+                console.error(e);
+            }
+
+        }
+
         else {
-            // console.log(portnum, envelope);
+            if(logUnknownPacketTypes){
+                console.log(portnum, envelope);
+            }
         }
 
     } catch(e) {
