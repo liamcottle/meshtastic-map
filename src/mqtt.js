@@ -215,10 +215,27 @@ client.on("message", async (topic, message) => {
 
             // handle device metrics
             if(telemetry.deviceMetrics){
+
                 data.battery_level = telemetry.deviceMetrics.batteryLevel !== 0 ? telemetry.deviceMetrics.batteryLevel : null;
                 data.voltage = telemetry.deviceMetrics.voltage !== 0 ? telemetry.deviceMetrics.voltage : null;
                 data.channel_utilization = telemetry.deviceMetrics.channelUtilization !== 0 ? telemetry.deviceMetrics.channelUtilization : null;
                 data.air_util_tx = telemetry.deviceMetrics.airUtilTx !== 0 ? telemetry.deviceMetrics.airUtilTx : null;
+
+                // create device metric
+                try {
+                    await prisma.deviceMetric.create({
+                        data: {
+                            node_id: envelope.packet.from,
+                            battery_level: data.battery_level,
+                            voltage: data.voltage,
+                            channel_utilization: data.channel_utilization,
+                            air_util_tx: data.air_util_tx,
+                        },
+                    });
+                } catch (e) {
+                    console.error(e);
+                }
+
             }
 
             // update node telemetry in db

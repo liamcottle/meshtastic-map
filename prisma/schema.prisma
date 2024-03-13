@@ -82,6 +82,24 @@ model NeighbourInfo {
   @@map("neighbour_infos")
 }
 
+model DeviceMetric {
+  id      BigInt @id @default(autoincrement())
+  node_id BigInt
+
+  battery_level       Int?
+  voltage             Decimal?
+  channel_utilization Decimal?
+  air_util_tx         Decimal?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@index(created_at)
+  @@index(updated_at)
+  @@index(node_id)
+  @@map("device_metrics")
+}
+
 model TraceRoute {
   id      BigInt @id @default(autoincrement())
   node_id BigInt
