@@ -36,6 +36,7 @@ model Node {
 
   @@index(created_at)
   @@index(updated_at)
+  @@index(node_id)
   @@map("nodes")
 }
 
@@ -77,6 +78,7 @@ model NeighbourInfo {
 
   @@index(created_at)
   @@index(updated_at)
+  @@index(node_id)
   @@map("neighbour_infos")
 }
 
