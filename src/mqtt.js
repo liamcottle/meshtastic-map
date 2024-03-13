@@ -19,6 +19,7 @@ root.resolvePath = (origin, target) => path.join(__dirname, "protos", target);
 root.loadSync('meshtastic/mqtt.proto');
 const Data = root.lookupType("Data");
 const ServiceEnvelope = root.lookupType("ServiceEnvelope");
+const NeighborInfo = root.lookupType("NeighborInfo");
 const Position = root.lookupType("Position");
 const Telemetry = root.lookupType("Telemetry");
 const User = root.lookupType("User");
@@ -152,6 +153,35 @@ client.on("message", async (topic, message) => {
                         hardware_model: user.hwModel,
                         is_licensed: user.isLicensed === true,
                         role: user.role,
+                    },
+                });
+            } catch (e) {
+                console.error(e);
+            }
+
+        }
+
+        if(portnum === 71) {
+
+            const neighbourInfo = NeighborInfo.decode(envelope.packet.decoded.payload);
+
+            console.log("NEIGHBORINFO_APP", {
+                from: envelope.packet.from.toString(16),
+                // envelope: envelope,
+                neighbour_info: neighbourInfo,
+            });
+
+            try {
+                await prisma.neighbourInfo.create({
+                    data: {
+                        node_id: envelope.packet.from,
+                        node_broadcast_interval_secs: neighbourInfo.nodeBroadcastIntervalSecs,
+                        neighbours: neighbourInfo.neighbors.map((neighbour) => {
+                            return {
+                                node_id: neighbour.nodeId,
+                                snr: neighbour.snr,
+                            };
+                        }),
                     },
                 });
             } catch (e) {

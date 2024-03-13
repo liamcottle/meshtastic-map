@@ -38,3 +38,17 @@ model Node {
   @@index(updated_at)
   @@map("nodes")
 }
+
+model NeighbourInfo {
+  id                           BigInt @id @default(autoincrement())
+  node_id                      BigInt
+  node_broadcast_interval_secs Int
+  neighbours                   Json
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@index(created_at)
+  @@index(updated_at)
+  @@map("neighbour_infos")
+}
