@@ -54,15 +54,26 @@ app.get('/api/v1/nodes', async (req, res) => {
         // get nodes from db
         const nodes = await prisma.node.findMany();
 
+        const nodesWithNeighbourInfo = [];
+        for(const node of nodes){
+            nodesWithNeighbourInfo.push({
+                ...node,
+                node_id_hex: "!" + node.node_id.toString(16),
+                hardware_model_name: HardwareModel.valuesById[node.hardware_model] ?? "UNKNOWN",
+                role_name: Role.valuesById[node.role] ?? "UNKNOWN",
+                neighbour_info: await prisma.neighbourInfo.findFirst({
+                    where: {
+                        node_id: node.node_id,
+                    },
+                    orderBy: {
+                        createdAt: 'desc',
+                    },
+                }),
+            })
+        }
+
         res.json({
-            nodes: nodes.map((node) => {
-                return {
-                    ...node,
-                    node_id_hex: "!" + node.node_id.toString(16),
-                    hardware_model_name: HardwareModel.valuesById[node.hardware_model] ?? "UNKNOWN",
-                    role_name: Role.valuesById[node.role] ?? "UNKNOWN",
-                }
-            }),
+            nodes: nodesWithNeighbourInfo,
         });
 
     } catch(err) {

@@ -368,6 +368,18 @@
 
     }
 
+    function findNodeById(id) {
+
+        // find node by id
+        var node = nodes.find((node) => node.node_id.toString() === id.toString());
+        if(node){
+            return node;
+        }
+
+        return null;
+
+    }
+
     function findNodeMarkerById(id) {
 
         // find node marker by id
@@ -553,6 +565,62 @@
                 nodes.push(node);
                 nodeMarkers[node.node_id] = marker;
 
+            }
+
+        }
+
+        for(var node of updatedNodes){
+
+            // find current node
+            const currentNode = findNodeMarkerById(node.node_id);
+            if(!currentNode){
+                continue;
+            }
+
+            // add node connections
+            const neighbours = node.neighbour_info?.neighbours ?? [];
+            console.log(neighbours);
+            for(const neighbour of neighbours){
+
+                // fixme: skipping zero snr? saw some crazy long neighbours with zero snr...
+                if(neighbour.snr === 0){
+                    continue;
+                }
+
+                const neighbourNode = findNodeById(neighbour.node_id);
+                if(!neighbourNode){
+                    continue;
+                }
+
+                const neighbourNodeMarker = findNodeMarkerById(neighbour.node_id);
+                if(neighbourNodeMarker){
+
+                    const line = L.polyline([
+                        currentNode.getLatLng(),
+                        neighbourNodeMarker.getLatLng(),
+                    ], {
+                        color: '#2563eb',
+                        opacity: 0.5,
+                    }).addTo(connectionsLayerGroup);
+
+                    const tooltip = `<b>${node.long_name}</b> heard <b>${neighbourNode.long_name}</b>`
+                        + `<br/>SNR: ${neighbour.snr}dB`
+                        + `<br/><br/>ID: ${neighbourNode.node_id} -> ${node.node_id}`
+                        + `<br/>Hex ID: ${neighbourNode.node_id_hex} -> ${node.node_id_hex}`
+                        + `<br/>Updated: ${moment(new Date(node.neighbour_info.updated_at)).fromNow()}`;
+
+                    line.bindTooltip(tooltip, {
+                        sticky: true,
+                        opacity: 1,
+                        interactive: true,
+                    })
+                    .bindPopup(tooltip)
+                    .on('click', function(event) {
+                        // close tooltip on click to prevent tooltip and popup showing at same time
+                        event.target.closeTooltip();
+                    });
+
+                }
             }
 
         }
