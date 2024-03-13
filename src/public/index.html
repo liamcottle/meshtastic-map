@@ -686,29 +686,6 @@
 
     }
 
-    function toggleFavourites() {
-
-        var favourites = document.getElementById("favourites");
-        var favouritesInner = document.getElementById("favourites-inner");
-
-        favourites.classList.toggle("hidden");
-        favouritesInner.classList.toggle("translate-x-full");
-        favouritesInner.classList.toggle("translate-x-0");
-
-    }
-
-    function timeAgo(timestamp) {
-
-        // default if invalid timestamp
-        if(!timestamp){
-            return "-";
-        }
-
-        // time from now
-        return moment(timestamp * 1000).fromNow();
-
-    }
-
     // parse url params
     var queryParams = new URLSearchParams(location.search);
     var queryNodeId = queryParams.get('node_id');
