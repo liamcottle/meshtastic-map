@@ -66,7 +66,7 @@ app.get('/api/v1/nodes', async (req, res) => {
                         node_id: node.node_id,
                     },
                     orderBy: {
-                        createdAt: 'desc',
+                        created_at: 'desc',
                     },
                 }),
             })
