@@ -520,7 +520,8 @@
 
                 var icon = iconOnline; // todo status
 
-                var tooltip = `<b>${node.long_name}</b>` +
+                var tooltip = `<img class="mb-4 w-32 mx-auto" src="/images/devices/${node.hardware_model_name}.png" onerror="this.classList.add('hidden')"/>` +
+                    `<b>${node.long_name}</b>` +
                     `<br/>Short Name: ${node.short_name}` +
                     `<br/><br/>Role: ${node.role_name}` +
                     `<br/>Hardware: ${node.hardware_model_name}`;
