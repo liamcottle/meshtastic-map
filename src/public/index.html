@@ -246,20 +246,286 @@
 
     </div>
 
+    <!-- node info sidebar -->
+    <div class="relative z-sidebar" role="dialog" aria-modal="true">
+
+        <!-- overlay -->
+        <transition
+                enter-active-class="transition-opacity duration-300 ease-linear"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition-opacity duration-300 ease-linear"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0">
+            <div v-show="selectedNode != null" @click="selectedNode = null" class="fixed inset-0 bg-gray-900 bg-opacity-75"></div>
+        </transition>
+
+        <!-- sidebar -->
+        <transition
+                enter-active-class="transition duration-300 ease-in-out transform"
+                enter-from-class="-translate-x-full"
+                enter-to-class="translate-x-0"
+                leave-active-class="transition duration-300 ease-in-out transform"
+                leave-from-class="translate-x-0"
+                leave-to-class="-translate-x-full">
+            <div v-show="selectedNode != null" class="fixed top-0 left-0 bottom-0">
+                <div v-if="selectedNode != null" class="w-screen max-w-md overflow-hidden">
+                    <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+
+                        <!-- slideover header -->
+                        <div class="p-2 border-b border-gray-200 shadow">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h2 class="font-bold">Node Info</h2>
+                                    <h3 class="text-sm">{{ selectedNode.long_name }}</h3>
+                                </div>
+                                <div class="my-auto ml-3 flex h-7 items-center">
+                                    <a href="javascript:void(0)" class="rounded-full" @click="selectedNode = null">
+                                        <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M18 6l-12 12"></path>
+                                                <path d="M6 6l12 12"></path>
+                                            </svg>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col my-2">
+                            <div class="mx-auto">
+                                <img class="h-48 w-48 rounded object-contain" :src="`/images/devices/${selectedNode.hardware_model_name}.png`" alt="" onerror="if(this.src != 'https://placehold.co/512x512?text=No+Image') this.src = 'https://placehold.co/512x512?text=No+Image';">
+                            </div>
+                        </div>
+
+                        <!-- details -->
+                        <div>
+                            <div class="bg-gray-200 p-2 font-semibold">Details</div>
+                            <ul role="list" class="flex-1 divide-y divide-gray-200 overflow-y-auto">
+
+                                <li>
+                                    <div class="group relative flex items-center">
+                                        <div class="block flex-1 px-4 py-2">
+                                            <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                            <div class="relative flex min-w-0 flex-1 items-center">
+                                                <div class="truncate">
+                                                    <p class="truncate text-sm font-medium text-gray-900">Long Name</p>
+                                                    <p class="truncate text-sm text-gray-500">{{ selectedNode.long_name }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="group relative flex items-center">
+                                        <div class="block flex-1 px-4 py-2">
+                                            <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                            <div class="relative flex min-w-0 flex-1 items-center">
+                                                <div class="truncate">
+                                                    <p class="truncate text-sm font-medium text-gray-900">Short Name</p>
+                                                    <p class="truncate text-sm text-gray-500">{{ selectedNode.short_name }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="group relative flex items-center">
+                                        <div class="block flex-1 px-4 py-2">
+                                            <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                            <div class="relative flex min-w-0 flex-1 items-center">
+                                                <div class="truncate">
+                                                    <p class="truncate text-sm font-medium text-gray-900">Role</p>
+                                                    <p class="truncate text-sm text-gray-500">{{ selectedNode.role_name }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="group relative flex items-center">
+                                        <div class="block flex-1 px-4 py-2">
+                                            <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                            <div class="relative flex min-w-0 flex-1 items-center">
+                                                <div class="truncate">
+                                                    <p class="truncate text-sm font-medium text-gray-900">Hardware</p>
+                                                    <p class="truncate text-sm text-gray-500">{{ selectedNode.hardware_model_name }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </div>
+
+                        <!-- telemetry -->
+                        <div>
+                            <div class="bg-gray-200 p-2 font-semibold">Telemetry</div>
+                            <ul role="list" class="flex-1 divide-y divide-gray-200 overflow-y-auto">
+
+                                <li>
+                                    <div class="group relative flex items-center">
+                                        <div class="block flex-1 px-4 py-2">
+                                            <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                            <div class="relative flex min-w-0 flex-1 items-center">
+                                                <div class="truncate">
+                                                    <p class="truncate text-sm font-medium text-gray-900">Battery Level</p>
+                                                    <p class="truncate text-sm text-gray-500">
+                                                        <span v-if="selectedNode.battery_level > 100">Plugged In</span>
+                                                        <span v-else>{{ selectedNode.battery_level }}%</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="group relative flex items-center">
+                                        <div class="block flex-1 px-4 py-2">
+                                            <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                            <div class="relative flex min-w-0 flex-1 items-center">
+                                                <div class="truncate">
+                                                    <p class="truncate text-sm font-medium text-gray-900">Voltage</p>
+                                                    <p class="truncate text-sm text-gray-500">{{ Number(selectedNode.voltage).toFixed(2) }}V</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="group relative flex items-center">
+                                        <div class="block flex-1 px-4 py-2">
+                                            <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                            <div class="relative flex min-w-0 flex-1 items-center">
+                                                <div class="truncate">
+                                                    <p class="truncate text-sm font-medium text-gray-900">Channel Utilization</p>
+                                                    <p class="truncate text-sm text-gray-500">{{ Number(selectedNode.channel_utilization).toFixed(2) }}%</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="group relative flex items-center">
+                                        <div class="block flex-1 px-4 py-2">
+                                            <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                            <div class="relative flex min-w-0 flex-1 items-center">
+                                                <div class="truncate">
+                                                    <p class="truncate text-sm font-medium text-gray-900">Air Util Tx</p>
+                                                    <p class="truncate text-sm text-gray-500">{{ Number(selectedNode.air_util_tx).toFixed(2) }}%</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </div>
+
+                        <!-- other -->
+                        <div>
+                            <div class="bg-gray-200 p-2 font-semibold">Other</div>
+                            <ul role="list" class="flex-1 divide-y divide-gray-200 overflow-y-auto">
+
+                                <li>
+                                    <div class="group relative flex items-center">
+                                        <div class="block flex-1 px-4 py-2">
+                                            <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                            <div class="relative flex min-w-0 flex-1 items-center">
+                                                <div class="truncate">
+                                                    <p class="truncate text-sm font-medium text-gray-900">ID</p>
+                                                    <p class="truncate text-sm text-gray-500">{{ selectedNode.node_id }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="group relative flex items-center">
+                                        <div class="block flex-1 px-4 py-2">
+                                            <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                            <div class="relative flex min-w-0 flex-1 items-center">
+                                                <div class="truncate">
+                                                    <p class="truncate text-sm font-medium text-gray-900">Hex ID</p>
+                                                    <p class="truncate text-sm text-gray-500">{{ selectedNode.node_id_hex }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="group relative flex items-center">
+                                        <div class="block flex-1 px-4 py-2">
+                                            <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                            <div class="relative flex min-w-0 flex-1 items-center">
+                                                <div class="truncate">
+                                                    <p class="truncate text-sm font-medium text-gray-900">First Seen</p>
+                                                    <p class="truncate text-sm text-gray-500">{{ moment(new Date(selectedNode.created_at)).fromNow() }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="group relative flex items-center">
+                                        <div class="block flex-1 px-4 py-2">
+                                            <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                            <div class="relative flex min-w-0 flex-1 items-center">
+                                                <div class="truncate">
+                                                    <p class="truncate text-sm font-medium text-gray-900">Last Seen</p>
+                                                    <p class="truncate text-sm text-gray-500">{{ moment(new Date(selectedNode.updated_at)).fromNow() }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+    </div>
+
 </div>
 
 <script>
     Vue.createApp({
         data() {
             return {
+
                 isShowingHardwareModels: false,
                 hardwareModelStats: null,
+
+                selectedNode: null,
+
+                moment: window.moment,
+
             };
         },
         mounted: function() {
 
             // load data
             this.loadHardwareModelStats();
+
+            // handle node callback from outside of vue
+            window._onNodeClick = (node) => {
+                this.selectedNode = node;
+            };
 
         },
         methods: {
@@ -596,12 +862,25 @@
                     .bindTooltip(tooltip, {
                         interactive: true,
                     })
-                    .bindPopup(tooltip)
                     .on('click', function(event) {
                         // close tooltip on click to prevent tooltip and popup showing at same time
                         event.target.closeTooltip();
                     })
                     .addTo(nodesLayerGroup);
+
+                // show node info sidebar when clicking node marker
+                marker.on("click", function(event) {
+
+                    // find node
+                    const node = findNodeById(event.target.options.tagName);
+                    if(!node){
+                        return;
+                    }
+
+                    // fire callback to vuejs handler
+                    window._onNodeClick(node);
+
+                });
 
                 // add to cache
                 nodes.push(node);
