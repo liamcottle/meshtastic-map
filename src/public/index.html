@@ -108,6 +108,7 @@
                 </div>
             </div>
             <div class="flex my-auto ml-auto mr-0 sm:mr-2 space-x-1 sm:space-x-2">
+                <div id="stats-label" class="my-auto mr-2 text-gray-700 hidden sm:inline-block"></div>
                 <a href="#" class="tooltip rounded-full" onclick="searchNodes()">
                     <div id="search-button" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
                         <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -491,6 +492,9 @@
 
         // clear nodes cache
         nodes = [];
+
+        // update stats
+        document.getElementById("stats-label").textContent = `${updatedNodes.length} nodes`;
 
         // add nodes
         for(var node of updatedNodes){
