@@ -24,6 +24,10 @@
     <!-- moment -->
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
 
+    <!-- vuejs -->
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <style>
 
         .icon-online {
@@ -84,160 +88,174 @@
 
 </head>
 <body class="h-full bg-gray-200">
-<div class="flex flex-col h-full w-full overflow-hidden">
-    <div class="flex flex-col h-full">
+<div id="app">
 
-        <!-- header -->
-        <div class="flex bg-white p-2 border-gray-300 border-b">
-            <div class="hidden sm:block my-auto mr-3">
-                <img class="w-10 h-10 rounded" src="icon.png"/>
-            </div>
-            <div class="my-auto">
-                <div class="font-bold">Meshtastic Map</div>
-                <div class="text-sm">
-                    <div class="hidden sm:inline-block">
-                        <span>Created by</span>
-                        <a class="link" target="_blank" href="https://liamcottle.com">Liam Cottle</a>
-                        <a class="link" target="_blank" href="https://www.qrz.com/db/zl2dev">ZL2DEV</a>
-                    </div>
-                    <div class="inline-block sm:hidden">
-                        <span>Created by</span>
-                        <a class="link" target="_blank" href="https://liamcottle.com">Liam</a>
-                        <a class="link" target="_blank" href="https://www.qrz.com/db/zl2dev">ZL2DEV</a>
+    <div class="flex flex-col h-full w-full overflow-hidden">
+        <div class="flex flex-col h-full">
+
+            <!-- header -->
+            <div class="flex bg-white p-2 border-gray-300 border-b">
+                <div class="hidden sm:block my-auto mr-3">
+                    <img class="w-10 h-10 rounded" src="icon.png"/>
+                </div>
+                <div class="my-auto">
+                    <div class="font-bold">Meshtastic Map</div>
+                    <div class="text-sm">
+                        <div class="hidden sm:inline-block space-x-1">
+                            <span>Created by</span>
+                            <a class="link" target="_blank" href="https://liamcottle.com">Liam Cottle</a>
+                            <a class="link" target="_blank" href="https://www.qrz.com/db/zl2dev">ZL2DEV</a>
+                        </div>
+                        <div class="inline-block sm:hidden space-x-1">
+                            <span>Created by</span>
+                            <a class="link" target="_blank" href="https://liamcottle.com">Liam</a>
+                            <a class="link" target="_blank" href="https://www.qrz.com/db/zl2dev">ZL2DEV</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="flex my-auto ml-auto mr-0 sm:mr-2 space-x-1 sm:space-x-2">
-                <div id="stats-label" class="my-auto mr-2 text-gray-700 hidden sm:inline-block"></div>
-                <a href="#" class="tooltip rounded-full" onclick="searchNodes()">
-                    <div id="search-button" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
-                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path>
-                            <path d="M21 21l-6 -6"></path>
-                        </svg>
-                    </div>
-                    <div class="hidden sm:block">
-                        <span class="tooltip-text">Search</span>
-                    </div>
-                </a>
-                <!-- hide favourites for now
-                <a href="#" class="tooltip rounded-full" onclick="toggleFavourites()">
-                    <div id="favourites-button" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
-                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z"></path>
-                        </svg>
-                    </div>
-                    <div class="hidden sm:block">
-                        <span class="tooltip-text">Favourites</span>
-                    </div>
-                </a>
-                -->
-                <a href="#" class="tooltip rounded-full" onclick="goToRandomNode()">
-                    <div id="random-button" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
-                        <svg class="w-6 h-6"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <path d="M18 4l3 3l-3 3"></path>
-                            <path d="M18 20l3 -3l-3 -3"></path>
-                            <path d="M3 7h3a5 5 0 0 1 5 5a5 5 0 0 0 5 5h5"></path>
-                            <path d="M21 7h-5a4.978 4.978 0 0 0 -3 1m-4 8a4.984 4.984 0 0 1 -3 1h-3"></path>
-                        </svg>
-                    </div>
-                    <div class="hidden sm:block">
-                        <span class="tooltip-text">Random</span>
-                    </div>
-                </a>
-                <a href="#" class="tooltip rounded-full" onclick="reload()">
-                    <div id="reload-button" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
-                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <path d="M19.933 13.041a8 8 0 1 1 -9.925 -8.788c3.899 -1 7.935 1.007 9.425 4.747"></path>
-                            <path d="M20 4v5h-5"></path>
-                        </svg>
-                    </div>
-                    <div class="hidden sm:block">
-                        <span class="tooltip-text">Reload</span>
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <!-- map -->
-        <div id="map" style="width:100%;height:100%;"></div>
-
-    </div>
-</div>
-
-<!-- favourites slideover -->
-<div id="favourites" class="hidden relative z-sidebar" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
-    <div id="favourites-backdrop" onclick="toggleFavourites()" class="fixed inset-0 bg-gray-900 bg-opacity-50"></div>
-    <div class="fixed top-0 right-0 overflow-hidden">
-        <div class="absolute inset-0 overflow-hidden">
-            <div class="fixed inset-y-0 right-0 flex max-w-full ml-10 sm:ml-16">
-                <div id="favourites-inner" class="translate-x-full pointer-events-auto w-screen max-w-md transform transition ease-in-out duration-500 sm:duration-700">
-                    <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
-
-                        <!-- slideover header -->
-                        <div class="p-4 border-b border-gray-200">
-                            <div class="flex items-start justify-between">
-                                <h2 class="text-base font-semibold leading-6 text-gray-900" id="slide-over-title">Favourites</h2>
-                                <div class="ml-3 flex h-7 items-center">
-                                    <a href="#" class="rounded-full" onclick="toggleFavourites()">
-                                        <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
-                                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                <path d="M18 6l-12 12"></path>
-                                                <path d="M6 6l12 12"></path>
-                                            </svg>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
+                <div class="flex my-auto ml-auto mr-0 sm:mr-2 space-x-1 sm:space-x-2">
+                    <div id="stats-label" class="my-auto mr-2 text-gray-700 hidden sm:inline-block"></div>
+                    <a href="#" class="tooltip rounded-full" onclick="searchNodes()">
+                        <div id="search-button" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path>
+                                <path d="M21 21l-6 -6"></path>
+                            </svg>
                         </div>
+                        <div class="hidden sm:block">
+                            <span class="tooltip-text">Search</span>
+                        </div>
+                    </a>
+                    <a @click="isShowingHardwareModels = !isShowingHardwareModels" href="javascript:void(0)" class="tooltip rounded-full">
+                        <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+                            </svg>
+                        </div>
+                        <div class="hidden sm:block">
+                            <span class="tooltip-text">Devices</span>
+                        </div>
+                    </a>
+                    <a href="#" class="tooltip rounded-full" onclick="goToRandomNode()">
+                        <div id="random-button" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                            <svg class="w-6 h-6"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M18 4l3 3l-3 3"></path>
+                                <path d="M18 20l3 -3l-3 -3"></path>
+                                <path d="M3 7h3a5 5 0 0 1 5 5a5 5 0 0 0 5 5h5"></path>
+                                <path d="M21 7h-5a4.978 4.978 0 0 0 -3 1m-4 8a4.984 4.984 0 0 1 -3 1h-3"></path>
+                            </svg>
+                        </div>
+                        <div class="hidden sm:block">
+                            <span class="tooltip-text">Random</span>
+                        </div>
+                    </a>
+                    <a href="#" class="tooltip rounded-full" onclick="reload()">
+                        <div id="reload-button" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M19.933 13.041a8 8 0 1 1 -9.925 -8.788c3.899 -1 7.935 1.007 9.425 4.747"></path>
+                                <path d="M20 4v5h-5"></path>
+                            </svg>
+                        </div>
+                        <div class="hidden sm:block">
+                            <span class="tooltip-text">Reload</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
 
-                        <!-- list of favourites -->
-                        <ul role="list" class="flex-1 divide-y divide-gray-200 overflow-y-auto">
+            <!-- map -->
+            <div id="map" style="width:100%;height:100%;"></div>
 
-                            <!-- !da5c85b8 -->
-                            <li>
-                                <div class="group relative flex items-center">
-                                    <a href="#" onclick="toggleFavourites(); goToNode('!da5c85b8');" class="-m-1 block flex-1 p-4">
-                                        <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
-                                        <div class="relative flex min-w-0 flex-1 items-center">
-                                            <span class="relative inline-block flex-shrink-0">
-                                                <img class="h-10 w-10 rounded-full" src="https://hatscripts.github.io/circle-flags/flags/nz.svg" alt="">
-                                            </span>
-                                            <div class="ml-4 truncate">
-                                                <p class="truncate text-sm font-medium text-gray-900">ZL4NT-E [Mt. Towai Router]</p>
-                                                <p class="truncate text-sm text-gray-500">!da5c85b8 - Wellington, New Zealand</p>
+        </div>
+    </div>
+
+    <!-- hardware models sidebar -->
+    <div class="relative z-sidebar" :class="{ 'hidden': !isShowingHardwareModels }" role="dialog" aria-modal="true">
+        <div @click="isShowingHardwareModels = !isShowingHardwareModels" class="fixed inset-0 bg-gray-900 bg-opacity-50"></div>
+        <div class="fixed top-0 left-0 overflow-hidden">
+            <div class="absolute inset-0 overflow-hidden">
+                <div class="fixed inset-y-0 left-0 flex max-w-full mr-10 sm:mr-16">
+                    <div class="pointer-events-auto w-screen max-w-md transform transition ease-in-out duration-500 sm:duration-700" :class="{ 'translate-x-0': isShowingHardwareModels, 'translate-x-full': !isShowingHardwareModels }">
+                        <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+
+                            <!-- slideover header -->
+                            <div class="p-2 border-b border-gray-200 shadow">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <h2 class="font-bold">Meshtastic Devices</h2>
+                                        <h3 class="text-sm">Ordered by most popular</h3>
+                                    </div>
+                                    <div class="my-auto ml-3 flex h-7 items-center">
+                                        <a href="javascript:void(0)" class="rounded-full" @click="isShowingHardwareModels = !isShowingHardwareModels">
+                                            <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                    <path d="M18 6l-12 12"></path>
+                                                    <path d="M6 6l12 12"></path>
+                                                </svg>
                                             </div>
-                                        </div>
-                                    </a>
+                                        </a>
+                                    </div>
                                 </div>
-                            </li>
-
-                        </ul>
-
-                        <!-- info -->
-                        <div class="flex text-small text-gray-500 p-3">
-                            <div class="my-auto mr-2">
-                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                    <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
-                                    <path d="M12 9h.01"></path>
-                                    <path d="M11 12h1v4h1"></path>
-                                </svg>
                             </div>
-                            <div class="my-auto">These will eventually be customizable.</div>
-                        </div>
 
+                            <!-- list of hardware models -->
+                            <ul role="list" class="flex-1 divide-y divide-gray-200 overflow-y-auto">
+                                <li v-for="hardwareModel of hardwareModelStats">
+                                    <div class="group relative flex items-center">
+                                        <a href="#" class="block flex-1 px-4 py-2">
+                                            <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
+                                            <div class="relative flex min-w-0 flex-1 items-center">
+                                                <span class="relative inline-block flex-shrink-0 mr-4">
+                                                    <img class="h-20 w-20 rounded object-contain" :src="`/images/devices/${hardwareModel.hardware_model_name}.png`" alt="" onerror="if(this.src != 'https://placehold.co/512x512?text=No+Image') this.src = 'https://placehold.co/512x512?text=No+Image';">
+                                                </span>
+                                                <div class="truncate">
+                                                    <p class="truncate text-sm font-medium text-gray-900">{{ hardwareModel.hardware_model_name }}</p>
+                                                    <p class="truncate text-sm text-gray-500">{{ hardwareModel.count }} nodes on the map</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 </div>
+
+<script>
+    Vue.createApp({
+        data() {
+            return {
+                isShowingHardwareModels: false,
+                hardwareModelStats: null,
+            };
+        },
+        mounted: function() {
+
+            // load data
+            this.loadHardwareModelStats();
+
+        },
+        methods: {
+            loadHardwareModelStats: function() {
+                window.axios.get('/api/v1/stats/hardware').then((response) => {
+                    this.hardwareModelStats = response.data.hardware_model_stats;
+                }).catch((error) => {
+                    // do nothing
+                });
+            },
+        },
+    }).mount('#app');
+</script>
 
 <script>
 
