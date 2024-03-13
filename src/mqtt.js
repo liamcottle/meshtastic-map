@@ -21,6 +21,7 @@ const Data = root.lookupType("Data");
 const ServiceEnvelope = root.lookupType("ServiceEnvelope");
 const NeighborInfo = root.lookupType("NeighborInfo");
 const Position = root.lookupType("Position");
+const RouteDiscovery = root.lookupType("RouteDiscovery");
 const Telemetry = root.lookupType("Telemetry");
 const User = root.lookupType("User");
 
@@ -124,7 +125,7 @@ client.on("message", async (topic, message) => {
 
         }
 
-        if(portnum === 4) {
+        else if(portnum === 4) {
 
             const user = User.decode(envelope.packet.decoded.payload);
 
@@ -161,7 +162,7 @@ client.on("message", async (topic, message) => {
 
         }
 
-        if(portnum === 71) {
+        else if(portnum === 71) {
 
             const neighbourInfo = NeighborInfo.decode(envelope.packet.decoded.payload);
 
@@ -189,7 +190,7 @@ client.on("message", async (topic, message) => {
 
         }
 
-        if(portnum === 67) {
+        else if(portnum === 67) {
 
             const telemetry = Telemetry.decode(envelope.packet.decoded.payload);
 
@@ -223,6 +224,32 @@ client.on("message", async (topic, message) => {
                 }
             }
 
+        }
+
+        else if(portnum === 70) {
+
+            const routeDiscovery = RouteDiscovery.decode(envelope.packet.decoded.payload);
+
+            console.log("TRACEROUTE_APP", {
+                from: envelope.packet.from.toString(16),
+                route_discovery: routeDiscovery,
+            });
+
+            try {
+                await prisma.traceRoute.create({
+                    data: {
+                        node_id: envelope.packet.from,
+                        route: routeDiscovery.route,
+                    },
+                });
+            } catch (e) {
+                console.error(e);
+            }
+
+        }
+
+        else {
+            // console.log(portnum, envelope);
         }
 
     } catch(e) {

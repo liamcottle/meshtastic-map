@@ -52,3 +52,17 @@ model NeighbourInfo {
   @@index(updated_at)
   @@map("neighbour_infos")
 }
+
+model TraceRoute {
+  id      BigInt @id @default(autoincrement())
+  node_id BigInt
+  route   Json
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@index(created_at)
+  @@index(updated_at)
+  @@index(node_id)
+  @@map("traceroutes")
+}
