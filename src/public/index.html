@@ -311,7 +311,7 @@
                                             <div class="relative flex min-w-0 flex-1 items-center">
                                                 <div class="truncate">
                                                     <p class="truncate text-sm font-medium text-gray-900">Long Name</p>
-                                                    <p class="truncate text-sm text-gray-500">{{ selectedNode.long_name }}</p>
+                                                    <p class="truncate text-sm text-gray-700">{{ selectedNode.long_name }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -325,7 +325,7 @@
                                             <div class="relative flex min-w-0 flex-1 items-center">
                                                 <div class="truncate">
                                                     <p class="truncate text-sm font-medium text-gray-900">Short Name</p>
-                                                    <p class="truncate text-sm text-gray-500">{{ selectedNode.short_name }}</p>
+                                                    <p class="truncate text-sm text-gray-700">{{ selectedNode.short_name }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -339,7 +339,7 @@
                                             <div class="relative flex min-w-0 flex-1 items-center">
                                                 <div class="truncate">
                                                     <p class="truncate text-sm font-medium text-gray-900">Role</p>
-                                                    <p class="truncate text-sm text-gray-500">{{ selectedNode.role_name }}</p>
+                                                    <p class="truncate text-sm text-gray-700">{{ selectedNode.role_name }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -353,7 +353,7 @@
                                             <div class="relative flex min-w-0 flex-1 items-center">
                                                 <div class="truncate">
                                                     <p class="truncate text-sm font-medium text-gray-900">Hardware</p>
-                                                    <p class="truncate text-sm text-gray-500">{{ selectedNode.hardware_model_name }}</p>
+                                                    <p class="truncate text-sm text-gray-700">{{ selectedNode.hardware_model_name }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -375,9 +375,12 @@
                                             <div class="relative flex min-w-0 flex-1 items-center">
                                                 <div class="truncate">
                                                     <p class="truncate text-sm font-medium text-gray-900">Battery Level</p>
-                                                    <p class="truncate text-sm text-gray-500">
-                                                        <span v-if="selectedNode.battery_level > 100">Plugged In</span>
-                                                        <span v-else>{{ selectedNode.battery_level }}%</span>
+                                                    <p class="truncate text-sm text-gray-700">
+                                                        <span v-if="selectedNode.battery_level">
+                                                            <span v-if="selectedNode.battery_level > 100">Plugged In</span>
+                                                            <span v-else>{{ selectedNode.battery_level }}%</span>
+                                                        </span>
+                                                        <span v-else class="text-gray-500">???</span>
                                                     </p>
                                                 </div>
                                             </div>
@@ -392,7 +395,10 @@
                                             <div class="relative flex min-w-0 flex-1 items-center">
                                                 <div class="truncate">
                                                     <p class="truncate text-sm font-medium text-gray-900">Voltage</p>
-                                                    <p class="truncate text-sm text-gray-500">{{ Number(selectedNode.voltage).toFixed(2) }}V</p>
+                                                    <p class="truncate text-sm text-gray-700">
+                                                        <span v-if="selectedNode.voltage">{{ Number(selectedNode.voltage).toFixed(2) }}V</span>
+                                                        <span v-else class="text-gray-500">???</span>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -406,7 +412,10 @@
                                             <div class="relative flex min-w-0 flex-1 items-center">
                                                 <div class="truncate">
                                                     <p class="truncate text-sm font-medium text-gray-900">Channel Utilization</p>
-                                                    <p class="truncate text-sm text-gray-500">{{ Number(selectedNode.channel_utilization).toFixed(2) }}%</p>
+                                                    <p class="truncate text-sm text-gray-700">
+                                                        <span v-if="selectedNode.channel_utilization">{{ Number(selectedNode.channel_utilization).toFixed(2) }}%</span>
+                                                        <span v-else class="text-gray-500">???</span>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -420,7 +429,10 @@
                                             <div class="relative flex min-w-0 flex-1 items-center">
                                                 <div class="truncate">
                                                     <p class="truncate text-sm font-medium text-gray-900">Air Util Tx</p>
-                                                    <p class="truncate text-sm text-gray-500">{{ Number(selectedNode.air_util_tx).toFixed(2) }}%</p>
+                                                    <p class="truncate text-sm text-gray-700">
+                                                        <span v-if="selectedNode.air_util_tx">{{ Number(selectedNode.air_util_tx).toFixed(2) }}%</span>
+                                                        <span v-else class="text-gray-500">???</span>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -442,7 +454,7 @@
                                             <div class="relative flex min-w-0 flex-1 items-center">
                                                 <div class="truncate">
                                                     <p class="truncate text-sm font-medium text-gray-900">ID</p>
-                                                    <p class="truncate text-sm text-gray-500">{{ selectedNode.node_id }}</p>
+                                                    <p class="truncate text-sm text-gray-700">{{ selectedNode.node_id }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -456,7 +468,7 @@
                                             <div class="relative flex min-w-0 flex-1 items-center">
                                                 <div class="truncate">
                                                     <p class="truncate text-sm font-medium text-gray-900">Hex ID</p>
-                                                    <p class="truncate text-sm text-gray-500">{{ selectedNode.node_id_hex }}</p>
+                                                    <p class="truncate text-sm text-gray-700">{{ selectedNode.node_id_hex }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -470,7 +482,7 @@
                                             <div class="relative flex min-w-0 flex-1 items-center">
                                                 <div class="truncate">
                                                     <p class="truncate text-sm font-medium text-gray-900">First Seen</p>
-                                                    <p class="truncate text-sm text-gray-500">{{ moment(new Date(selectedNode.created_at)).fromNow() }}</p>
+                                                    <p class="truncate text-sm text-gray-700">{{ moment(new Date(selectedNode.created_at)).fromNow() }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -484,7 +496,7 @@
                                             <div class="relative flex min-w-0 flex-1 items-center">
                                                 <div class="truncate">
                                                     <p class="truncate text-sm font-medium text-gray-900">Last Seen</p>
-                                                    <p class="truncate text-sm text-gray-500">{{ moment(new Date(selectedNode.updated_at)).fromNow() }}</p>
+                                                    <p class="truncate text-sm text-gray-700">{{ moment(new Date(selectedNode.updated_at)).fromNow() }}</p>
                                                 </div>
                                             </div>
                                         </div>
