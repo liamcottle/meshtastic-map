@@ -96,7 +96,7 @@ client.on("message", async (topic, message) => {
         }
 
         const logKnownPacketTypes = false;
-        const logUnknownPacketTypes = true;
+        const logUnknownPacketTypes = false;
         const portnum = envelope.packet?.decoded?.portnum;
 
         if(portnum === 3) {
