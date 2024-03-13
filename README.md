@@ -10,3 +10,8 @@ A map of all Meshtastic nodes heard via MQTT.
 - store x days worth of historical logs
 - be able to go back in time and see how the mesh evolved
 - dedupe packets
+
+## References
+
+- https://meshtastic.org/docs/software/integrations/mqtt/
+- https://buf.build/meshtastic/protobufs/docs/main:meshtastic
