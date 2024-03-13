@@ -303,6 +303,7 @@ client.on("message", async (topic, message) => {
                 // ignore packets we don't want to see for now
                 if(portnum === undefined // ignore failed to decrypt
                     || portnum === 1 // ignore TEXT_MESSAGE_APP
+                    || portnum === 5 // ignore ROUTING_APP
                     || portnum === 34 // ignore PAXCOUNTER_APP
                     || portnum === 65 // ignore STORE_FORWARD_APP
                     || portnum === 66 // ignore RANGE_TEST_APP
