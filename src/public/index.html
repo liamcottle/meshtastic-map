@@ -28,6 +28,9 @@
     <script src="https://unpkg.com/vue@3"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+    <!-- chart js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
 
         .icon-online {
@@ -368,7 +371,7 @@
                                     <div class="relative flex items-center">
                                         <div class="block flex-1 px-4 py-2">
                                             <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="truncate">
+                                                <div class="w-full">
                                                     <p class="truncate text-sm font-medium text-gray-900">Battery Level</p>
                                                     <p class="truncate text-sm text-gray-700">
                                                         <span v-if="selectedNode.battery_level">
@@ -378,6 +381,9 @@
                                                         <span v-else class="text-gray-500">???</span>
                                                     </p>
                                                 </div>
+                                                <div>
+                                                    <canvas id="batteryLevelChart" style="width:150px;height:50px;"></canvas>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -387,28 +393,15 @@
                                     <div class="relative flex items-center">
                                         <div class="block flex-1 px-4 py-2">
                                             <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="truncate">
+                                                <div class="w-full">
                                                     <p class="truncate text-sm font-medium text-gray-900">Voltage</p>
                                                     <p class="truncate text-sm text-gray-700">
                                                         <span v-if="selectedNode.voltage">{{ Number(selectedNode.voltage).toFixed(2) }}V</span>
                                                         <span v-else class="text-gray-500">???</span>
                                                     </p>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-
-                                <li>
-                                    <div class="relative flex items-center">
-                                        <div class="block flex-1 px-4 py-2">
-                                            <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="truncate">
-                                                    <p class="truncate text-sm font-medium text-gray-900">Channel Utilization</p>
-                                                    <p class="truncate text-sm text-gray-700">
-                                                        <span v-if="selectedNode.channel_utilization">{{ Number(selectedNode.channel_utilization).toFixed(2) }}%</span>
-                                                        <span v-else class="text-gray-500">???</span>
-                                                    </p>
+                                                <div>
+                                                    <canvas id="voltageChart" style="width:150px;height:50px;"></canvas>
                                                 </div>
                                             </div>
                                         </div>
@@ -419,12 +412,34 @@
                                     <div class="relative flex items-center">
                                         <div class="block flex-1 px-4 py-2">
                                             <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="truncate">
+                                                <div class="w-full">
+                                                    <p class="truncate text-sm font-medium text-gray-900">Channel Utilization</p>
+                                                    <p class="truncate text-sm text-gray-700">
+                                                        <span v-if="selectedNode.channel_utilization">{{ Number(selectedNode.channel_utilization).toFixed(2) }}%</span>
+                                                        <span v-else class="text-gray-500">???</span>
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <canvas id="channelUtilizationChart" style="width:150px;height:50px;"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="relative flex items-center">
+                                        <div class="block flex-1 px-4 py-2">
+                                            <div class="relative flex min-w-0 flex-1 items-center">
+                                                <div class="w-full">
                                                     <p class="truncate text-sm font-medium text-gray-900">Air Util Tx</p>
                                                     <p class="truncate text-sm text-gray-700">
                                                         <span v-if="selectedNode.air_util_tx">{{ Number(selectedNode.air_util_tx).toFixed(2) }}%</span>
                                                         <span v-else class="text-gray-500">???</span>
                                                     </p>
+                                                </div>
+                                                <div>
+                                                    <canvas id="airUtilTxChart" style="width:150px;height:50px;"></canvas>
                                                 </div>
                                             </div>
                                         </div>
@@ -512,6 +527,7 @@
                 hardwareModelStats: null,
 
                 selectedNode: null,
+                selectedNodeDeviceMetrics: [],
 
                 moment: window.moment,
 
@@ -525,6 +541,7 @@
             // handle node callback from outside of vue
             window._onNodeClick = (node) => {
                 this.selectedNode = node;
+                this.loadNodeDeviceMetrics(node.node_id);
             };
 
         },
@@ -535,6 +552,257 @@
                 }).catch((error) => {
                     // do nothing
                 });
+            },
+            loadNodeDeviceMetrics: function(nodeId) {
+                window.axios.get(`/api/v1/nodes/${nodeId}/device-metrics`, {
+                    params: {
+                        count: 100,
+                    },
+                }).then((response) => {
+                    this.selectedNodeDeviceMetrics = response.data.device_metrics;
+                    this.renderDeviceMetricCharts();
+                }).catch(() => {
+                    this.selectedNodeDeviceMetrics = [];
+                    this.renderDeviceMetricCharts();
+                });
+            },
+            renderDeviceMetricCharts: function() {
+                this.updateBatteryLevelChart();
+                this.updateVoltageChart();
+                this.updateChannelUtilizationChart();
+                this.updateAirUtilTxChart();
+            },
+            updateBatteryLevelChart: function() {
+
+                // get chart context
+                const ctx = window.document.getElementById('batteryLevelChart')?.getContext('2d');
+                if(!ctx){
+                    return;
+                }
+
+                new window.Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                            return new Date(deviceMetric.created_at).toLocaleTimeString();
+                        }),
+                        datasets: [{
+                            label: 'Battery Level',
+                            data: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                                return deviceMetric.battery_level;
+                            }),
+                            borderColor: '#22c55e',
+                            backgroundColor: '#e5e7eb',
+                            fill: true,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                display: false, // Hide x-axis labels
+                            },
+                            y: {
+                                display: false, // Hide y-axis labels
+                                min: 0,
+                                max: 100,
+                            },
+                        },
+                        plugins: {
+                            legend: {
+                                display: false, // Hide the legend
+                            },
+                            tooltip: {
+                                yAlign: 'top',
+                                intersect: false,
+                                displayColors: false,
+                                callbacks: {
+                                    label: (item) => item.formattedValue + "%",
+                                },
+                            },
+                        },
+                        elements: {
+                            point: {
+                                radius: 0, // Set the radius to 0 to hide the dots
+                            },
+                        },
+                    }
+                });
+
+            },
+            updateVoltageChart: function() {
+
+                // get chart context
+                const ctx = window.document.getElementById('voltageChart')?.getContext('2d');
+                if(!ctx){
+                    return;
+                }
+
+                new window.Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                            return new Date(deviceMetric.created_at).toLocaleTimeString();
+                        }),
+                        datasets: [{
+                            label: 'Voltage',
+                            data: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                                return deviceMetric.voltage;
+                            }),
+                            borderColor: '#22c55e',
+                            backgroundColor: '#e5e7eb',
+                            fill: true,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                display: false, // Hide x-axis labels
+                            },
+                            y: {
+                                display: false, // Hide y-axis labels
+                                min: 0,
+                                max: 5,
+                            },
+                        },
+                        plugins: {
+                            legend: {
+                                display: false, // Hide the legend
+                            },
+                            tooltip: {
+                                yAlign: 'top',
+                                intersect: false,
+                                displayColors: false,
+                                callbacks: {
+                                    label: (item) => item.formattedValue + "V",
+                                },
+                            },
+                        },
+                        elements: {
+                            point: {
+                                radius: 0, // Set the radius to 0 to hide the dots
+                            },
+                        },
+                    }
+                });
+
+            },
+            updateChannelUtilizationChart: function() {
+
+                // get chart context
+                const ctx = window.document.getElementById('channelUtilizationChart')?.getContext('2d');
+                if(!ctx){
+                    return;
+                }
+
+                new window.Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                            return new Date(deviceMetric.created_at).toLocaleTimeString();
+                        }),
+                        datasets: [{
+                            label: 'Channel Utilization',
+                            data: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                                return deviceMetric.channel_utilization;
+                            }),
+                            borderColor: '#22c55e',
+                            backgroundColor: '#e5e7eb',
+                            fill: true,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                display: false, // Hide x-axis labels
+                            },
+                            y: {
+                                display: false, // Hide y-axis labels
+                                min: -5,
+                                max: 100,
+                            },
+                        },
+                        plugins: {
+                            legend: {
+                                display: false, // Hide the legend
+                            },
+                            tooltip: {
+                                yAlign: 'top',
+                                intersect: false,
+                                displayColors: false,
+                                callbacks: {
+                                    label: (item) => item.formattedValue + "%",
+                                },
+                            },
+                        },
+                        elements: {
+                            point: {
+                                radius: 0, // Set the radius to 0 to hide the dots
+                            },
+                        },
+                    }
+                });
+
+            },
+            updateAirUtilTxChart: function() {
+
+                // get chart context
+                const ctx = window.document.getElementById('airUtilTxChart')?.getContext('2d');
+                if(!ctx){
+                    return;
+                }
+
+                new window.Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                            return new Date(deviceMetric.created_at).toLocaleTimeString();
+                        }),
+                        datasets: [{
+                            label: 'Air Util Tx',
+                            data: this.selectedNodeDeviceMetrics.map((deviceMetric) => {
+                                return deviceMetric.air_util_tx;
+                            }),
+                            borderColor: '#22c55e',
+                            backgroundColor: '#e5e7eb',
+                            fill: true,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                display: false, // Hide x-axis labels
+                            },
+                            y: {
+                                display: false, // Hide y-axis labels
+                                min: -5,
+                                max: 100,
+                            },
+                        },
+                        plugins: {
+                            legend: {
+                                display: false, // Hide the legend
+                            },
+                            tooltip: {
+                                yAlign: 'top',
+                                intersect: false,
+                                displayColors: false,
+                                callbacks: {
+                                    label: (item) => item.formattedValue + "%",
+                                },
+                            },
+                        },
+                        elements: {
+                            point: {
+                                radius: 0, // Set the radius to 0 to hide the dots
+                            },
+                        },
+                    }
+                });
+
             },
         },
     }).mount('#app');
