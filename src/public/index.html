@@ -1235,8 +1235,21 @@
                         opacity: 0.5,
                     }).addTo(neighboursLayerGroup);
 
+                    // calculate distance in meters between nodes (rounded to 2 decimal places)
+                    const distanceInMeters = currentNode.getLatLng().distanceTo(neighbourNodeMarker.getLatLng()).toFixed(2);
+
+                    // default to showing distance in meters
+                    var distance = `${distanceInMeters} meters`;
+
+                    // scale to distance in kms
+                    if(distanceInMeters >= 1000){
+                        const distanceInKilometers = (distanceInMeters / 1000).toFixed(2);
+                        distance = `${distanceInKilometers} kms`;
+                    }
+
                     const tooltip = `<b>${node.long_name}</b> heard <b>${neighbourNode.long_name}</b>`
                         + `<br/>SNR: ${neighbour.snr}dB`
+                        + `<br/>Distance: ${distance}`
                         + `<br/><br/>ID: ${neighbourNode.node_id} -> ${node.node_id}`
                         + `<br/>Hex ID: ${neighbourNode.node_id_hex} -> ${node.node_id_hex}`
                         + `<br/>Updated: ${moment(new Date(node.neighbour_info.updated_at)).fromNow()}`
