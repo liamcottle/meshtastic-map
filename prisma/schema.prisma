@@ -100,6 +100,34 @@ model DeviceMetric {
   @@map("device_metrics")
 }
 
+model TextMessage {
+  id         BigInt  @id @default(autoincrement())
+  to         BigInt
+  from       BigInt
+  channel    Int
+  packet_id  BigInt
+  channel_id String
+  gateway_id BigInt?
+
+  text String
+
+  rx_time   BigInt?
+  rx_snr    Decimal?
+  rx_rssi   Int?
+  hop_limit Int?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@index(created_at)
+  @@index(updated_at)
+  @@index(to)
+  @@index(from)
+  @@index(packet_id)
+  @@index(gateway_id)
+  @@map("text_messages")
+}
+
 model TraceRoute {
   id      BigInt @id @default(autoincrement())
   node_id BigInt

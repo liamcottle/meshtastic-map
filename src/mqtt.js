@@ -99,7 +99,39 @@ client.on("message", async (topic, message) => {
         const logUnknownPacketTypes = false;
         const portnum = envelope.packet?.decoded?.portnum;
 
-        if(portnum === 3) {
+        if(portnum === 1) {
+
+            if(logKnownPacketTypes) {
+                console.log("TEXT_MESSAGE_APP", {
+                    to: envelope.packet.to.toString(16),
+                    from: envelope.packet.from.toString(16),
+                    text: envelope.packet.decoded.payload.toString(),
+                });
+            }
+
+            try {
+                await prisma.textMessage.create({
+                    data: {
+                        to: envelope.packet.to,
+                        from: envelope.packet.from,
+                        channel: envelope.packet.channel,
+                        packet_id: envelope.packet.id,
+                        channel_id: envelope.channelId,
+                        gateway_id: envelope.gatewayId ? BigInt('0x' + envelope.gatewayId.replaceAll("!", "")) : null, // convert hex id "!f96a92f0" to bigint
+                        text: envelope.packet.decoded.payload.toString(),
+                        rx_time: envelope.packet.rxTime,
+                        rx_snr: envelope.packet.rxSnr,
+                        rx_rssi: envelope.packet.rxRssi,
+                        hop_limit: envelope.packet.hopLimit,
+                    },
+                });
+            } catch (e) {
+                console.error(e);
+            }
+
+        }
+
+        else if(portnum === 3) {
 
             const position = Position.decode(envelope.packet.decoded.payload);
 
