@@ -5,7 +5,7 @@ A map of all Meshtastic nodes heard via MQTT.
 ## Features
 
 - [x] Connects to mqtt.meshtastic.org to collect nodes and metrics.
-- [x] Shows nodes on the map if they have reporeted a valid position.
+- [x] Shows nodes on the map if they have reported a valid position.
 - [x] Hover over nodes on the map to see basic information and a preview image.
 - [x] Click nodes on the map to show a sidebar with more info such as graphs of historical telemetry.
 - [x] Ability to share a direct link to a node. The map will auto navigate to it.
