@@ -38,6 +38,7 @@ A map of all Meshtastic nodes heard via MQTT.
 - Collect all `ServiceEnvelope` packets and provide a UI to filter and view them.
 - Real-Time message UI to view `TEXT_MESSAGE_APP` packets as they come in.
 - Map Filters
+  - Filter out "Neighbours" based on max distance setting. Eg no greater than 200km.
   - Filter by Hardware Model
   - Filter by Frequency (we don't have this information yet)
   - Filter by Last Updated (ie, only show nodes heard in the last 1hr, 24hr, etc)
