@@ -2,6 +2,32 @@
 
 A map of all Meshtastic nodes heard via MQTT.
 
+## Features
+
+- [x] Connects to mqtt.meshtastic.org to collect nodes and metrics.
+- [x] Shows nodes on the map if they have reporeted a valid position.
+- [x] Hover over nodes on the map to see basic information and a preview image.
+- [x] Click nodes on the map to show a sidebar with more info such as graphs of historical telemetry.
+- [x] Ability to share a direct link to a node. The map will auto navigate to it.
+- [x] Ability to search for a node by ID and Hex ID. The map will auto navigate to it.
+- [x] Device list. To see which hardware models are most popular.
+- [x] Mobile optimised layout.
+
+## Beta Features
+
+- [x] "Neighbours" map layer. Shows blue connection lines between nodes that heard the other node.
+  - This information is taken from the `NEIGHBORINFO_APP`, but I feel like some of the neighbours weren't heard?? Maybe I am wrong.
+
+## Planned Features
+
+- Login/Register to manually add nodes to the map, and manage their details.
+
+## Ideas
+
+- Maybe a way to "claim" nodes, by sending a custom message from the node.
+  - Set other information, such as frequency, antenna info.
+  - Could allow you to upload your own photos of the node to show on the map.
+
 ## TODO
 
 - show frequency
