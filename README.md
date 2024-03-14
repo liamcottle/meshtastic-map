@@ -21,6 +21,12 @@ A map of all Meshtastic nodes heard via MQTT.
 ## Planned Features
 
 - Login/Register to manually add nodes to the map, and manage their details.
+- Collect all `ServiceEnvelope` packets and provide a UI to filter and view them.
+- Real-Time message UI to view `TEXT_MESSAGE_APP` packets as they come in.
+- Map Filters
+  - Filter by Hardware Model
+  - Filter by Frequency (we don't have this information yet)
+  - Filter by Last Updated (ie, only show nodes heard in the last 1hr, 24hr, etc)
 
 ## Ideas
 
@@ -29,6 +35,9 @@ A map of all Meshtastic nodes heard via MQTT.
   - Could allow you to upload your own photos of the node to show on the map.
 
 ## TODO
+
+- dedupe packets to prevent spamming database
+- track gateway id and channel for packets
 
 - show frequency
 - welcome modal
@@ -44,7 +53,6 @@ A map of all Meshtastic nodes heard via MQTT.
 - ui to view text messages log
 - store x days worth of historical logs
 - be able to go back in time and see how the mesh evolved
-- dedupe packets
 
 ## References
 
