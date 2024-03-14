@@ -273,7 +273,7 @@
                 leave-to-class="-translate-x-full">
             <div v-show="selectedNode != null" class="fixed top-0 left-0 bottom-0">
                 <div v-if="selectedNode != null" class="w-screen max-w-md overflow-hidden">
-                    <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+                    <div class="flex h-full flex-col bg-white shadow-xl">
 
                         <!-- slideover header -->
                         <div class="p-2 border-b border-gray-200 shadow">
@@ -296,217 +296,221 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-col my-2">
-                            <div class="mx-auto">
-                                <img class="h-48 w-48 rounded object-contain" :src="`/images/devices/${selectedNode.hardware_model_name}.png`" alt="" onerror="if(this.src != 'https://placehold.co/512x512?text=No+Image') this.src = 'https://placehold.co/512x512?text=No+Image';">
+                        <div class="overflow-y-auto">
+
+                            <div class="flex flex-col my-2">
+                                <div class="mx-auto">
+                                    <img class="h-48 w-48 rounded object-contain" :src="`/images/devices/${selectedNode.hardware_model_name}.png`" alt="" onerror="if(this.src != 'https://placehold.co/512x512?text=No+Image') this.src = 'https://placehold.co/512x512?text=No+Image';">
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- details -->
-                        <div>
-                            <div class="bg-gray-200 p-2 font-semibold">Details</div>
-                            <ul role="list" class="flex-1 divide-y divide-gray-200 overflow-y-auto">
+                            <!-- details -->
+                            <div>
+                                <div class="bg-gray-200 p-2 font-semibold">Details</div>
+                                <ul role="list" class="flex-1 divide-y divide-gray-200">
 
-                                <li>
-                                    <div class="relative flex items-center">
-                                        <div class="block flex-1 px-4 py-2">
-                                            <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="truncate">
-                                                    <p class="truncate text-sm font-medium text-gray-900">Long Name</p>
-                                                    <p class="truncate text-sm text-gray-700">{{ selectedNode.long_name }}</p>
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="truncate">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Long Name</p>
+                                                        <p class="truncate text-sm text-gray-700">{{ selectedNode.long_name }}</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
 
-                                <li>
-                                    <div class="relative flex items-center">
-                                        <div class="block flex-1 px-4 py-2">
-                                            <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="truncate">
-                                                    <p class="truncate text-sm font-medium text-gray-900">Short Name</p>
-                                                    <p class="truncate text-sm text-gray-700">{{ selectedNode.short_name }}</p>
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="truncate">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Short Name</p>
+                                                        <p class="truncate text-sm text-gray-700">{{ selectedNode.short_name }}</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
 
-                                <li>
-                                    <div class="relative flex items-center">
-                                        <div class="block flex-1 px-4 py-2">
-                                            <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="truncate">
-                                                    <p class="truncate text-sm font-medium text-gray-900">Role</p>
-                                                    <p class="truncate text-sm text-gray-700">{{ selectedNode.role_name }}</p>
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="truncate">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Role</p>
+                                                        <p class="truncate text-sm text-gray-700">{{ selectedNode.role_name }}</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
 
-                                <li>
-                                    <div class="relative flex items-center">
-                                        <div class="block flex-1 px-4 py-2">
-                                            <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="truncate">
-                                                    <p class="truncate text-sm font-medium text-gray-900">Hardware</p>
-                                                    <p class="truncate text-sm text-gray-700">{{ selectedNode.hardware_model_name }}</p>
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="truncate">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Hardware</p>
+                                                        <p class="truncate text-sm text-gray-700">{{ selectedNode.hardware_model_name }}</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
 
-                            </ul>
-                        </div>
+                                </ul>
+                            </div>
 
-                        <!-- telemetry -->
-                        <div>
-                            <div class="bg-gray-200 p-2 font-semibold">Telemetry</div>
-                            <ul role="list" class="flex-1 divide-y divide-gray-200 overflow-y-auto">
+                            <!-- telemetry -->
+                            <div>
+                                <div class="bg-gray-200 p-2 font-semibold">Telemetry</div>
+                                <ul role="list" class="flex-1 divide-y divide-gray-200">
 
-                                <li>
-                                    <div class="relative flex items-center">
-                                        <div class="block flex-1 px-4 py-2">
-                                            <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="w-full">
-                                                    <p class="truncate text-sm font-medium text-gray-900">Battery Level</p>
-                                                    <p class="truncate text-sm text-gray-700">
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="w-full">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Battery Level</p>
+                                                        <p class="truncate text-sm text-gray-700">
                                                         <span v-if="selectedNode.battery_level">
                                                             <span v-if="selectedNode.battery_level > 100">Plugged In</span>
                                                             <span v-else>{{ selectedNode.battery_level }}%</span>
                                                         </span>
-                                                        <span v-else class="text-gray-500">???</span>
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <canvas id="batteryLevelChart" style="width:150px;height:50px;"></canvas>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-
-                                <li>
-                                    <div class="relative flex items-center">
-                                        <div class="block flex-1 px-4 py-2">
-                                            <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="w-full">
-                                                    <p class="truncate text-sm font-medium text-gray-900">Voltage</p>
-                                                    <p class="truncate text-sm text-gray-700">
-                                                        <span v-if="selectedNode.voltage">{{ Number(selectedNode.voltage).toFixed(2) }}V</span>
-                                                        <span v-else class="text-gray-500">???</span>
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <canvas id="voltageChart" style="width:150px;height:50px;"></canvas>
+                                                            <span v-else class="text-gray-500">???</span>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <canvas id="batteryLevelChart" style="width:150px;height:50px;"></canvas>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
 
-                                <li>
-                                    <div class="relative flex items-center">
-                                        <div class="block flex-1 px-4 py-2">
-                                            <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="w-full">
-                                                    <p class="truncate text-sm font-medium text-gray-900">Channel Utilization</p>
-                                                    <p class="truncate text-sm text-gray-700">
-                                                        <span v-if="selectedNode.channel_utilization">{{ Number(selectedNode.channel_utilization).toFixed(2) }}%</span>
-                                                        <span v-else class="text-gray-500">???</span>
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <canvas id="channelUtilizationChart" style="width:150px;height:50px;"></canvas>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-
-                                <li>
-                                    <div class="relative flex items-center">
-                                        <div class="block flex-1 px-4 py-2">
-                                            <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="w-full">
-                                                    <p class="truncate text-sm font-medium text-gray-900">Air Util Tx</p>
-                                                    <p class="truncate text-sm text-gray-700">
-                                                        <span v-if="selectedNode.air_util_tx">{{ Number(selectedNode.air_util_tx).toFixed(2) }}%</span>
-                                                        <span v-else class="text-gray-500">???</span>
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <canvas id="airUtilTxChart" style="width:150px;height:50px;"></canvas>
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="w-full">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Voltage</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span v-if="selectedNode.voltage">{{ Number(selectedNode.voltage).toFixed(2) }}V</span>
+                                                            <span v-else class="text-gray-500">???</span>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <canvas id="voltageChart" style="width:150px;height:50px;"></canvas>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
 
-                            </ul>
-                        </div>
-
-                        <!-- other -->
-                        <div>
-                            <div class="bg-gray-200 p-2 font-semibold">Other</div>
-                            <ul role="list" class="flex-1 divide-y divide-gray-200 overflow-y-auto">
-
-                                <li>
-                                    <div class="relative flex items-center">
-                                        <div class="block flex-1 px-4 py-2">
-                                            <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="truncate">
-                                                    <p class="truncate text-sm font-medium text-gray-900">ID</p>
-                                                    <p class="truncate text-sm text-gray-700">{{ selectedNode.node_id }}</p>
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="w-full">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Channel Utilization</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span v-if="selectedNode.channel_utilization">{{ Number(selectedNode.channel_utilization).toFixed(2) }}%</span>
+                                                            <span v-else class="text-gray-500">???</span>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <canvas id="channelUtilizationChart" style="width:150px;height:50px;"></canvas>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
 
-                                <li>
-                                    <div class="group relative flex items-center">
-                                        <div class="block flex-1 px-4 py-2">
-                                            <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="truncate">
-                                                    <p class="truncate text-sm font-medium text-gray-900">Hex ID</p>
-                                                    <p class="truncate text-sm text-gray-700">{{ selectedNode.node_id_hex }}</p>
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="w-full">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Air Util Tx</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span v-if="selectedNode.air_util_tx">{{ Number(selectedNode.air_util_tx).toFixed(2) }}%</span>
+                                                            <span v-else class="text-gray-500">???</span>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <canvas id="airUtilTxChart" style="width:150px;height:50px;"></canvas>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
 
-                                <li>
-                                    <div class="relative flex items-center">
-                                        <div class="block flex-1 px-4 py-2">
-                                            <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="truncate">
-                                                    <p class="truncate text-sm font-medium text-gray-900">First Seen</p>
-                                                    <p class="truncate text-sm text-gray-700">{{ moment(new Date(selectedNode.created_at)).fromNow() }}</p>
+                                </ul>
+                            </div>
+
+                            <!-- other -->
+                            <div>
+                                <div class="bg-gray-200 p-2 font-semibold">Other</div>
+                                <ul role="list" class="flex-1 divide-y divide-gray-200">
+
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="truncate">
+                                                        <p class="truncate text-sm font-medium text-gray-900">ID</p>
+                                                        <p class="truncate text-sm text-gray-700">{{ selectedNode.node_id }}</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
 
-                                <li>
-                                    <div class="relative flex items-center">
-                                        <div class="block flex-1 px-4 py-2">
-                                            <div class="relative flex min-w-0 flex-1 items-center">
-                                                <div class="truncate">
-                                                    <p class="truncate text-sm font-medium text-gray-900">Last Seen</p>
-                                                    <p class="truncate text-sm text-gray-700">{{ moment(new Date(selectedNode.updated_at)).fromNow() }}</p>
+                                    <li>
+                                        <div class="group relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="truncate">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Hex ID</p>
+                                                        <p class="truncate text-sm text-gray-700">{{ selectedNode.node_id_hex }}</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
 
-                            </ul>
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="truncate">
+                                                        <p class="truncate text-sm font-medium text-gray-900">First Seen</p>
+                                                        <p class="truncate text-sm text-gray-700">{{ moment(new Date(selectedNode.created_at)).fromNow() }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="truncate">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Last Seen</p>
+                                                        <p class="truncate text-sm text-gray-700">{{ moment(new Date(selectedNode.updated_at)).fromNow() }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                </ul>
+                            </div>
+
                         </div>
 
                     </div>
