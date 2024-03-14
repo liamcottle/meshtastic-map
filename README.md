@@ -14,6 +14,7 @@ A map of all Meshtastic nodes heard via MQTT.
 - `TELEMETRY_APP` packets update battery and voltage metrics for a node in the database.
 - `TRACEROUTE_APP` packets log all trace routes performed by a node to the database.
 - `MAP_REPORT_APP` packets are stored in the database, but are not widely adopted, so are not used yet.
+- The database is a MySQL server, and a nodejs express server is running an API to serve data to the map interface.
 
 ## Features
 
