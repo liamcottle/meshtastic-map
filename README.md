@@ -8,6 +8,10 @@ A map of all Meshtastic nodes heard via MQTT.
 - welcome modal
 - not affiliated with meshtastic info
 - donate link
+- login/register to add nodes to the map manually
+  - need to prevent spam
+  - captcha for reg
+  - limit how many nodes can be added from an account
 
 - show connection lines between nodes and the neighbours they have heard directly
 - ui to view realtime events from specific nodes
