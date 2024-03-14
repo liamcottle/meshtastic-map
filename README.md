@@ -2,6 +2,19 @@
 
 A map of all Meshtastic nodes heard via MQTT.
 
+## How does it work?
+
+- An [mqtt client](./src/mqtt.js) is persistently connected to `mqtt.meshtastic.org` and subscribed to the `#` topic.
+- All messages received are attempted to be decoded as [ServiceEnvelope](https://buf.build/meshtastic/protobufs/docs/main:meshtastic#meshtastic.ServiceEnvelope) packets.
+- If a packet is encrypted, it attempts to decrypt it with the default `AQ==` key.
+- If a packet can't be decoded as a `ServiceEnvelope`, it is ignored.
+- `NODEINFO_APP` packets add a node to the database.
+- `POSITION_APP` packets update the position of a node in the database.
+- `NEIGHBORINFO_APP` packets log neighbours heard by a node to the database.
+- `TELEMETRY_APP` packets update battery and voltage metrics for a node in the database.
+- `TRACEROUTE_APP` packets log all trace routes performed by a node to the database.
+- `MAP_REPORT_APP` packets are stored in the database, but are not widely adopted, so are not used yet.
+
 ## Features
 
 - [x] Connects to mqtt.meshtastic.org to collect nodes and metrics.
