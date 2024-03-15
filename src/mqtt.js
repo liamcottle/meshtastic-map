@@ -25,6 +25,7 @@ const Position = root.lookupType("Position");
 const RouteDiscovery = root.lookupType("RouteDiscovery");
 const Telemetry = root.lookupType("Telemetry");
 const User = root.lookupType("User");
+const Waypoint = root.lookupType("Waypoint");
 
 function createNonce(packetId, fromNode) {
 
@@ -193,6 +194,43 @@ client.on("message", async (topic, message) => {
                         hardware_model: user.hwModel,
                         is_licensed: user.isLicensed === true,
                         role: user.role,
+                    },
+                });
+            } catch (e) {
+                console.error(e);
+            }
+
+        }
+
+        else if(portnum === 8) {
+
+            const waypoint = Waypoint.decode(envelope.packet.decoded.payload);
+
+            if(logKnownPacketTypes) {
+                console.log("WAYPOINT_APP", {
+                    to: envelope.packet.to.toString(16),
+                    from: envelope.packet.from.toString(16),
+                    waypoint: waypoint,
+                });
+            }
+
+            try {
+                await prisma.waypoint.create({
+                    data: {
+                        to: envelope.packet.to,
+                        from: envelope.packet.from,
+                        waypoint_id: waypoint.id,
+                        latitude: waypoint.latitudeI,
+                        longitude: waypoint.longitudeI,
+                        expire: waypoint.expire,
+                        locked_to: waypoint.lockedTo,
+                        name: waypoint.name,
+                        description: waypoint.description,
+                        icon: waypoint.icon,
+                        channel: envelope.packet.channel,
+                        packet_id: envelope.packet.id,
+                        channel_id: envelope.channelId,
+                        gateway_id: envelope.gatewayId ? BigInt('0x' + envelope.gatewayId.replaceAll("!", "")) : null, // convert hex id "!f96a92f0" to bigint
                     },
                 });
             } catch (e) {
@@ -370,11 +408,13 @@ client.on("message", async (topic, message) => {
 
                 // ignore packets we don't want to see for now
                 if(portnum === undefined // ignore failed to decrypt
+                    || portnum === 0 // ignore UNKNOWN_APP
                     || portnum === 1 // ignore TEXT_MESSAGE_APP
                     || portnum === 5 // ignore ROUTING_APP
                     || portnum === 34 // ignore PAXCOUNTER_APP
                     || portnum === 65 // ignore STORE_FORWARD_APP
                     || portnum === 66 // ignore RANGE_TEST_APP
+                    || portnum === 72 // ignore ATAK_PLUGIN
                 ){
                     return;
                 }

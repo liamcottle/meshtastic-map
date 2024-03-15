@@ -141,3 +141,34 @@ model TraceRoute {
   @@index(node_id)
   @@map("traceroutes")
 }
+
+model Waypoint {
+  id          BigInt  @id @default(autoincrement())
+  from        BigInt
+  to          BigInt
+  waypoint_id BigInt
+  latitude    Int
+  longitude   Int
+  expire      BigInt?
+  locked_to   BigInt?
+  name        String?
+  description String?
+  icon        Int?
+
+  channel    Int
+  packet_id  BigInt
+  channel_id String
+  gateway_id BigInt?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@index(created_at)
+  @@index(updated_at)
+  @@index(to)
+  @@index(from)
+  @@index(waypoint_id)
+  @@index(packet_id)
+  @@index(gateway_id)
+  @@map("waypoints")
+}
