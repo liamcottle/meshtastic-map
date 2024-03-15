@@ -926,6 +926,10 @@
         clearNodeOutline();
     });
 
+    function isMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
     function isValidLatLng(lat, lng) {
 
         if(isNaN(lat) || isNaN(lng)){
@@ -1176,18 +1180,21 @@
                 var marker = L.marker([node.latitude, node.longitude], {
                     icon: icon,
                     tagName: node.node_id,
-                })
-                    .bindTooltip(tooltip, {
-                        interactive: true,
-                    })
-                    .on('click', function(event) {
-                        // close tooltip on click to prevent tooltip and popup showing at same time
-                        event.target.closeTooltip();
-                    });
+                }).on('click', function(event) {
+                    // close tooltip on click to prevent tooltip and popup showing at same time
+                    event.target.closeTooltip();
+                });
 
                 // add marker to node layer groups
                 marker.addTo(nodesLayerGroup);
                 nodesClusteredLayerGroup.addLayer(marker);
+
+                // show tooltip on desktop only
+                if(!isMobile()){
+                    marker.bindTooltip(tooltip, {
+                        interactive: true,
+                    });
+                }
 
                 // show node info sidebar when clicking node marker
                 marker.on("click", function(event) {
