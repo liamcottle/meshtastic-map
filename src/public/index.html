@@ -1021,6 +1021,13 @@
 
     function goToNode(id){
 
+        // find node
+        var node = findNodeById(id);
+        if(!node){
+            alert("Could not find node: " + id);
+            return;
+        }
+
         // find node marker by id
         var nodeMarker = findNodeMarkerById(id);
         if(!nodeMarker){
@@ -1040,8 +1047,8 @@
             animate: true,
         });
 
-        // open tooltip
-        nodeMarker.openTooltip();
+        // open tooltip for node
+        map.openTooltip(getTooltipContentForNode(node), nodeMarker.getLatLng());
 
     }
 
@@ -1146,37 +1153,6 @@
 
                 var icon = iconOnline; // todo status
 
-                var tooltip = `<img class="mb-4 w-40 mx-auto" src="/images/devices/${node.hardware_model_name}.png" onerror="this.classList.add('hidden')"/>` +
-                    `<b>${node.long_name}</b>` +
-                    `<br/>Short Name: ${node.short_name}` +
-                    `<br/><br/>Role: ${node.role_name}` +
-                    `<br/>Hardware: ${node.hardware_model_name}`;
-
-                if(node.battery_level){
-                    if(node.battery_level > 100){
-                        tooltip += `<br/>Battery: ${node.battery_level > 100 ? 'Plugged In' : node.battery_level}`;
-                    } else {
-                        tooltip += `<br/>Battery: ${node.battery_level}%`;
-                    }
-                }
-
-                if(node.voltage){
-                    tooltip += `<br/>Voltage: ${Number(node.voltage).toFixed(2)}V`;
-                }
-
-                if(node.channel_utilization){
-                    tooltip += `<br/>Ch Util: ${Number(node.channel_utilization).toFixed(2)}%`;
-                }
-
-                if(node.air_util_tx){
-                    tooltip += `<br/>Air Util: ${Number(node.air_util_tx).toFixed(2)}%`;
-                }
-
-                // bottom info
-                tooltip += `<br/><br/>ID: ${node.node_id}`;
-                tooltip += `<br/>Hex ID: ${node.node_id_hex}`;
-                tooltip += `<br/>Updated: ${moment(new Date(node.updated_at)).fromNow()}`;
-
                 // create node marker
                 var marker = L.marker([node.latitude, node.longitude], {
                     icon: icon,
@@ -1192,7 +1168,7 @@
 
                 // show tooltip on desktop only
                 if(!isMobile()){
-                    marker.bindTooltip(tooltip, {
+                    marker.bindTooltip(getTooltipContentForNode(node), {
                         interactive: true,
                     });
                 }
@@ -1320,6 +1296,43 @@
             }
 
         });
+
+    }
+
+    function getTooltipContentForNode(node) {
+
+        var tooltip = `<img class="mb-4 w-40 mx-auto" src="/images/devices/${node.hardware_model_name}.png" onerror="this.classList.add('hidden')"/>` +
+            `<b>${node.long_name}</b>` +
+            `<br/>Short Name: ${node.short_name}` +
+            `<br/><br/>Role: ${node.role_name}` +
+            `<br/>Hardware: ${node.hardware_model_name}`;
+
+        if(node.battery_level){
+            if(node.battery_level > 100){
+                tooltip += `<br/>Battery: ${node.battery_level > 100 ? 'Plugged In' : node.battery_level}`;
+            } else {
+                tooltip += `<br/>Battery: ${node.battery_level}%`;
+            }
+        }
+
+        if(node.voltage){
+            tooltip += `<br/>Voltage: ${Number(node.voltage).toFixed(2)}V`;
+        }
+
+        if(node.channel_utilization){
+            tooltip += `<br/>Ch Util: ${Number(node.channel_utilization).toFixed(2)}%`;
+        }
+
+        if(node.air_util_tx){
+            tooltip += `<br/>Air Util: ${Number(node.air_util_tx).toFixed(2)}%`;
+        }
+
+        // bottom info
+        tooltip += `<br/><br/>ID: ${node.node_id}`;
+        tooltip += `<br/>Hex ID: ${node.node_id_hex}`;
+        tooltip += `<br/>Updated: ${moment(new Date(node.updated_at)).fromNow()}`;
+
+        return tooltip;
 
     }
 
