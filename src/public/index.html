@@ -20,6 +20,9 @@
     <!-- leaflet map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <script src="plugins/leaflet.markercluster/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" href="plugins/leaflet.markercluster/MarkerCluster.css"/>
+    <link rel="stylesheet" href="plugins/leaflet.markercluster/MarkerCluster.Default.css"/>
 
     <!-- moment -->
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
@@ -882,6 +885,9 @@
     // create layer groups
     var nodesLayerGroup = new L.LayerGroup();
     var neighboursLayerGroup = new L.LayerGroup();
+    var nodesClusteredLayerGroup = L.markerClusterGroup({
+        showCoverageOnHover: false,
+    });
 
     // create icons
     var iconOnline = L.divIcon({ className: 'icon-online'});
@@ -898,11 +904,11 @@
     };
 
     var baseLayers = {
-
+        "Nodes (All)": nodesLayerGroup,
+        "Nodes (Clustered)": nodesClusteredLayerGroup,
     };
 
     var overlays = {
-        "Nodes": nodesLayerGroup,
         "Neighbours": neighboursLayerGroup,
     };
 
@@ -910,7 +916,8 @@
     L.control.layers(baseLayers, overlays).addTo(map);
 
     // add layers to map that should be enabled by default
-    nodesLayerGroup.addTo(map);
+    // nodesLayerGroup.addTo(map);
+    nodesClusteredLayerGroup.addTo(map);
     // neighboursLayerGroup.addTo(map);
     // legend.addTo(map);
 
@@ -1176,8 +1183,11 @@
                     .on('click', function(event) {
                         // close tooltip on click to prevent tooltip and popup showing at same time
                         event.target.closeTooltip();
-                    })
-                    .addTo(nodesLayerGroup);
+                    });
+
+                // add marker to node layer groups
+                marker.addTo(nodesLayerGroup);
+                nodesClusteredLayerGroup.addLayer(marker);
 
                 // show node info sidebar when clicking node marker
                 marker.on("click", function(event) {
