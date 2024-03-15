@@ -887,6 +887,7 @@
     var neighboursLayerGroup = new L.LayerGroup();
     var nodesClusteredLayerGroup = L.markerClusterGroup({
         showCoverageOnHover: false,
+        disableClusteringAtZoom: 10, // zoom level where goToNode zooms to
     });
 
     // create icons
