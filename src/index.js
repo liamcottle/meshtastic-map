@@ -127,6 +127,61 @@ app.get('/api/v1/nodes/:nodeId/device-metrics', async (req, res) => {
     }
 });
 
+app.get('/api/v1/nodes/:nodeId/mqtt-topics', async (req, res) => {
+    try {
+
+        const nodeId = parseInt(req.params.nodeId);
+
+        // find node
+        const node = await prisma.node.findFirst({
+            where: {
+                node_id: nodeId,
+            },
+        });
+
+        // make sure node exists
+        if(!node){
+            res.status(404).json({
+                message: "Not Found",
+            });
+        }
+
+        // get list of unique mqtt topics published to by this node
+        const queryResult = await prisma.$queryRaw`SELECT
+        gateway_id,
+            JSON_ARRAYAGG(mqtt_topic) AS unique_mqtt_topics
+        FROM (
+            SELECT
+        gateway_id,
+            mqtt_topic
+        FROM
+        service_envelopes
+        GROUP BY
+        gateway_id, mqtt_topic
+        ) AS subquery
+        WHERE
+        gateway_id is not null
+        and gateway_id = ${nodeId}
+        GROUP BY
+        gateway_id
+        ORDER BY
+        COUNT(*) DESC;`;
+
+        // get result from query
+        const uniqueMqttTopics = queryResult[0]?.unique_mqtt_topics ?? [];
+
+        res.json({
+            mqtt_topics: uniqueMqttTopics,
+        });
+
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({
+            message: "Something went wrong, try again later.",
+        });
+    }
+});
+
 app.get('/api/v1/stats/hardware-models', async (req, res) => {
     try {
 
