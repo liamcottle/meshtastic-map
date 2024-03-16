@@ -86,8 +86,12 @@
             visibility: visible;
         }
 
-        .z-sidebar {
+        .z-search {
             z-index: 1000;
+        }
+
+        .z-sidebar {
+            z-index: 1001;
         }
 
     </style>
@@ -121,8 +125,32 @@
                         </div>
                     </div>
                 </div>
+                <div class="mx-3 flex-1 relative hidden lg:block">
+                    <input v-model="searchText" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" :placeholder="`Search ${nodes.length} nodes...`">
+                    <div v-if="searchText !== ''" class="absolute z-search bg-white w-full border border-gray-200 rounded-lg shadow-md mt-1 overflow-y-scroll max-h-80 divide-y divide-gray-200">
+
+                        <template v-if="searchedNodes.length > 0">
+
+                            <div @click="searchText = ''" :onclick="`goToNode(${node.node_id})`" class="p-2 hover:bg-gray-100 cursor-pointer" v-for="node of searchedNodes">
+                                <div class="text-gray-900">{{ node.long_name !== '' ? node.long_name : "-" }}</div>
+                                <div class="flex space-x-1 text-sm text-gray-700">
+                                    <div>Short Name: {{ node.short_name !== '' ? node.short_name : "-" }}</div>
+                                    <div class="text-gray-500">/</div>
+                                    <div>Hex ID: {{ node.node_id_hex }}</div>
+                                </div>
+                            </div>
+
+                        </template>
+
+                        <template v-else>
+                            <div class="p-2">
+                                No results found...
+                            </div>
+                        </template>
+
+                    </div>
+                </div>
                 <div class="flex my-auto ml-auto mr-0 sm:mr-2 space-x-1 sm:space-x-2">
-                    <div id="stats-label" class="my-auto mr-2 text-gray-700 hidden sm:inline-block"></div>
                     <a href="#" class="tooltip rounded-full" onclick="searchNodes()">
                         <div id="search-button" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -590,6 +618,9 @@
                 isShowingHardwareModels: false,
                 hardwareModelStats: null,
 
+                nodes: [],
+                searchText: "",
+
                 selectedNode: null,
                 selectedNodeDeviceMetrics: [],
                 selectedNodeMqttMetrics: [],
@@ -603,11 +634,21 @@
             // load data
             this.loadHardwareModelStats();
 
+            // handle map click callback from outside of vue
+            window._onMapClick = () => {
+                this.searchText = "";
+            };
+
             // handle node callback from outside of vue
             window._onNodeClick = (node) => {
                 this.selectedNode = node;
                 this.loadNodeDeviceMetrics(node.node_id);
                 this.loadNodeMqttMetrics(node.node_id);
+            };
+
+            // handle nodes updated callback from outside of vue
+            window._onNodesUpdated = (nodes) => {
+                this.nodes = nodes;
             };
 
         },
@@ -900,6 +941,29 @@
 
             },
         },
+        computed: {
+            searchedNodes() {
+
+                // search nodes
+                const nodes = this.nodes.filter((node) => {
+                    const matchesId = node.node_id?.toLowerCase()?.includes(this.searchText.toLowerCase());
+                    const matchesHexId = node.node_id_hex?.toLowerCase()?.includes(this.searchText.toLowerCase());
+                    const matchesLongName = node.long_name?.toLowerCase()?.includes(this.searchText.toLowerCase());
+                    const matchesShortName = node.short_name?.toLowerCase()?.includes(this.searchText.toLowerCase());
+                    return matchesId || matchesHexId || matchesLongName || matchesShortName;
+                });
+
+                // order alphabetically by long name
+                nodes.sort((nodeA, nodeB) => {
+                    const nodeALongName = nodeA.long_name || "";
+                    const nodeBLongName = nodeB.long_name || "";
+                    return nodeALongName.localeCompare(nodeBLongName);
+                });
+
+                return nodes;
+
+            },
+        },
     }).mount('#app');
 </script>
 
@@ -974,9 +1038,15 @@
     // neighboursLayerGroup.addTo(map);
     // legend.addTo(map);
 
-    // remove outline when map clicked
+    // handle map clicks
     map.on('click', function() {
+
+        // remove outline when map clicked
         clearNodeOutline();
+
+        // send callback to vue
+        window._onMapClick();
+
     });
 
     function isMobile() {
@@ -1178,9 +1248,6 @@
         // clear nodes cache
         nodes = [];
 
-        // update stats
-        document.getElementById("stats-label").textContent = `${updatedNodes.length} nodes`;
-
         // add nodes
         for(var node of updatedNodes){
 
@@ -1315,6 +1382,8 @@
             }
 
         }
+
+        window._onNodesUpdated(nodes);
 
     }
 
