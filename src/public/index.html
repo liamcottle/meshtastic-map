@@ -891,7 +891,10 @@
     });
 
     // create icons
-    var iconOnline = L.divIcon({ className: 'icon-online'});
+    var iconOnline = L.divIcon({
+        className: 'icon-online',
+        iconSize: [16, 16], // increase from 12px to 16px to make hover easier
+    });
 
     // create legend
     var legend = L.control({position: 'bottomleft'});
