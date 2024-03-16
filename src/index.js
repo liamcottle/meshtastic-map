@@ -127,7 +127,7 @@ app.get('/api/v1/nodes/:nodeId/device-metrics', async (req, res) => {
     }
 });
 
-app.get('/api/v1/nodes/:nodeId/mqtt-topics', async (req, res) => {
+app.get('/api/v1/nodes/:nodeId/mqtt-metrics', async (req, res) => {
     try {
 
         const nodeId = parseInt(req.params.nodeId);
@@ -146,32 +146,11 @@ app.get('/api/v1/nodes/:nodeId/mqtt-topics', async (req, res) => {
             });
         }
 
-        // get list of unique mqtt topics published to by this node
-        const queryResult = await prisma.$queryRaw`SELECT
-        gateway_id,
-            JSON_ARRAYAGG(mqtt_topic) AS unique_mqtt_topics
-        FROM (
-            SELECT
-        gateway_id,
-            mqtt_topic
-        FROM
-        service_envelopes
-        GROUP BY
-        gateway_id, mqtt_topic
-        ) AS subquery
-        WHERE
-        gateway_id is not null
-        and gateway_id = ${nodeId}
-        GROUP BY
-        gateway_id
-        ORDER BY
-        COUNT(*) DESC;`;
-
-        // get result from query
-        const uniqueMqttTopics = queryResult[0]?.unique_mqtt_topics ?? [];
+        // get mqtt topics published to by this node
+        const queryResult = await prisma.$queryRaw`select mqtt_topic, count(*) as packet_count, max(created_at) as last_packet_at from service_envelopes where gateway_id = ${nodeId} group by mqtt_topic order by packet_count desc;`;
 
         res.json({
-            mqtt_topics: uniqueMqttTopics,
+            mqtt_metrics: queryResult,
         });
 
     } catch(err) {
