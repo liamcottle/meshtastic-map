@@ -114,6 +114,7 @@ model ServiceEnvelope {
 
   @@index(created_at)
   @@index(updated_at)
+  @@index(gateway_id)
   @@map("service_envelopes")
 }
 
