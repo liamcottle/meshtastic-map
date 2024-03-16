@@ -100,6 +100,23 @@ model DeviceMetric {
   @@map("device_metrics")
 }
 
+model ServiceEnvelope {
+  id         BigInt  @id @default(autoincrement())
+  mqtt_topic String
+  channel_id String
+  gateway_id BigInt?
+  to         BigInt
+  from       BigInt
+  protobuf   Bytes
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@index(created_at)
+  @@index(updated_at)
+  @@map("service_envelopes")
+}
+
 model TextMessage {
   id         BigInt  @id @default(autoincrement())
   to         BigInt
