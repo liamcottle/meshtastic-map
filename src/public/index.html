@@ -454,6 +454,43 @@
                                 </ul>
                             </div>
 
+                            <!-- mqtt -->
+                            <div>
+                                <div class="bg-gray-200 p-2">
+                                    <div class="font-semibold">MQTT</div>
+                                    <div class="text-sm text-gray-600">Topics this node sent packets to.</div>
+                                </div>
+                                <ul role="list" class="flex-1 divide-y divide-gray-200">
+                                    <template v-if="selectedNodeMqttMetrics.length > 0">
+                                        <li v-for="mqttMetric of selectedNodeMqttMetrics">
+                                            <div class="relative flex items-center">
+                                                <div class="block flex-1 px-4 py-2">
+                                                    <div class="relative flex min-w-0 flex-1 items-center">
+                                                        <div class="truncate">
+                                                            <p class="truncate text-sm font-medium text-gray-900">{{ mqttMetric.mqtt_topic }}</p>
+                                                            <div class="text-sm text-gray-700">Last packet {{ moment(new Date(mqttMetric.last_packet_at)).fromNow() }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </template>
+                                    <template v-else>
+                                        <li>
+                                            <div class="relative flex items-center">
+                                                <div class="block flex-1 px-4 py-2">
+                                                    <div class="relative flex min-w-0 flex-1 items-center">
+                                                        <div class="truncate">
+                                                            <div class="text-sm text-gray-700">No packets seen on MQTT</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+
                             <!-- other -->
                             <div>
                                 <div class="bg-gray-200 p-2 font-semibold">Other</div>
@@ -553,6 +590,7 @@
 
                 selectedNode: null,
                 selectedNodeDeviceMetrics: [],
+                selectedNodeMqttMetrics: [],
 
                 moment: window.moment,
 
@@ -567,6 +605,7 @@
             window._onNodeClick = (node) => {
                 this.selectedNode = node;
                 this.loadNodeDeviceMetrics(node.node_id);
+                this.loadNodeMqttMetrics(node.node_id);
             };
 
         },
@@ -590,6 +629,14 @@
                 }).catch(() => {
                     this.selectedNodeDeviceMetrics = [];
                     this.renderDeviceMetricCharts();
+                });
+            },
+            loadNodeMqttMetrics: function(nodeId) {
+                this.selectedNodeMqttMetrics = [];
+                window.axios.get(`/api/v1/nodes/${nodeId}/mqtt-metrics`).then((response) => {
+                    this.selectedNodeMqttMetrics = response.data.mqtt_metrics;
+                }).catch(() => {
+                    // do nothing
                 });
             },
             renderDeviceMetricCharts: function() {
