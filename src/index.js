@@ -197,4 +197,45 @@ app.get('/api/v1/stats/hardware-models', async (req, res) => {
     }
 });
 
+app.get('/api/v1/waypoints', async (req, res) => {
+    try {
+
+        // get waypoints from db that have not expired yet
+        const waypoints = await prisma.waypoint.findMany({
+            where: {
+                expire: {
+                    gte: Math.floor(Date.now() / 1000), // now in seconds
+                },
+            },
+            orderBy: {
+                id: 'desc',
+            },
+        });
+
+        // ensure we only have the latest unique waypoints
+        // since ordered by newest first, older entries will be ignored
+        const uniqueWaypoints = [];
+        for(const waypoint of waypoints){
+
+            // skip if we already have a newer entry for this waypoint
+            if(uniqueWaypoints.find((w) => w.from === waypoint.from && w.waypoint_id === waypoint.waypoint_id)){
+                continue;
+            }
+
+            // first time seeing this waypoint, add to unique list
+            uniqueWaypoints.push(waypoint);
+
+        }
+
+        res.json({
+            waypoints: uniqueWaypoints,
+        });
+
+    } catch(err) {
+        res.status(500).json({
+            message: "Something went wrong, try again later.",
+        });
+    }
+});
+
 app.listen(8080);
