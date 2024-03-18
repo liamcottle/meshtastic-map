@@ -1477,7 +1477,7 @@
         }
     }
 
-    function reload(goToNodeId) {
+    async function reload(goToNodeId) {
 
         // show loading
         setLoading(true);
@@ -1486,7 +1486,7 @@
         clearMap();
 
         // fetch nodes
-        fetch('/api/v1/nodes').then(async (response) => {
+        await fetch('/api/v1/nodes').then(async (response) => {
 
             // update nodes
             var json = await response.json();
@@ -1502,8 +1502,8 @@
 
         });
 
-        // fetch waypoints
-        fetch('/api/v1/waypoints').then(async (response) => {
+        // fetch waypoints (after awaiting nodes, so we can use nodes cache in waypoint tooltips)
+        await fetch('/api/v1/waypoints').then(async (response) => {
 
             // update waypoints
             var json = await response.json();
@@ -1552,10 +1552,22 @@
 
     function getTooltipContentForWaypoint(waypoint) {
 
+        // get from node name
+        var fromNode = findNodeById(waypoint.from);
+
         var tooltip = `<b>${waypoint.name}</b>` +
             (waypoint.description ? `<br/>${waypoint.description}` : '') +
             `<br/><br/>Expires: ${moment(new Date(waypoint.expire * 1000)).fromNow()}` +
-            `<br/>Lat/Lng: ${waypoint.latitude}, ${waypoint.longitude}`;
+            `<br/>Lat/Lng: ${waypoint.latitude}, ${waypoint.longitude}` +
+            `<br/><br/>From ID: ${waypoint.from}` +
+            `<br/>From Hex ID: !${Number(waypoint.from).toString(16)}`;
+
+        // show node name this waypoint is from, if possible
+        if(fromNode != null){
+            tooltip += `<br/>From Node: <a href="#" onclick="goToNode(${waypoint.from})">${fromNode.long_name || 'Unnamed Node'}</a>`;
+        } else {
+            tooltip += `<br/>From Node: ???`;
+        }
 
         // bottom info
         tooltip += `<br/><br/>ID: ${waypoint.waypoint_id}`;
