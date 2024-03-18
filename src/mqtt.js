@@ -380,6 +380,10 @@ client.on("message", async (topic, message) => {
                     data: {
                         node_id: envelope.packet.from,
                         route: routeDiscovery.route,
+                        channel: envelope.packet.channel,
+                        packet_id: envelope.packet.id,
+                        channel_id: envelope.channelId,
+                        gateway_id: envelope.gatewayId ? BigInt('0x' + envelope.gatewayId.replaceAll("!", "")) : null, // convert hex id "!f96a92f0" to bigint
                     },
                 });
             } catch (e) {

@@ -151,6 +151,11 @@ model TraceRoute {
   node_id BigInt
   route   Json
 
+  channel    Int?
+  packet_id  BigInt?
+  channel_id String?
+  gateway_id BigInt?
+
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
 
