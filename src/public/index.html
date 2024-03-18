@@ -1553,7 +1553,7 @@
     function getTooltipContentForWaypoint(waypoint) {
 
         var tooltip = `<b>${waypoint.name}</b>` +
-            `<br/>${waypoint.description}` +
+            (waypoint.description ? `<br/>${waypoint.description}` : '') +
             `<br/><br/>Expires: ${moment(new Date(waypoint.expire * 1000)).fromNow()}` +
             `<br/>Lat/Lng: ${waypoint.latitude}, ${waypoint.longitude}`;
 
