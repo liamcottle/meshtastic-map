@@ -161,6 +161,41 @@ app.get('/api/v1/nodes/:nodeId/mqtt-metrics', async (req, res) => {
     }
 });
 
+app.get('/api/v1/nodes/:nodeId/traceroutes', async (req, res) => {
+    try {
+
+        const nodeId = parseInt(req.params.nodeId);
+        const count = req.query.count ? parseInt(req.query.count) : 10; // can't set to null because of $queryRaw
+
+        // find node
+        const node = await prisma.node.findFirst({
+            where: {
+                node_id: nodeId,
+            },
+        });
+
+        // make sure node exists
+        if(!node){
+            res.status(404).json({
+                message: "Not Found",
+            });
+        }
+
+        // get latest traceroutes
+        const traceroutes = await prisma.$queryRaw`SELECT * FROM traceroutes WHERE node_id = ${node.node_id} and JSON_LENGTH(route) > 0 and gateway_id is not null order by id desc limit ${count}`;
+
+        res.json({
+            traceroutes: traceroutes,
+        });
+
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({
+            message: "Something went wrong, try again later.",
+        });
+    }
+});
+
 app.get('/api/v1/stats/hardware-models', async (req, res) => {
     try {
 

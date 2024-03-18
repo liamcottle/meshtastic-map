@@ -493,7 +493,7 @@
                             <div>
                                 <div class="bg-gray-200 p-2">
                                     <div class="font-semibold">MQTT</div>
-                                    <div class="text-sm text-gray-600">Topics this node sent packets to.</div>
+                                    <div class="text-sm text-gray-600">Topics this node sent packets to</div>
                                 </div>
                                 <ul role="list" class="flex-1 divide-y divide-gray-200">
                                     <template v-if="selectedNodeMqttMetrics.length > 0">
@@ -517,6 +517,43 @@
                                                     <div class="relative flex min-w-0 flex-1 items-center">
                                                         <div class="truncate">
                                                             <div class="text-sm text-gray-700">No packets seen on MQTT</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+
+                            <!-- traceroutes -->
+                            <div>
+                                <div class="bg-gray-200 p-2">
+                                    <div class="font-semibold">Trace Routes</div>
+                                    <div class="text-sm text-gray-600">Only 5 most recent are shown</div>
+                                </div>
+                                <ul role="list" class="flex-1 divide-y divide-gray-200">
+                                    <template v-if="selectedNodeTraceroutes.length > 0">
+                                        <li @click="showTraceRoute(traceroute)" v-for="traceroute of selectedNodeTraceroutes">
+                                            <div class="relative flex items-center">
+                                                <div class="block flex-1 px-4 py-2">
+                                                    <div class="relative flex min-w-0 flex-1 items-center">
+                                                        <div>
+                                                            <p class="text-sm font-medium text-gray-900">{{ traceroute.route.length }} hops {{ traceroute.channel_id ? `on ${traceroute.channel_id}` : '' }}</p>
+                                                            <div class="text-sm text-gray-700">Gated {{ moment(new Date(traceroute.updated_at)).fromNow() }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </template>
+                                    <template v-else>
+                                        <li>
+                                            <div class="relative flex items-center">
+                                                <div class="block flex-1 px-4 py-2">
+                                                    <div class="relative flex min-w-0 flex-1 items-center">
+                                                        <div class="truncate">
+                                                            <div class="text-sm text-gray-700">No traceroutes seen on MQTT</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -613,6 +650,118 @@
 
     </div>
 
+    <!-- traceroute info modal -->
+    <div class="relative z-sidebar" role="dialog" aria-modal="true">
+
+        <!-- overlay -->
+        <transition
+                enter-active-class="transition-opacity duration-300 ease-linear"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition-opacity duration-300 ease-linear"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0">
+            <div v-show="selectedTraceRoute != null" @click="selectedTraceRoute = null" class="fixed inset-0 bg-gray-900 bg-opacity-75"></div>
+        </transition>
+
+        <!-- sidebar -->
+        <transition
+                enter-active-class="transition duration-300 ease-in-out transform"
+                enter-from-class="-translate-x-full"
+                enter-to-class="translate-x-0"
+                leave-active-class="transition duration-300 ease-in-out transform"
+                leave-from-class="translate-x-0"
+                leave-to-class="-translate-x-full">
+            <div v-show="selectedTraceRoute != null" class="fixed top-0 left-0 bottom-0">
+                <div v-if="selectedTraceRoute != null" class="w-screen max-w-md overflow-hidden">
+                    <div class="flex h-full flex-col bg-white shadow-xl">
+
+                        <!-- slideover header -->
+                        <div class="p-2 border-b border-gray-200 shadow">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h2 class="font-bold">Traceroute #{{ selectedTraceRoute.id }}</h2>
+                                    <h3 class="text-sm">{{ moment(new Date(selectedTraceRoute.updated_at)).fromNow() }}</h3>
+                                </div>
+                                <div class="my-auto ml-3 flex h-7 items-center">
+                                    <a href="javascript:void(0)" class="rounded-full" @click="selectedTraceRoute = null">
+                                        <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M18 6l-12 12"></path>
+                                                <path d="M6 6l12 12"></path>
+                                            </svg>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="overflow-y-auto">
+
+                            <!-- details -->
+                            <div class="p-2">
+                                <ul role="list" class="space-y-6">
+
+                                    <!-- node that initiated traceroute -->
+                                    <li :onclick="`goToNode(${selectedTraceRoute.node_id})`" class="relative flex gap-x-4">
+                                        <div class="absolute left-0 top-0 flex w-6 justify-center top-6 -bottom-6">
+                                            <div class="w-px bg-gray-200"></div>
+                                        </div>
+                                        <div class="my-auto relative flex h-6 w-6 flex-none items-center justify-center bg-white">
+                                            <div class="h-4 w-4 rounded-full bg-gray-100 ring-1 ring-gray-300"></div>
+                                        </div>
+                                        <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                                            <div class="font-medium text-gray-900">{{ findNodeById(selectedTraceRoute.node_id)?.long_name || '???' }}</div>
+                                            <div>Hex ID: !{{ Number(selectedTraceRoute.node_id).toString(16) }}</div>
+                                            <div>Started the traceroute</div>
+                                        </div>
+                                    </li>
+
+                                    <!-- middleman nodes -->
+                                    <li :onclick="`goToNode(${route})`" v-for="route of selectedTraceRoute.route" class="relative flex gap-x-4">
+                                        <div class="absolute left-0 top-0 flex w-6 justify-center -bottom-6">
+                                            <div class="w-px bg-gray-200"></div>
+                                        </div>
+                                        <div class="my-auto relative flex h-6 w-6 flex-none items-center justify-center bg-white">
+                                            <div class="h-4 w-4 rounded-full bg-gray-100 ring-1 ring-gray-300"></div>
+                                        </div>
+                                        <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                                            <div class="font-medium text-gray-900">{{ findNodeById(route)?.long_name || '???' }}</div>
+                                            <div>Hex ID: !{{ Number(route).toString(16) }}</div>
+                                            <div>Forwarded the packet</div>
+                                        </div>
+                                    </li>
+
+                                    <!-- last node in route -->
+                                    <li :onclick="`goToNode(${route})`" v-if="selectedTraceRoute.gateway_id" class="relative flex gap-x-4">
+                                        <div class="absolute left-0 top-0 flex w-6 justify-center h-6">
+                                            <div class="w-px bg-gray-200"></div>
+                                        </div>
+                                        <div class="my-auto relative flex h-6 w-6 flex-none items-center justify-center bg-white">
+                                            <svg class="h-6 w-6 text-green-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                                <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                                            <div class="font-medium text-gray-900">{{ findNodeById(selectedTraceRoute.gateway_id)?.long_name || '???' }}</div>
+                                            <div>Hex ID: !{{ Number(selectedTraceRoute.gateway_id).toString(16) }}</div>
+                                            <div>Gated the packet to MQTT</div>
+                                        </div>
+                                    </li>
+
+                                </ul>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+    </div>
+
 </div>
 
 <script>
@@ -629,6 +778,9 @@
                 selectedNode: null,
                 selectedNodeDeviceMetrics: [],
                 selectedNodeMqttMetrics: [],
+                selectedNodeTraceroutes: [],
+
+                selectedTraceRoute: null,
 
                 moment: window.moment,
 
@@ -649,6 +801,7 @@
                 this.selectedNode = node;
                 this.loadNodeDeviceMetrics(node.node_id);
                 this.loadNodeMqttMetrics(node.node_id);
+                this.loadNodeTraceroutes(node.node_id);
             };
 
             // handle nodes updated callback from outside of vue
@@ -683,6 +836,18 @@
                 this.selectedNodeMqttMetrics = [];
                 window.axios.get(`/api/v1/nodes/${nodeId}/mqtt-metrics`).then((response) => {
                     this.selectedNodeMqttMetrics = response.data.mqtt_metrics;
+                }).catch(() => {
+                    // do nothing
+                });
+            },
+            loadNodeTraceroutes: function(nodeId) {
+                this.selectedNodeTraceroutes = [];
+                window.axios.get(`/api/v1/nodes/${nodeId}/traceroutes`, {
+                    params: {
+                        count: 5,
+                    },
+                }).then((response) => {
+                    this.selectedNodeTraceroutes = response.data.traceroutes;
                 }).catch(() => {
                     // do nothing
                 });
@@ -944,6 +1109,12 @@
                     }
                 });
 
+            },
+            showTraceRoute: function(traceroute) {
+                this.selectedTraceRoute = traceroute;
+            },
+            findNodeById: function(id) {
+                return window.findNodeById(id);
             },
         },
         computed: {
