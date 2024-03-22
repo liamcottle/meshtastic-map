@@ -2,6 +2,8 @@
 
 A map of all Meshtastic nodes heard via MQTT.
 
+<img src="./screenshot.png">
+
 ## How does it work?
 
 - An [mqtt client](./src/mqtt.js) is persistently connected to `mqtt.meshtastic.org` and subscribed to the `#` topic.
