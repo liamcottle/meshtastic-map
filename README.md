@@ -147,6 +147,12 @@ If you have a feature request, or find a bug, please [open an issue](https://git
 
 MIT
 
+## Legal
+
+This project is not affiliated with or endorsed by the Meshtastic project.
+
+The Meshtastic logo trademark is the trademark of Meshtastic LLC.
+
 ## References
 
 - https://meshtastic.org/docs/software/integrations/mqtt/
