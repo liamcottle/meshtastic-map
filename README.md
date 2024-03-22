@@ -69,6 +69,66 @@ A map of all Meshtastic nodes heard via MQTT.
 - store x days worth of historical logs
 - be able to go back in time and see how the mesh evolved
 
+## Install
+
+Clone the project repo.
+
+```
+git clone https://github.com/liamcottle/meshtastic-map
+cd meshtastic-map
+```
+
+Install NodeJS dependencies
+
+```
+npm install
+```
+
+Create a `.env` environment file.
+
+```
+touch .env
+```
+
+Add a database [connection string for prisma](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project/relational-databases/connect-your-database-typescript-postgresql) to `.env` file.
+
+```
+DATABASE_URL="mysql://root@localhost:3306/meshtastic-map?connection_limit=100"
+```
+
+Migrate the database.
+
+```
+npx prisma migrate dev
+```
+
+Run the MQTT listener, to save packets to database.
+
+```
+node src/mqtt.js
+```
+
+Run the Express Server, to serve the `/api` and Map UI.
+
+```
+node src/index.js
+# Server running at http://127.0.0.1:8080
+```
+
+## Upgrading
+
+Run the following commands from inside the `meshtastic-map` repo.
+
+```
+# update repo
+git fetch && git pull
+
+# migrate database
+npx prisma migrate dev
+```
+
+You will now need to restart the `index.js` and `mqtt.js` scripts.
+
 ## References
 
 - https://meshtastic.org/docs/software/integrations/mqtt/
