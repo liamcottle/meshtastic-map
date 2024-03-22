@@ -91,21 +91,23 @@ client.on("message", async (topic, message) => {
         }
 
         // create service envelope in db
-        try {
-            await prisma.serviceEnvelope.create({
-                data: {
-                    mqtt_topic: topic,
-                    channel_id: envelope.channelId,
-                    gateway_id: envelope.gatewayId ? BigInt('0x' + envelope.gatewayId.replaceAll("!", "")) : null, // convert hex id "!f96a92f0" to bigint
-                    to: envelope.packet.to,
-                    from: envelope.packet.from,
-                    protobuf: message,
-                },
-            });
-        } catch (e) {
-            console.error(e, {
-                envelope: envelope.packet,
-            });
+        if(process.env.MM_COLLECT_SERVICE_ENVELOPES === "true"){
+            try {
+                await prisma.serviceEnvelope.create({
+                    data: {
+                        mqtt_topic: topic,
+                        channel_id: envelope.channelId,
+                        gateway_id: envelope.gatewayId ? BigInt('0x' + envelope.gatewayId.replaceAll("!", "")) : null, // convert hex id "!f96a92f0" to bigint
+                        to: envelope.packet.to,
+                        from: envelope.packet.from,
+                        protobuf: message,
+                    },
+                });
+            } catch (e) {
+                console.error(e, {
+                    envelope: envelope.packet,
+                });
+            }
         }
 
         // attempt to decrypt encrypted packets
