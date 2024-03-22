@@ -273,4 +273,8 @@ app.get('/api/v1/waypoints', async (req, res) => {
     }
 });
 
-app.listen(8080);
+// start express server
+const listener = app.listen(8080, () => {
+    const port = listener.address().port;
+    console.log(`Server running at http://127.0.0.1:${port}`);
+});
