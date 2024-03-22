@@ -143,6 +143,10 @@ You will now need to restart the `index.js` and `mqtt.js` scripts.
 
 If you have a feature request, or find a bug, please [open an issue](https://github.com/liamcottle/meshtastic-map/issues) here on GitHub.
 
+## License
+
+MIT
+
 ## References
 
 - https://meshtastic.org/docs/software/integrations/mqtt/
