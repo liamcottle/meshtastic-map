@@ -406,24 +406,41 @@ client.on("message", async (topic, message) => {
             }
 
             try {
-                await prisma.mapReport.create({
-                    data: {
+
+                // find an existing map with duplicate information created in the last 60 seconds
+                const existingDuplicateMapReport = await prisma.mapReport.findFirst({
+                    where: {
                         node_id: envelope.packet.from,
                         long_name: mapReport.longName,
                         short_name: mapReport.shortName,
-                        role: mapReport.role,
-                        hardware_model: mapReport.hwModel,
-                        firmware_version: mapReport.firmwareVersion,
-                        region: mapReport.region,
-                        modem_preset: mapReport.modemPreset,
-                        has_default_channel: mapReport.hasDefaultChannel,
-                        latitude: mapReport.latitudeI,
-                        longitude: mapReport.longitudeI,
-                        altitude: mapReport.altitude,
-                        position_precision: mapReport.positionPrecision,
-                        num_online_local_nodes: mapReport.numOnlineLocalNodes,
-                    },
+                        created_at: {
+                            gte: new Date(Date.now() - 60000), // created in the last 60 seconds
+                        },
+                    }
                 });
+
+                // create map report if no duplicates found
+                if(!existingDuplicateMapReport){
+                    await prisma.mapReport.create({
+                        data: {
+                            node_id: envelope.packet.from,
+                            long_name: mapReport.longName,
+                            short_name: mapReport.shortName,
+                            role: mapReport.role,
+                            hardware_model: mapReport.hwModel,
+                            firmware_version: mapReport.firmwareVersion,
+                            region: mapReport.region,
+                            modem_preset: mapReport.modemPreset,
+                            has_default_channel: mapReport.hasDefaultChannel,
+                            latitude: mapReport.latitudeI,
+                            longitude: mapReport.longitudeI,
+                            altitude: mapReport.altitude,
+                            position_precision: mapReport.positionPrecision,
+                            num_online_local_nodes: mapReport.numOnlineLocalNodes,
+                        },
+                    });
+                }
+
             } catch (e) {
                 console.error(e);
             }
