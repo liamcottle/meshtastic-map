@@ -49,6 +49,10 @@ app.get('/api', async (req, res) => {
             "description": "Meshtastic nodes in JSON format.",
         },
         {
+            "path": "/api/v1/stats/hardware-models",
+            "description": "Database statistics about hardware models in JSON format.",
+        },
+        {
             "path": "/api/v1/waypoints",
             "description": "Meshtastic waypoints in JSON format.",
         },
