@@ -61,7 +61,6 @@ app.get('/api/v1/nodes', async (req, res) => {
                 node_id_hex: "!" + node.node_id.toString(16),
                 hardware_model_name: HardwareModel.valuesById[node.hardware_model] ?? "UNKNOWN",
                 role_name: Role.valuesById[node.role] ?? "UNKNOWN",
-                neighbour_info: node.neighbours, // todo: remove once ui uses new neighbours key
             })
         }
 

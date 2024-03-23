@@ -1639,7 +1639,7 @@
             }
 
             // add node neighbours
-            const neighbours = node.neighbour_info?.neighbours ?? [];
+            const neighbours = node.neighbours ?? [];
             for(const neighbour of neighbours){
 
                 // fixme: skipping zero snr? saw some crazy long neighbours with zero snr...
@@ -1686,7 +1686,7 @@
                         + `<br/>Distance: ${distance}`
                         + `<br/><br/>ID: ${neighbourNode.node_id} -> ${node.node_id}`
                         + `<br/>Hex ID: ${neighbourNode.node_id_hex} -> ${node.node_id_hex}`
-                        + `<br/>Updated: ${moment(new Date(node.neighbour_info.updated_at)).fromNow()}`
+                        + (node.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(node.neighbours_updated_at)).fromNow()}` : '')
                         + `<br/><br/><span class="text-red-500">Note: Some of these super long distance 'Neighbours' don't seem right...</span>`
 
                     line.bindTooltip(tooltip, {
