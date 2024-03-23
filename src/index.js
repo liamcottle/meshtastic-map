@@ -18,6 +18,16 @@ root.loadSync('meshtastic/mqtt.proto');
 const HardwareModel = root.lookupEnum("HardwareModel");
 const Role = root.lookupEnum("Config.DeviceConfig.Role");
 
+// appends extra info for node objects returned from api
+function formatNodeInfo(node) {
+    return {
+        ...node,
+        node_id_hex: "!" + node.node_id.toString(16),
+        hardware_model_name: HardwareModel.valuesById[node.hardware_model] ?? "UNKNOWN",
+        role_name: Role.valuesById[node.role] ?? "UNKNOWN",
+    };
+}
+
 const app = express();
 
 // serve files inside the public folder from /
@@ -54,18 +64,45 @@ app.get('/api/v1/nodes', async (req, res) => {
         // get nodes from db
         const nodes = await prisma.node.findMany();
 
-        const nodesWithNeighbourInfo = [];
+        const nodesWithInfo = [];
         for(const node of nodes){
-            nodesWithNeighbourInfo.push({
-                ...node,
-                node_id_hex: "!" + node.node_id.toString(16),
-                hardware_model_name: HardwareModel.valuesById[node.hardware_model] ?? "UNKNOWN",
-                role_name: Role.valuesById[node.role] ?? "UNKNOWN",
-            })
+            nodesWithInfo.push(formatNodeInfo(node));
         }
 
         res.json({
-            nodes: nodesWithNeighbourInfo,
+            nodes: nodesWithInfo,
+        });
+
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({
+            message: "Something went wrong, try again later.",
+        });
+    }
+});
+
+app.get('/api/v1/nodes/:nodeId', async (req, res) => {
+    try {
+
+        const nodeId = parseInt(req.params.nodeId);
+
+        // find node
+        const node = await prisma.node.findFirst({
+            where: {
+                node_id: nodeId,
+            },
+        });
+
+        // make sure node exists
+        if(!node){
+            res.status(404).json({
+                message: "Not Found",
+            });
+            return;
+        }
+
+        res.json({
+            node: formatNodeInfo(node),
         });
 
     } catch(err) {
@@ -94,6 +131,7 @@ app.get('/api/v1/nodes/:nodeId/device-metrics', async (req, res) => {
             res.status(404).json({
                 message: "Not Found",
             });
+            return;
         }
 
         // get latest device metrics
@@ -136,6 +174,7 @@ app.get('/api/v1/nodes/:nodeId/mqtt-metrics', async (req, res) => {
             res.status(404).json({
                 message: "Not Found",
             });
+            return;
         }
 
         // get mqtt topics published to by this node
@@ -171,6 +210,7 @@ app.get('/api/v1/nodes/:nodeId/traceroutes', async (req, res) => {
             res.status(404).json({
                 message: "Not Found",
             });
+            return;
         }
 
         // get latest traceroutes
