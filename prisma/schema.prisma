@@ -22,9 +22,10 @@ model Node {
   is_licensed    Boolean
   role           Int
 
-  latitude  Int?
-  longitude Int?
-  altitude  Int?
+  latitude            Int?
+  longitude           Int?
+  altitude            Int?
+  position_updated_at DateTime?
 
   battery_level       Int?
   voltage             Decimal?

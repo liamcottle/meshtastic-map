@@ -174,6 +174,7 @@ client.on("message", async (topic, message) => {
                             node_id: envelope.packet.from,
                         },
                         data: {
+                            position_updated_at: new Date(),
                             latitude: position.latitudeI,
                             longitude: position.longitudeI,
                             altitude: position.altitude !== 0 ? position.altitude : null,
