@@ -75,7 +75,6 @@ My version of the map is available at https://meshtastic.liamcottle.net
   - captcha for reg
   - limit how many nodes can be added from an account
 
-- show connection lines between nodes and the neighbours they have heard directly
 - ui to view realtime events from specific nodes
 - ui to view text messages log
 - store x days worth of historical logs
