@@ -1179,6 +1179,7 @@
     map.attributionControl.setPrefix('');
 
     var openStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 22, // increase from 18 to 22
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Data from <a target="_blank" href="https://meshtastic.org/docs/software/integrations/mqtt/">Meshtastic</a>',
     }).addTo(map);
 
