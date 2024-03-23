@@ -48,6 +48,10 @@ app.get('/api', async (req, res) => {
             "path": "/api/v1/nodes",
             "description": "Meshtastic nodes in JSON format.",
         },
+        {
+            "path": "/api/v1/waypoints",
+            "description": "Meshtastic waypoints in JSON format.",
+        },
     ];
 
     const html = links.map((link) => {
