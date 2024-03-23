@@ -832,11 +832,18 @@
 
                         <div class="overflow-y-auto divide-y divide-gray-200">
 
-                            <!-- neighbours_max_distance_in_meters -->
+                            <!-- configNeighboursMaxDistanceInMeters -->
                             <div class="p-2">
                                 <label class="block mb-2 text-sm font-medium text-gray-900">Neighbours Max Distance (meters)</label>
                                 <input type="number" v-model="configNeighboursMaxDistanceInMeters" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                 <div class="text-xs text-gray-600">Neighbours further than this are hidden. Reload to update map.</div>
+                            </div>
+
+                            <!-- configZoomLevelGoToNode -->
+                            <div class="p-2">
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Zoom Level (go to node)</label>
+                                <input type="number" v-model="configZoomLevelGoToNode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                <div class="text-xs text-gray-600">How far to zoom map when navigating to a node.</div>
                             </div>
 
                         </div>
@@ -861,6 +868,16 @@
         return localStorage.setItem("config_neighbours_max_distance_in_meters", value);
     }
 
+    function getConfigZoomLevelGoToNode() {
+        const value = localStorage.getItem("config_zoom_level_go_to_node");
+        const parsedValue = value != null ? parseInt(value) : null;
+        return parsedValue || 10;
+    }
+
+    function setConfigZoomLevelGoToNode(value) {
+        return localStorage.setItem("config_zoom_level_go_to_node", value);
+    }
+
 </script>
 
 <script>
@@ -869,6 +886,7 @@
             return {
 
                 configNeighboursMaxDistanceInMeters: window.getConfigNeighboursMaxDistanceInMeters(),
+                configZoomLevelGoToNode: window.getConfigZoomLevelGoToNode(),
 
                 isShowingHardwareModels: false,
                 hardwareModelStats: null,
@@ -1247,6 +1265,9 @@
             configNeighboursMaxDistanceInMeters() {
                 window.setConfigNeighboursMaxDistanceInMeters(this.configNeighboursMaxDistanceInMeters);
             },
+            configZoomLevelGoToNode() {
+                window.setConfigZoomLevelGoToNode(this.configZoomLevelGoToNode);
+            },
         },
     }).mount('#app');
 </script>
@@ -1454,7 +1475,7 @@
         showNodeOutline(id);
 
         // fly to node marker
-        map.flyTo(nodeMarker.getLatLng(), 10, {
+        map.flyTo(nodeMarker.getLatLng(), getConfigZoomLevelGoToNode(), {
             animate: true,
         });
 
