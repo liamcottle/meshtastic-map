@@ -298,6 +298,7 @@ client.on("message", async (topic, message) => {
                         node_id: envelope.packet.from,
                     },
                     data: {
+                        neighbours_updated_at: new Date(),
                         neighbour_broadcast_interval_secs: neighbourInfo.nodeBroadcastIntervalSecs,
                         neighbours: neighbourInfo.neighbors.map((neighbour) => {
                             return {

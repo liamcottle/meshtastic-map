@@ -33,6 +33,7 @@ model Node {
 
   neighbour_broadcast_interval_secs Int?
   neighbours                        Json?
+  neighbours_updated_at             DateTime?
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
