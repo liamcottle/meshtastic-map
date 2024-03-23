@@ -1855,6 +1855,8 @@
         tooltip += `<br/><br/>ID: ${node.node_id}`;
         tooltip += `<br/>Hex ID: ${node.node_id_hex}`;
         tooltip += `<br/>Updated: ${moment(new Date(node.updated_at)).fromNow()}`;
+        tooltip += (node.neighbours_updated_at ? `<br/>Neighbours Updated: ${moment(new Date(node.neighbours_updated_at)).fromNow()}` : '')
+        tooltip += (node.position_updated_at ? `<br/>Position Updated: ${moment(new Date(node.position_updated_at)).fromNow()}` : '')
 
         return tooltip;
 
