@@ -273,11 +273,32 @@ client.on("message", async (topic, message) => {
                 });
             }
 
+            // create neighbour info
             try {
                 await prisma.neighbourInfo.create({
                     data: {
                         node_id: envelope.packet.from,
                         node_broadcast_interval_secs: neighbourInfo.nodeBroadcastIntervalSecs,
+                        neighbours: neighbourInfo.neighbors.map((neighbour) => {
+                            return {
+                                node_id: neighbour.nodeId,
+                                snr: neighbour.snr,
+                            };
+                        }),
+                    },
+                });
+            } catch (e) {
+                console.error(e);
+            }
+
+            // update node neighbour info in db
+            try {
+                await prisma.node.updateMany({
+                    where: {
+                        node_id: envelope.packet.from,
+                    },
+                    data: {
+                        neighbour_broadcast_interval_secs: neighbourInfo.nodeBroadcastIntervalSecs,
                         neighbours: neighbourInfo.neighbors.map((neighbour) => {
                             return {
                                 node_id: neighbour.nodeId,

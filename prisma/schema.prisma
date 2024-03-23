@@ -31,6 +31,9 @@ model Node {
   channel_utilization Decimal?
   air_util_tx         Decimal?
 
+  neighbour_broadcast_interval_secs Int?
+  neighbours                        Json?
+
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
 
