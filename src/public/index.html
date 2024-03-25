@@ -92,11 +92,11 @@
         }
 
         .z-search {
-            z-index: 1000;
+            z-index: 1001;
         }
 
         .z-sidebar {
-            z-index: 1001;
+            z-index: 1002;
         }
 
     </style>
@@ -109,11 +109,26 @@
         <div class="flex flex-col h-full">
 
             <!-- header -->
-            <div class="flex bg-white p-2 border-gray-300 border-b">
-                <div class="hidden sm:block my-auto mr-3">
+            <div class="flex bg-white p-2 border-gray-300 border-b h-16">
+
+                <!-- close mobile search button -->
+                <div v-if="isShowingMobileSearch" class="my-auto">
+                    <a @click="isShowingMobileSearch = false" href="javascript:void(0)" class="rounded-full">
+                        <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                            </svg>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- icon -->
+                <div v-if="!isShowingMobileSearch" class="hidden sm:block my-auto mr-3">
                     <img class="w-10 h-10 rounded" src="icon.png"/>
                 </div>
-                <div class="my-auto">
+
+                <!-- app info -->
+                <div v-if="!isShowingMobileSearch" class="my-auto leading-tight">
                     <div class="font-bold">Meshtastic Map</div>
                     <div class="text-sm">
                         <div class="hidden sm:inline-block space-x-1">
@@ -130,13 +145,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="mx-3 flex-1 relative hidden lg:block">
+
+                <!-- search bar -->
+                <div class="mx-3 flex-1 relative" :class="{ 'hidden lg:block': !isShowingMobileSearch }">
                     <input v-model="searchText" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" :placeholder="`Search ${nodes.length} nodes...`">
                     <div v-if="searchText !== ''" class="absolute z-search bg-white w-full border border-gray-200 rounded-lg shadow-md mt-1 overflow-y-scroll max-h-80 divide-y divide-gray-200">
 
                         <template v-if="searchedNodes.length > 0">
 
-                            <div @click="searchText = ''" :onclick="`goToNode(${node.node_id})`" class="p-2 hover:bg-gray-100 cursor-pointer" v-for="node of searchedNodes">
+                            <div @click="onSearchResultNodeClick(node)" class="p-2 hover:bg-gray-100 cursor-pointer" v-for="node of searchedNodes">
                                 <div class="text-gray-900">{{ node.long_name !== '' ? node.long_name : "-" }}</div>
                                 <div class="flex space-x-1 text-sm text-gray-700">
                                     <div>Short Name: {{ node.short_name !== '' ? node.short_name : "-" }}</div>
@@ -155,7 +172,9 @@
 
                     </div>
                 </div>
-                <div class="flex my-auto ml-auto mr-0 sm:mr-2 space-x-1 sm:space-x-2">
+
+                <!-- header action buttons -->
+                <div v-if="!isShowingMobileSearch" class="flex my-auto ml-auto mr-0 sm:mr-2 space-x-1 sm:space-x-2">
                     <a href="https://github.com/liamcottle/meshtastic-map" class="tooltip rounded-full hidden lg:block">
                         <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
                             <svg class="w-6 h-6" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -166,7 +185,7 @@
                             <span class="tooltip-text">GitHub</span>
                         </div>
                     </a>
-                    <a href="#" class="tooltip rounded-full block lg:hidden" onclick="searchNodes()">
+                    <a @click="isShowingMobileSearch = true" href="javascript:void(0)" class="tooltip rounded-full block lg:hidden">
                         <div id="search-button" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -226,6 +245,7 @@
                         </div>
                     </a>
                 </div>
+
             </div>
 
             <!-- map -->
@@ -959,6 +979,7 @@
                 isShowingHardwareModels: false,
                 hardwareModelStats: null,
 
+                isShowingMobileSearch: false,
                 isShowingSettings: false,
 
                 nodes: [],
@@ -983,6 +1004,7 @@
             // handle map click callback from outside of vue
             window._onMapClick = () => {
                 this.searchText = "";
+                this.isShowingMobileSearch = false;
             };
 
             // handle node callback from outside of vue
@@ -1305,6 +1327,18 @@
             findNodeById: function(id) {
                 return window.findNodeById(id);
             },
+            onSearchResultNodeClick: function(node) {
+
+                // clear search
+                this.searchText = "";
+
+                // hide search
+                this.isShowingMobileSearch = false;
+
+                // go to node
+                window.goToNode(node.node_id);
+
+            },
         },
         computed: {
             searchedNodes() {
@@ -1441,60 +1475,6 @@
         }
 
         return true;
-
-    }
-
-    function searchNodes() {
-
-        // ask user for input
-        var search = prompt('Find by Node ID');
-        if(search === null || search === ""){
-            return;
-        }
-
-        // find node
-        var nodeId = findNodeId(search);
-        if(!nodeId){
-            alert("Could not find node: " + search);
-            return;
-        }
-
-        goToNode(nodeId);
-
-    }
-
-    function findNodeId(search) {
-
-        // make sure search is a string
-        search = search.toString();
-
-        // find node id from existing marker
-        var nodeMarker = findNodeMarkerById(search);
-        if(nodeMarker){
-            return nodeMarker.options.tagName;
-        }
-
-        // otherwise search nodes on map
-        for(var node of nodes){
-
-            // find by node_id
-            if(node.node_id.toString().toLowerCase() === search.toLowerCase()){
-                return node.node_id;
-            }
-
-            // find by node_id_hex
-            if(node.node_id_hex.toString().toLowerCase() === search.toLowerCase()){
-                return node.node_id;
-            }
-
-            // find by node_id_hex (without "!")
-            if(node.node_id_hex.toString().toLowerCase().replaceAll("!", "") === search.toLowerCase()){
-                return node.node_id;
-            }
-
-        }
-
-        return null;
 
     }
 
