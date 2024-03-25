@@ -866,7 +866,8 @@
 
                             <!-- configNodesMaxAgeInSeconds -->
                             <div class="p-2">
-                                <label class="block mb-2 text-sm font-medium text-gray-900">Nodes Max Age</label>
+                                <label class="block text-sm font-medium text-gray-900">Nodes Max Age</label>
+                                <div class="text-xs text-gray-600 mb-2">Nodes not updated within this time are hidden. Reload to update map.</div>
                                 <select v-model="configNodesMaxAgeInSeconds" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                                     <option :value="null">Show All</option>
                                     <option value="900">15 minutes</option>
@@ -883,21 +884,20 @@
                                     <option value="518400">6 days</option>
                                     <option value="604800">7 days</option>
                                 </select>
-                                <div class="text-xs text-gray-600">Nodes not updated within this time are hidden. Reload to update map.</div>
                             </div>
 
                             <!-- configNeighboursMaxDistanceInMeters -->
                             <div class="p-2">
-                                <label class="block mb-2 text-sm font-medium text-gray-900">Neighbours Max Distance (meters)</label>
+                                <label class="block text-sm font-medium text-gray-900">Neighbours Max Distance (meters)</label>
+                                <div class="text-xs text-gray-600 mb-2">Neighbours further than this are hidden. Reload to update map.</div>
                                 <input type="number" v-model="configNeighboursMaxDistanceInMeters" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                <div class="text-xs text-gray-600">Neighbours further than this are hidden. Reload to update map.</div>
                             </div>
 
                             <!-- configZoomLevelGoToNode -->
                             <div class="p-2">
-                                <label class="block mb-2 text-sm font-medium text-gray-900">Zoom Level (go to node)</label>
+                                <label class="block text-sm font-medium text-gray-900">Zoom Level (go to node)</label>
+                                <div class="text-xs text-gray-600 mb-2">How far to zoom map when navigating to a node.</div>
                                 <input type="number" v-model="configZoomLevelGoToNode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                <div class="text-xs text-gray-600">How far to zoom map when navigating to a node.</div>
                             </div>
 
                         </div>
