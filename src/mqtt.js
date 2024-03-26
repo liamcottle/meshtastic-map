@@ -24,12 +24,18 @@ const options = commandLineArgs([
         type: String,
         description: "MQTT Password (e.g: large4cats)",
     },
+    {
+        name: "collect-service-envelopes",
+        type: Boolean,
+        description: "This option will save all received service envelopes to the database.",
+    },
 ]);
 
 // get options and fallback to default values
 const mqttBrokerUrl = options["mqtt-broker-url"] || "mqtt://mqtt.meshtastic.org";
 const mqttUsername = options["mqtt-username"] || "meshdev";
 const mqttPassword = options["mqtt-password"] || "large4cats";
+const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
 
 // create mqtt client
 const client = mqtt.connect(mqttBrokerUrl, {
@@ -115,7 +121,7 @@ client.on("message", async (topic, message) => {
         }
 
         // create service envelope in db
-        if(process.env.MM_COLLECT_SERVICE_ENVELOPES === "true"){
+        if(collectServiceEnvelopes){
             try {
                 await prisma.serviceEnvelope.create({
                     data: {
