@@ -38,6 +38,7 @@ My version of the map is available at https://meshtastic.liamcottle.net
 - [x] Ability to share a direct link to a node. The map will auto navigate to it.
 - [x] Device list. To see which hardware models are most popular.
 - [x] Mobile optimised layout.
+- [x] Settings available to hide nodes from the map if they haven't been updated in a while.
 - [x] "Neighbours" map layer. Shows blue connection lines between nodes that heard the other node.
   - This information is taken from the `NEIGHBORINFO_APP`.
   - Some neighbour lines are clearly wrong.
