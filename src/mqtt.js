@@ -29,6 +29,13 @@ const options = commandLineArgs([
         type: Boolean,
         description: "This option will save all received service envelopes to the database.",
     },
+    {
+        name: "decryption-keys",
+        type: String,
+        multiple: true,
+        typeLabel: "<base64DecryptionKey>",
+        description: "Decryption keys encoded in base64 to use when decrypting service envelopes.",
+    },
 ]);
 
 // get options and fallback to default values
@@ -36,6 +43,9 @@ const mqttBrokerUrl = options["mqtt-broker-url"] ?? "mqtt://mqtt.meshtastic.org"
 const mqttUsername = options["mqtt-username"] ?? "meshdev";
 const mqttPassword = options["mqtt-password"] ?? "large4cats";
 const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
+const decryptionKeys = options["decryption-keys"] ?? [
+    "1PG7OiApB1nwvP+rz05pAQ==", // add default "AQ==" decryption key
+];
 
 // create mqtt client
 const client = mqtt.connect(mqttBrokerUrl, {
@@ -83,26 +93,32 @@ function createNonce(packetId, fromNode) {
  * https://github.com/pdxlocations/Meshtastic-MQTT-Connect/blob/main/meshtastic-mqtt-connect.py#L381
  */
 function decrypt(packet) {
-    try {
 
-        // default encryption key
-        const key = Buffer.from("1PG7OiApB1nwvP+rz05pAQ==", "base64");
+    // attempt to decrypt with all available decryption keys
+    for(const decryptionKey of decryptionKeys){
+        try {
 
-        // create decryption iv/nonce for this packet
-        const nonceBuffer = createNonce(packet.id, packet.from);
+            // convert encryption key to buffer
+            const key = Buffer.from(decryptionKey, "base64");
 
-        // create aes-128-ctr decipher
-        const decipher = crypto.createDecipheriv('aes-128-ctr', key, nonceBuffer);
+            // create decryption iv/nonce for this packet
+            const nonceBuffer = createNonce(packet.id, packet.from);
 
-        // decrypt encrypted packet
-        const decryptedBuffer = Buffer.concat([decipher.update(packet.encrypted), decipher.final()]);
+            // create aes-128-ctr decipher
+            const decipher = crypto.createDecipheriv('aes-128-ctr', key, nonceBuffer);
 
-        // parse as data message
-        return Data.decode(decryptedBuffer);
+            // decrypt encrypted packet
+            const decryptedBuffer = Buffer.concat([decipher.update(packet.encrypted), decipher.final()]);
 
-    } catch(e) {
-        return null;
+            // parse as data message
+            return Data.decode(decryptedBuffer);
+
+        } catch(e){}
     }
+
+    // couldn't decrypt
+    return null;
+
 }
 
 // subscribe to everything when connected
