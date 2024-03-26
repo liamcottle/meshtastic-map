@@ -933,6 +933,24 @@
 
 <script>
 
+    function getConfigMapEnabledOverlayLayers() {
+
+        try {
+            const value = localStorage.getItem("config_map_enabled_overlay_layers");
+            if(value){
+                return JSON.parse(value);
+            }
+        } catch(e) {}
+
+        // no overlays enabled by default
+        return [];
+
+    }
+
+    function setConfigMapEnabledOverlayLayers(layers) {
+        return localStorage.setItem("config_map_enabled_overlay_layers", JSON.stringify(layers));
+    }
+
     function getConfigNodesMaxAgeInSeconds() {
         const value = localStorage.getItem("config_nodes_max_age_in_seconds");
         return value != null ? parseInt(value) : null;
@@ -1447,11 +1465,36 @@
     // add layers to control ui
     L.control.layers(baseLayers, overlays).addTo(map);
 
-    // add layers to map that should be enabled by default
-    // nodesLayerGroup.addTo(map);
+    // enable base layers
     nodesClusteredLayerGroup.addTo(map);
-    // neighboursLayerGroup.addTo(map);
-    // legend.addTo(map);
+
+    // enable overlay layers based on config
+    const enabledOverlayLayers = getConfigMapEnabledOverlayLayers();
+    if(enabledOverlayLayers.includes("Neighbours")){
+        neighboursLayerGroup.addTo(map);
+    }
+    if(enabledOverlayLayers.includes("Waypoints")){
+        waypointsLayerGroup.addTo(map);
+    }
+
+    // update config when map overlay is added
+    map.on('overlayadd', function(event) {
+        const layerName = event.name;
+        const enabledOverlayLayers = getConfigMapEnabledOverlayLayers();
+        if(!enabledOverlayLayers.includes(layerName)){
+            enabledOverlayLayers.push(layerName);
+        }
+        setConfigMapEnabledOverlayLayers(enabledOverlayLayers);
+    });
+
+    // update config when map overlay is removed
+    map.on('overlayremove', function(event) {
+        const layerName = event.name;
+        const enabledOverlayLayers = getConfigMapEnabledOverlayLayers().filter(function(enabledOverlayLayer) {
+            return enabledOverlayLayer !== layerName;
+        });
+        setConfigMapEnabledOverlayLayers(enabledOverlayLayers);
+    });
 
     // handle map clicks
     map.on('click', function() {
