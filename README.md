@@ -32,10 +32,10 @@ My version of the map is available at https://meshtastic.liamcottle.net
 
 - [x] Connects to mqtt.meshtastic.org to collect nodes and metrics.
 - [x] Shows nodes on the map if they have reported a valid position.
+- [x] Search bar to find nodes by ID, Hex ID, Short Name and Long Name.
 - [x] Hover over nodes on the map to see basic information and a preview image.
-- [x] Click nodes on the map to show a sidebar with more info such as graphs of historical telemetry.
+- [x] Click nodes on the map to show a sidebar with more info such as telemetry graphs and traceroutes.
 - [x] Ability to share a direct link to a node. The map will auto navigate to it.
-- [x] Ability to search for a node by ID and Hex ID. The map will auto navigate to it.
 - [x] Device list. To see which hardware models are most popular.
 - [x] Mobile optimised layout.
 
