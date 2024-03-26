@@ -2,15 +2,39 @@ const crypto = require("crypto");
 const path = require("path");
 const mqtt = require("mqtt");
 const protobufjs = require("protobufjs");
+const commandLineArgs = require('command-line-args');
 
 // create prisma db client
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+const options = commandLineArgs([
+    {
+        name: "mqtt-broker-url",
+        type: String,
+        description: "MQTT Broker URL (e.g: mqtt://mqtt.meshtastic.org)",
+    },
+    {
+        name: "mqtt-username",
+        type: String,
+        description: "MQTT Username (e.g: meshdev)",
+    },
+    {
+        name: "mqtt-password",
+        type: String,
+        description: "MQTT Password (e.g: large4cats)",
+    },
+]);
+
+// get options and fallback to default values
+const mqttBrokerUrl = options["mqtt-broker-url"] || "mqtt://mqtt.meshtastic.org";
+const mqttUsername = options["mqtt-username"] || "meshdev";
+const mqttPassword = options["mqtt-password"] || "large4cats";
+
 // create mqtt client
-const client = mqtt.connect("mqtt://mqtt.meshtastic.org", {
-    username: "meshdev",
-    password: "large4cats",
+const client = mqtt.connect(mqttBrokerUrl, {
+    username: mqttUsername,
+    password: mqttPassword,
 });
 
 // load protobufs
