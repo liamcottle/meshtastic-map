@@ -42,7 +42,10 @@ My version of the map is available at https://meshtastic.liamcottle.net
 ## Beta Features
 
 - [x] "Neighbours" map layer. Shows blue connection lines between nodes that heard the other node.
-  - This information is taken from the `NEIGHBORINFO_APP`, but I feel like some of the neighbours weren't heard?? Maybe I am wrong.
+  - This information is taken from the `NEIGHBORINFO_APP`.
+  - Some neighbour lines are clearly wrong.
+  - Meshtastic firmware older than [v2.3.2](https://github.com/meshtastic/firmware/releases/tag/v2.3.2.63df972) reports MQTT nodes as Neighbours.
+  - This was fixed in [meshtastic/firmware/#3457](https://github.com/meshtastic/firmware/pull/3457), but adoption will likely be slow...
 
 ## Planned Features
 
