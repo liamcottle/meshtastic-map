@@ -140,6 +140,36 @@ npx prisma migrate dev
 
 You will now need to restart the `index.js` and `mqtt.js` scripts.
 
+## MQTT Collector
+
+By default, the [MQTT Collector](./src/mqtt.js) connects to the public Meshtastic MQTT server.
+Alternatively, you may provide the relevant options shown in the help section below to connect to your own MQTT server along with your own decryption keys.
+
+```
+node src/mqtt.js --help
+```
+
+```
+Meshtastic MQTT Collector
+
+  Collects and processes service envelopes from a Meshtastic MQTT server. 
+
+Options
+
+  -h, --help                                    Display this usage guide.
+  --mqtt-broker-url string                      MQTT Broker URL (e.g: mqtt://mqtt.meshtastic.org)
+  --mqtt-username string                        MQTT Username (e.g: meshdev)
+  --mqtt-password string                        MQTT Password (e.g: large4cats)
+  --collect-service-envelopes                   This option will save all received service envelopes to the database.
+  --decryption-keys <base64DecryptionKey> ...   Decryption keys encoded in base64 to use when decrypting service envelopes.
+```
+
+To connect to your own MQTT server, you could do something like the following;
+
+```
+node src/mqtt.js --mqtt-broker-url mqtt://mqtt.example.com --mqtt-username username --mqtt-password password --decryption-keys 1PG7OiApB1nwvP+rz05pAQ==
+```
+
 ## Contributing
 
 If you have a feature request, or find a bug, please [open an issue](https://github.com/liamcottle/meshtastic-map/issues) here on GitHub.
