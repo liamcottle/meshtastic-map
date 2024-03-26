@@ -2,13 +2,20 @@ const crypto = require("crypto");
 const path = require("path");
 const mqtt = require("mqtt");
 const protobufjs = require("protobufjs");
-const commandLineArgs = require('command-line-args');
+const commandLineArgs = require("command-line-args");
+const commandLineUsage = require("command-line-usage");
 
 // create prisma db client
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-const options = commandLineArgs([
+const optionsList = [
+    {
+        name: 'help',
+        alias: 'h',
+        type: Boolean,
+        description: 'Display this usage guide.'
+    },
     {
         name: "mqtt-broker-url",
         type: String,
@@ -33,10 +40,29 @@ const options = commandLineArgs([
         name: "decryption-keys",
         type: String,
         multiple: true,
-        typeLabel: "<base64DecryptionKey>",
+        typeLabel: '<base64DecryptionKey> ...',
         description: "Decryption keys encoded in base64 to use when decrypting service envelopes.",
     },
-]);
+];
+
+// parse command line args
+const options = commandLineArgs(optionsList);
+
+// show help
+if(options.help){
+    const usage = commandLineUsage([
+        {
+            header: 'Meshtastic MQTT Collector',
+            content: 'Collects and processes service envelopes from a Meshtastic MQTT server.',
+        },
+        {
+            header: 'Options',
+            optionList: optionsList,
+        },
+    ]);
+    console.log(usage);
+    return;
+}
 
 // get options and fallback to default values
 const mqttBrokerUrl = options["mqtt-broker-url"] ?? "mqtt://mqtt.meshtastic.org";
