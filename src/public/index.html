@@ -1141,6 +1141,10 @@
         return localStorage.setItem("config_zoom_level_go_to_node", value);
     }
 
+    function isMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
 </script>
 
 <script>
@@ -1155,7 +1159,7 @@
                 isShowingHardwareModels: false,
                 hardwareModelStats: null,
 
-                isShowingInfoModal: !window.getConfigHasSeenInfoModal(),
+                isShowingInfoModal: !window.isMobile() && !window.getConfigHasSeenInfoModal(),
                 isShowingMobileSearch: false,
                 isShowingSettings: false,
 
@@ -1669,10 +1673,6 @@
         window._onMapClick();
 
     });
-
-    function isMobile() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
 
     function isValidLatLng(lat, lng) {
 
