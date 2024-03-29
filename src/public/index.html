@@ -265,7 +265,7 @@
                 leave-active-class="transition-opacity duration-300 ease-linear"
                 leave-from-class="opacity-100"
                 leave-to-class="opacity-0">
-            <div v-show="isShowingInfoModal" @click="isShowingInfoModal = !isShowingInfoModal" class="fixed inset-0 bg-gray-900 bg-opacity-75"></div>
+            <div v-show="isShowingInfoModal" @click="dismissInfoModal" class="fixed inset-0 bg-gray-900 bg-opacity-75"></div>
         </transition>
 
         <!-- modal -->
@@ -284,7 +284,7 @@
                             <!-- close button -->
                             <div class="absolute top-0 right-0">
                                 <div class="h-7">
-                                    <a href="javascript:void(0)" class="rounded-full" @click="isShowingInfoModal = false">
+                                    <a href="javascript:void(0)" class="rounded-full" @click="dismissInfoModal">
                                         <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
                                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -398,7 +398,7 @@
 
                                 <!-- dismiss button -->
                                 <div class="mx-auto">
-                                    <a href="javascript:void(0)" @click="isShowingInfoModal = false">
+                                    <a href="javascript:void(0)" @click="dismissInfoModal">
                                         <div class="bg-gray-200 hover:bg-gray-300 px-6 py-2 rounded-md shadow">
                                             Dismiss
                                         </div>
@@ -1094,6 +1094,14 @@
 
 <script>
 
+    function getConfigHasSeenInfoModal() {
+        return localStorage.getItem("config_has_seen_info_modal") === "true"
+    }
+
+    function setConfigHasSeenInfoModal(value) {
+        return localStorage.setItem("config_has_seen_info_modal", value);
+    }
+
     function getConfigMapEnabledOverlayLayers() {
 
         try {
@@ -1158,7 +1166,7 @@
                 isShowingHardwareModels: false,
                 hardwareModelStats: null,
 
-                isShowingInfoModal: true,
+                isShowingInfoModal: !window.getConfigHasSeenInfoModal(),
                 isShowingMobileSearch: false,
                 isShowingSettings: false,
 
@@ -1518,6 +1526,10 @@
                 // go to node
                 window.goToNode(node.node_id);
 
+            },
+            dismissInfoModal: function() {
+                this.isShowingInfoModal = false;
+                window.setConfigHasSeenInfoModal(true);
             },
         },
         computed: {
