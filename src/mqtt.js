@@ -42,6 +42,11 @@ const optionsList = [
         description: "This option will save all received text messages to the database.",
     },
     {
+        name: "collect-waypoints",
+        type: Boolean,
+        description: "This option will save all received waypoints to the database.",
+    },
+    {
         name: "decryption-keys",
         type: String,
         multiple: true,
@@ -85,6 +90,7 @@ const mqttUsername = options["mqtt-username"] ?? "meshdev";
 const mqttPassword = options["mqtt-password"] ?? "large4cats";
 const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
 const collectTextMessages = options["collect-text-messages"] ?? false;
+const collectWaypoints = options["collect-waypoints"] ?? true;
 const decryptionKeys = options["decryption-keys"] ?? [
     "1PG7OiApB1nwvP+rz05pAQ==", // add default "AQ==" decryption key
 ];
@@ -349,7 +355,7 @@ client.on("message", async (topic, message) => {
 
         }
 
-        else if(portnum === 8) {
+        else if(portnum === 8 && collectWaypoints) {
 
             const waypoint = Waypoint.decode(envelope.packet.decoded.payload);
 
