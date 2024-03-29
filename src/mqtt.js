@@ -47,6 +47,11 @@ const optionsList = [
         description: "This option will save all received waypoints to the database.",
     },
     {
+        name: "collect-neighbour-info",
+        type: Boolean,
+        description: "This option will save all received neighbour infos to the database.",
+    },
+    {
         name: "collect-map-reports",
         type: Boolean,
         description: "This option will save all received map reports to the database.",
@@ -96,6 +101,7 @@ const mqttPassword = options["mqtt-password"] ?? "large4cats";
 const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
 const collectTextMessages = options["collect-text-messages"] ?? false;
 const collectWaypoints = options["collect-waypoints"] ?? true;
+const collectNeighbourInfo = options["collect-neighbour-info"] ?? false;
 const collectMapReports = options["collect-map-reports"] ?? false;
 const decryptionKeys = options["decryption-keys"] ?? [
     "1PG7OiApB1nwvP+rz05pAQ==", // add default "AQ==" decryption key
@@ -417,12 +423,15 @@ client.on("message", async (topic, message) => {
                 });
             }
 
-            // create neighbour info
+            // update node neighbour info in db
             try {
-                await prisma.neighbourInfo.create({
-                    data: {
+                await prisma.node.updateMany({
+                    where: {
                         node_id: envelope.packet.from,
-                        node_broadcast_interval_secs: neighbourInfo.nodeBroadcastIntervalSecs,
+                    },
+                    data: {
+                        neighbours_updated_at: new Date(),
+                        neighbour_broadcast_interval_secs: neighbourInfo.nodeBroadcastIntervalSecs,
                         neighbours: neighbourInfo.neighbors.map((neighbour) => {
                             return {
                                 node_id: neighbour.nodeId,
@@ -435,15 +444,17 @@ client.on("message", async (topic, message) => {
                 console.error(e);
             }
 
-            // update node neighbour info in db
+            // don't store all neighbour infos, but we want to update the existing node above
+            if(!collectNeighbourInfo){
+                return;
+            }
+
+            // create neighbour info
             try {
-                await prisma.node.updateMany({
-                    where: {
-                        node_id: envelope.packet.from,
-                    },
+                await prisma.neighbourInfo.create({
                     data: {
-                        neighbours_updated_at: new Date(),
-                        neighbour_broadcast_interval_secs: neighbourInfo.nodeBroadcastIntervalSecs,
+                        node_id: envelope.packet.from,
+                        node_broadcast_interval_secs: neighbourInfo.nodeBroadcastIntervalSecs,
                         neighbours: neighbourInfo.neighbors.map((neighbour) => {
                             return {
                                 node_id: neighbour.nodeId,
