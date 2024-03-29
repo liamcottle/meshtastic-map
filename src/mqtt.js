@@ -258,7 +258,11 @@ client.on("message", async (topic, message) => {
         const logUnknownPacketTypes = false;
         const portnum = envelope.packet?.decoded?.portnum;
 
-        if(portnum === 1 && collectTextMessages) {
+        if(portnum === 1) {
+
+            if(!collectTextMessages){
+                return;
+            }
 
             if(logKnownPacketTypes) {
                 console.log("TEXT_MESSAGE_APP", {
@@ -361,7 +365,11 @@ client.on("message", async (topic, message) => {
 
         }
 
-        else if(portnum === 8 && collectWaypoints) {
+        else if(portnum === 8) {
+
+            if(!collectWaypoints){
+                return;
+            }
 
             const waypoint = Waypoint.decode(envelope.packet.decoded.payload);
 
