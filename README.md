@@ -162,6 +162,10 @@ Options
   --mqtt-username string                        MQTT Username (e.g: meshdev)
   --mqtt-password string                        MQTT Password (e.g: large4cats)
   --collect-service-envelopes                   This option will save all received service envelopes to the database.
+  --collect-text-messages                       This option will save all received text messages to the database.
+  --collect-waypoints                           This option will save all received waypoints to the database.
+  --collect-neighbour-info                      This option will save all received neighbour infos to the database.
+  --collect-map-reports                         This option will save all received map reports to the database.
   --decryption-keys <base64DecryptionKey> ...   Decryption keys encoded in base64 to use when decrypting service envelopes.
   --purge-interval-seconds number               How long to wait between each automatic database purge.
   --purge-nodes-unheard-for-seconds number      Nodes that haven't been heard from in this many seconds will be purged from the database.
