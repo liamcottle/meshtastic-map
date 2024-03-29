@@ -37,6 +37,11 @@ const optionsList = [
         description: "This option will save all received service envelopes to the database.",
     },
     {
+        name: "collect-text-messages",
+        type: Boolean,
+        description: "This option will save all received text messages to the database.",
+    },
+    {
         name: "decryption-keys",
         type: String,
         multiple: true,
@@ -79,6 +84,7 @@ const mqttBrokerUrl = options["mqtt-broker-url"] ?? "mqtt://mqtt.meshtastic.org"
 const mqttUsername = options["mqtt-username"] ?? "meshdev";
 const mqttPassword = options["mqtt-password"] ?? "large4cats";
 const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
+const collectTextMessages = options["collect-text-messages"] ?? false;
 const decryptionKeys = options["decryption-keys"] ?? [
     "1PG7OiApB1nwvP+rz05pAQ==", // add default "AQ==" decryption key
 ];
@@ -240,7 +246,7 @@ client.on("message", async (topic, message) => {
         const logUnknownPacketTypes = false;
         const portnum = envelope.packet?.decoded?.portnum;
 
-        if(portnum === 1) {
+        if(portnum === 1 && collectTextMessages) {
 
             if(logKnownPacketTypes) {
                 console.log("TEXT_MESSAGE_APP", {
