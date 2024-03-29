@@ -47,6 +47,11 @@ const optionsList = [
         description: "This option will save all received waypoints to the database.",
     },
     {
+        name: "collect-map-reports",
+        type: Boolean,
+        description: "This option will save all received map reports to the database.",
+    },
+    {
         name: "decryption-keys",
         type: String,
         multiple: true,
@@ -91,6 +96,7 @@ const mqttPassword = options["mqtt-password"] ?? "large4cats";
 const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
 const collectTextMessages = options["collect-text-messages"] ?? false;
 const collectWaypoints = options["collect-waypoints"] ?? true;
+const collectMapReports = options["collect-map-reports"] ?? false;
 const decryptionKeys = options["decryption-keys"] ?? [
     "1PG7OiApB1nwvP+rz05pAQ==", // add default "AQ==" decryption key
 ];
@@ -547,6 +553,10 @@ client.on("message", async (topic, message) => {
         }
 
         else if(portnum === 73) {
+
+            if(!collectMapReports){
+                return;
+            }
 
             const mapReport = MapReport.decode(envelope.packet.decoded.payload);
 
