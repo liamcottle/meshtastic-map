@@ -43,6 +43,16 @@ const optionsList = [
         typeLabel: '<base64DecryptionKey> ...',
         description: "Decryption keys encoded in base64 to use when decrypting service envelopes.",
     },
+    {
+        name: "purge-interval-seconds",
+        type: Number,
+        description: "How long to wait between each automatic database purge.",
+    },
+    {
+        name: "purge-nodes-unheard-for-seconds",
+        type: Number,
+        description: "Nodes that haven't been heard from in this many seconds will be purged from the database.",
+    },
 ];
 
 // parse command line args
@@ -72,6 +82,8 @@ const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
 const decryptionKeys = options["decryption-keys"] ?? [
     "1PG7OiApB1nwvP+rz05pAQ==", // add default "AQ==" decryption key
 ];
+const purgeIntervalSeconds = options["purge-interval-seconds"] ?? 10;
+const purgeNodesUnheardForSeconds = options["purge-nodes-unheard-for-seconds"] ?? null;
 
 // create mqtt client
 const client = mqtt.connect(mqttBrokerUrl, {
@@ -92,6 +104,39 @@ const RouteDiscovery = root.lookupType("RouteDiscovery");
 const Telemetry = root.lookupType("Telemetry");
 const User = root.lookupType("User");
 const Waypoint = root.lookupType("Waypoint");
+
+// run automatic purge if configured
+if(purgeIntervalSeconds){
+    setInterval(async () => {
+        await purgeUnheardNodes();
+    }, purgeIntervalSeconds * 1000);
+}
+
+/**
+ * Purges all nodes from the database that haven't been heard from within the configured timeframe.
+ */
+async function purgeUnheardNodes() {
+
+    // make sure seconds provided
+    if(!purgeNodesUnheardForSeconds){
+        return;
+    }
+
+    // delete all nodes that were last updated before configured purge time
+    try {
+        await prisma.node.deleteMany({
+            where: {
+                updated_at: {
+                    // last updated before x seconds ago
+                    lt: new Date(Date.now() - purgeNodesUnheardForSeconds * 1000),
+                },
+            }
+        });
+    } catch(e) {
+        // do nothing
+    }
+
+}
 
 function createNonce(packetId, fromNode) {
 
