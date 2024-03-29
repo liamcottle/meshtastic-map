@@ -163,6 +163,8 @@ Options
   --mqtt-password string                        MQTT Password (e.g: large4cats)
   --collect-service-envelopes                   This option will save all received service envelopes to the database.
   --decryption-keys <base64DecryptionKey> ...   Decryption keys encoded in base64 to use when decrypting service envelopes.
+  --purge-interval-seconds number               How long to wait between each automatic database purge.
+  --purge-nodes-unheard-for-seconds number      Nodes that haven't been heard from in this many seconds will be purged from the database.
 ```
 
 To connect to your own MQTT server, you could do something like the following;
