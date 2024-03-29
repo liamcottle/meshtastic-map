@@ -175,14 +175,14 @@
 
                 <!-- header action buttons -->
                 <div v-if="!isShowingMobileSearch" class="flex my-auto ml-auto mr-0 sm:mr-2 space-x-1 sm:space-x-2">
-                    <a href="https://github.com/liamcottle/meshtastic-map" class="tooltip rounded-full hidden lg:block">
+                    <a @click="isShowingInfoModal = true" href="javascript:void(0)" class="tooltip rounded-full hidden lg:block">
                         <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
-                            <svg class="w-6 h-6" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
                             </svg>
                         </div>
                         <div class="hidden sm:block">
-                            <span class="tooltip-text">GitHub</span>
+                            <span class="tooltip-text">About</span>
                         </div>
                     </a>
                     <a @click="isShowingMobileSearch = true" href="javascript:void(0)" class="tooltip rounded-full block lg:hidden">
@@ -252,6 +252,167 @@
             <div id="map" style="width:100%;height:100%;"></div>
 
         </div>
+    </div>
+
+    <!-- info modal -->
+    <div class="relative z-sidebar">
+
+        <!-- overlay -->
+        <transition
+                enter-active-class="transition-opacity duration-300 ease-linear"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition-opacity duration-300 ease-linear"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0">
+            <div v-show="isShowingInfoModal" @click="isShowingInfoModal = !isShowingInfoModal" class="fixed inset-0 bg-gray-900 bg-opacity-75"></div>
+        </transition>
+
+        <!-- modal -->
+        <transition
+                enter-active-class="transition duration-300 ease-in-out transform"
+                enter-from-class="translate-y-full"
+                enter-to-class="translate-y-0"
+                leave-active-class="transition duration-300 ease-in-out transform"
+                leave-from-class="translate-y-0"
+                leave-to-class="translate-y-full">
+            <div v-show="isShowingInfoModal" class="fixed left-0 right-0 top-0 bottom-0">
+                <div class="flex w-full h-full overflow-y-auto p-4">
+                    <div class="mx-auto my-auto w-full max-w-2xl flex-col bg-white shadow-xl rounded-xl p-2">
+                        <div class="relative flex">
+
+                            <!-- close button -->
+                            <div class="absolute top-0 right-0">
+                                <div class="h-7">
+                                    <a href="javascript:void(0)" class="rounded-full" @click="isShowingInfoModal = false">
+                                        <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M18 6l-12 12"></path>
+                                                <path d="M6 6l12 12"></path>
+                                            </svg>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- content -->
+                            <div class="flex flex-col w-full py-2 space-y-2">
+
+                                <!-- app info -->
+                                <div class="w-full mx-auto text-center">
+                                    <img src="./icon.png" class="mx-auto w-16 h-16 rounded mb-1"/>
+                                    <h1 class="font-bold">Meshtastic Map</h1>
+                                    <h2>Created by <a class="link" target="_blank" href="https://liamcottle.com">Liam Cottle</a></h2>
+                                    <div class="w-full mx-auto text-center space-x-1 mt-2">
+
+                                        <a target="_blank" href="https://twitter.com/liamcottle" title="Twitter" class="raise inline-flex items-center p-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-[#1da1f2] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1da1f2]">
+                                            <svg role="img" class="w-4 h-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill="currentColor" d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"></path>
+                                            </svg>
+                                        </a>
+
+                                        <a target="_blank" href="https://github.com/liamcottle/meshtastic-map" title="GitHub" class="raise inline-flex items-center p-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-[#333333] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#333333]">
+                                            <svg role="img" class="w-4 h-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path>
+                                            </svg>
+                                        </a>
+
+                                        <a target="_blank" href="https://discord.gg/K55zeZyHKK" title="Discord" class="raise inline-flex items-center p-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-[#5865f2] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5865f2]">
+                                            <svg role="img" class="w-4 h-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"></path>
+                                            </svg>
+                                        </a>
+
+                                        <a target="_blank" href="https://paypal.me/liamcarncottle" title="PayPal" class="raise inline-flex items-center p-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-[#0070ba] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0070ba]">
+                                            <svg role="img" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 48 48">
+                                                <path fill="#fff" fill-opacity=".45" d="M16.13 39.115H8.367a1.041 1.041 0 0 1-1.026-1.2l5.234-33.176a1.279 1.279 0 0 1 1.261-1.079h13.335c6.315 0 10.909 4.592 10.8 10.157 3.735 1.95 5.915 5.91 5.234 10.247a12.548 12.548 0 0 1-12.39 10.62H26.89a1.275 1.275 0 0 0-1.261 1.08L23.87 46.9a1.276 1.276 0 0 1-1.262 1.079H15.94a1.04 1.04 0 0 1-1.026-1.199l1.215-7.664v-.002Z"></path>
+                                                <path fill="#fff" fill-opacity=".45" d="M37.973 13.817a11.668 11.668 0 0 0-5.441-1.294H21.414a1.277 1.277 0 0 0-1.261 1.08l-2.098 13.293.006-.035a1.28 1.28 0 0 1 1.256-1.042h6.144a12.553 12.553 0 0 0 12.39-10.62c.071-.457.113-.92.122-1.382Z"></path>
+                                                <path fill="#fff" d="M16.133 39.115H8.368a1.041 1.041 0 0 1-1.026-1.2l5.234-33.176a1.279 1.279 0 0 1 1.261-1.079h13.335c6.315 0 10.909 4.592 10.801 10.157a11.67 11.67 0 0 0-5.441-1.294H21.414a1.277 1.277 0 0 0-1.261 1.08l-2.098 13.293.006-.035-1.928 12.254Z"></path>
+                                            </svg>
+                                        </a>
+
+                                        <a target="_blank" href="https://liamcottle.com/contact" title="Email" class="raise inline-flex items-center p-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </a>
+
+                                    </div>
+                                </div>
+
+                                <!-- welcome -->
+                                <div class="bg-green-100 rounded p-2 border border-green-200">
+                                    👋 Welcome to my open source map of Meshtastic nodes heard on the public MQTT server.
+                                </div>
+
+                                <!-- features -->
+                                <div>
+                                    <div class="font-bold mb-2">Features</div>
+                                    <div class="bg-gray-100 rounded p-2 border border-gray-200">
+                                        <ul class="list-disc list-inside">
+                                            <li>The map shows nodes that have sent a valid position to MQTT.</li>
+                                            <li>Position packets must be unencrypted, or encrypted with the default key.</li>
+                                            <li>Use the search bar to find nodes by ID or name.</li>
+                                            <li>Hover over nodes (on desktop) to see basic details.</li>
+                                            <li>Click a node to see info such as telemetry graphs and traceroutes.</li>
+                                            <li>Use the top right layers panel to show neighbours and waypoints.</li>
+                                            <li>Use the settings button to configure the map to your liking.</li>
+                                            <li>Have a feature request, or found a bug? <a class="link" target="_blank" href="https://github.com/liamcottle/meshtastic-map">Open an issue</a> on GitHub.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- faq -->
+                                <div>
+                                    <div class="font-bold mb-2">FAQ</div>
+                                    <div class="space-y-2">
+                                        <div class="bg-gray-100 rounded p-2 border border-gray-200">
+                                            <div class="font-semibold">How do I show my node on the map?</div>
+                                            <div>Your node, or a node that hears your node must uplink to MQTT.</div>
+                                            <div>Your position packet must be unencrypted, or encrypted with the default key.</div>
+                                        </div>
+                                        <div class="bg-gray-100 rounded p-2 border border-gray-200">
+                                            <div class="font-semibold">How do I hide my node on the map?</div>
+                                            <div>Nodes that have not been heard for 7 days are automatically removed.</div>
+                                            <div>Disable position reporting in your node to prevent it coming back.</div>
+                                            <div>Use custom encryption keys so the public can't see your position data.</div>
+                                        </div>
+                                        <div class="bg-gray-100 rounded p-2 border border-gray-200">
+                                            <div class="font-semibold">How do I see neighbours a node heard?</div>
+                                            <div>Open the top right layers panel and enable neighbours.</div>
+                                            <div>Some neighbours are from MQTT, this is patched in latest firmware.</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- legal -->
+                                <div>
+                                    <div class="font-bold mb-2">Legal</div>
+                                    <div class="bg-gray-100 rounded p-2 border border-gray-200">
+                                        <div>This project is not affiliated with or endorsed by the <a class="link" target="_blank" href="https://meshtastic.org">Meshtastic</a> project.</div>
+                                        <div>The Meshtastic logo is the trademark of Meshtastic LLC.</div>
+                                        <div>Map tiles provided by <a class="link" target="_blank" href="https://www.openstreetmap.org/copyright">OpenStreetMap</a></div>
+                                    </div>
+                                </div>
+
+                                <!-- dismiss button -->
+                                <div class="mx-auto">
+                                    <a href="javascript:void(0)" @click="isShowingInfoModal = false">
+                                        <div class="bg-gray-200 hover:bg-gray-300 px-6 py-2 rounded-md shadow">
+                                            Dismiss
+                                        </div>
+                                    </a>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
     </div>
 
     <!-- hardware models sidebar -->
@@ -997,6 +1158,7 @@
                 isShowingHardwareModels: false,
                 hardwareModelStats: null,
 
+                isShowingInfoModal: true,
                 isShowingMobileSearch: false,
                 isShowingSettings: false,
 
