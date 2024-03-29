@@ -1159,7 +1159,7 @@
                 isShowingHardwareModels: false,
                 hardwareModelStats: null,
 
-                isShowingInfoModal: !window.isMobile() && !window.getConfigHasSeenInfoModal(),
+                isShowingInfoModal: this.shouldShowInfoModal(),
                 isShowingMobileSearch: false,
                 isShowingSettings: false,
 
@@ -1203,6 +1203,10 @@
 
         },
         methods: {
+            shouldShowInfoModal: function() {
+                return !window.getConfigHasSeenInfoModal()
+                    && !window.isMobile();
+            },
             loadHardwareModelStats: function() {
                 window.axios.get('/api/v1/stats/hardware-models').then((response) => {
                     this.hardwareModelStats = response.data.hardware_model_stats;
