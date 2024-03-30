@@ -1070,6 +1070,17 @@
                                 <input type="number" v-model="configZoomLevelGoToNode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                             </div>
 
+                            <!-- configAutoUpdatePositionInUrl -->
+                            <div class="p-2">
+                                <div class="flex items-start">
+                                    <div class="flex items-center h-5">
+                                        <input type="checkbox" v-model="configAutoUpdatePositionInUrl" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300" required>
+                                    </div>
+                                    <label class="ml-2 text-sm font-medium text-gray-900">Auto Update Position in URL</label>
+                                </div>
+                                <div class="text-xs text-gray-600">Sets lat/lng/zoom as query parameters.</div>
+                            </div>
+
                         </div>
 
                     </div>
@@ -1089,6 +1100,14 @@
 
     function setConfigHasSeenInfoModal(value) {
         return localStorage.setItem("config_has_seen_info_modal", value);
+    }
+
+    function getConfigAutoUpdatePositionInUrl() {
+        return localStorage.getItem("config_auto_update_position_in_url") === "true"
+    }
+
+    function setConfigAutoUpdatePositionInUrl(value) {
+        return localStorage.setItem("config_auto_update_position_in_url", value);
     }
 
     function getConfigMapEnabledOverlayLayers() {
@@ -1155,6 +1174,7 @@
                 configNodesMaxAgeInSeconds: window.getConfigNodesMaxAgeInSeconds(),
                 configNeighboursMaxDistanceInMeters: window.getConfigNeighboursMaxDistanceInMeters(),
                 configZoomLevelGoToNode: window.getConfigZoomLevelGoToNode(),
+                configAutoUpdatePositionInUrl: window.getConfigAutoUpdatePositionInUrl(),
 
                 isShowingHardwareModels: false,
                 hardwareModelStats: null,
@@ -1561,6 +1581,9 @@
             },
             configZoomLevelGoToNode() {
                 window.setConfigZoomLevelGoToNode(this.configZoomLevelGoToNode);
+            },
+            configAutoUpdatePositionInUrl() {
+                window.setConfigAutoUpdatePositionInUrl(this.configAutoUpdatePositionInUrl);
             },
         },
     }).mount('#app');
@@ -2230,6 +2253,32 @@
             animate: false,
         });
     }
+
+    // auto update url when lat/lng/zoom changes
+    map.on("moveend zoomend", function() {
+
+        // check if user enabled auto updating position in url
+        const autoUpdatePositionInUrl = getConfigAutoUpdatePositionInUrl();
+        if(!autoUpdatePositionInUrl){
+            return;
+        }
+
+        // get map info
+        const latLng = map.getCenter();
+        const zoom = map.getZoom();
+
+        // construct new url
+        const url = new URL(window.location.href);
+        url.searchParams.set("lat", latLng.lat);
+        url.searchParams.set("lng", latLng.lng);
+        url.searchParams.set("zoom", zoom);
+
+        // update current url
+        if(window.history.replaceState){
+            window.history.replaceState(null, null, url.toString());
+        }
+
+    });
 
     // reload and go to provided node id
     reload(queryNodeId, queryZoom);
