@@ -1712,7 +1712,7 @@
 
     }
 
-    function goToNode(id){
+    function goToNode(id, animate, zoom){
 
         // find node
         var node = findNodeById(id);
@@ -1736,8 +1736,9 @@
         showNodeOutline(id);
 
         // fly to node marker
-        map.flyTo(nodeMarker.getLatLng(), getConfigZoomLevelGoToNode(), {
-            animate: true,
+        const shouldAnimate = animate != null ? animate : true;
+        map.flyTo(nodeMarker.getLatLng(), zoom || getConfigZoomLevelGoToNode(), {
+            animate: shouldAnimate,
         });
 
         // open tooltip for node
@@ -2110,7 +2111,7 @@
         }
     }
 
-    async function reload(goToNodeId) {
+    async function reload(goToNodeId, zoom) {
 
         // show loading
         setLoading(true);
@@ -2130,7 +2131,7 @@
 
             // go to node id if provided
             if(goToNodeId){
-                goToNode(goToNodeId);
+                goToNode(goToNodeId, false, zoom);
             }
 
         });
@@ -2218,9 +2219,20 @@
     // parse url params
     var queryParams = new URLSearchParams(location.search);
     var queryNodeId = queryParams.get('node_id');
+    var queryLat = queryParams.get('lat');
+    var queryLng = queryParams.get('lng');
+    var queryZoom = queryParams.get('zoom');
+
+    // go to lat/lng if provided
+    if(queryLat && queryLng){
+        const zoomLevel = queryZoom || getConfigZoomLevelGoToNode();
+        map.flyTo([queryLat, queryLng], zoomLevel, {
+            animate: false,
+        });
+    }
 
     // reload and go to provided node id
-    reload(queryNodeId);
+    reload(queryNodeId, queryZoom);
 
 </script>
 
