@@ -1808,6 +1808,19 @@
 
     }
 
+    function showNodeDetails(id) {
+
+        // find node
+        const node = findNodeById(id);
+        if(!node){
+            return;
+        }
+
+        // fire callback to vuejs handler
+        window._onNodeClick(node);
+
+    }
+
     function clearMap() {
         closeAllPopups();
         closeAllTooltips();
@@ -1815,6 +1828,24 @@
         clearAllNeighbours();
         clearAllWaypoints();
         clearNodeOutline();
+    }
+
+    // returns true if the element or one of its parents has the class classname
+    function elementOrAnyAncestorHasClass(element, className) {
+
+        // check if element contains class
+        if(element.classList && element.classList.contains(className)){
+            return true;
+        }
+
+        // check if parent node has the class
+        if(element.parentNode){
+            return elementOrAnyAncestorHasClass(element.parentNode, className);
+        }
+
+        // couldn't find the class
+        return false;
+
     }
 
     function onNodesUpdated(updatedNodes) {
@@ -1882,14 +1913,35 @@
                 // show node info sidebar when clicking node marker
                 marker.on("click", function(event) {
 
+                    // close all other popups and tooltips
+                    closeAllTooltips();
+                    closeAllPopups();
+
                     // find node
                     const node = findNodeById(event.target.options.tagName);
                     if(!node){
                         return;
                     }
 
-                    // fire callback to vuejs handler
-                    window._onNodeClick(node);
+                    // open tooltip for node
+                    map.openTooltip(getTooltipContentForNode(node), event.target.getLatLng(), {
+                        interactive: true, // allow clicking buttons inside tooltip
+                        permanent: true, // don't auto dismiss when clicking buttons inside tooltip
+                    });
+
+                });
+
+                // close all tooltips and popups when clicking map
+                map.on("click", function(event) {
+
+                    // do nothing when clicking inside tooltip
+                    const clickedElement = event.originalEvent.target;
+                    if(elementOrAnyAncestorHasClass(clickedElement, "leaflet-tooltip")){
+                        return;
+                    }
+
+                    closeAllTooltips();
+                    closeAllPopups();
 
                 });
 
@@ -2126,8 +2178,11 @@
         tooltip += `<br/><br/>ID: ${node.node_id}`;
         tooltip += `<br/>Hex ID: ${node.node_id_hex}`;
         tooltip += `<br/>Updated: ${moment(new Date(node.updated_at)).fromNow()}`;
-        tooltip += (node.neighbours_updated_at ? `<br/>Neighbours Updated: ${moment(new Date(node.neighbours_updated_at)).fromNow()}` : '')
-        tooltip += (node.position_updated_at ? `<br/>Position Updated: ${moment(new Date(node.position_updated_at)).fromNow()}` : '')
+        tooltip += (node.neighbours_updated_at ? `<br/>Neighbours Updated: ${moment(new Date(node.neighbours_updated_at)).fromNow()}` : '');
+        tooltip += (node.position_updated_at ? `<br/>Position Updated: ${moment(new Date(node.position_updated_at)).fromNow()}` : '');
+
+        // show details button
+        tooltip += `<br/><br/><button onclick="showNodeDetails(${node.node_id});" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200">Show Full Details</button>`;
 
         return tooltip;
 
