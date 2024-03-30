@@ -1779,7 +1779,10 @@
         });
 
         // open tooltip for node
-        map.openTooltip(getTooltipContentForNode(node), nodeMarker.getLatLng());
+        map.openTooltip(getTooltipContentForNode(node), nodeMarker.getLatLng(), {
+            interactive: true, // allow clicking buttons inside tooltip
+            permanent: true, // don't auto dismiss when clicking buttons inside tooltip
+        });
 
     }
 
