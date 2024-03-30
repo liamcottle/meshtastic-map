@@ -1701,6 +1701,20 @@
 
     });
 
+    // close all tooltips and popups when clicking map
+    map.on("click", function(event) {
+
+        // do nothing when clicking inside tooltip
+        const clickedElement = event.originalEvent.target;
+        if(elementOrAnyAncestorHasClass(clickedElement, "leaflet-tooltip")){
+            return;
+        }
+
+        closeAllTooltips();
+        closeAllPopups();
+
+    });
+
     function isValidLatLng(lat, lng) {
 
         if(isNaN(lat) || isNaN(lng)){
@@ -1952,20 +1966,6 @@
                         interactive: true, // allow clicking buttons inside tooltip
                         permanent: true, // don't auto dismiss when clicking buttons inside tooltip
                     });
-
-                });
-
-                // close all tooltips and popups when clicking map
-                map.on("click", function(event) {
-
-                    // do nothing when clicking inside tooltip
-                    const clickedElement = event.originalEvent.target;
-                    if(elementOrAnyAncestorHasClass(clickedElement, "leaflet-tooltip")){
-                        return;
-                    }
-
-                    closeAllTooltips();
-                    closeAllPopups();
 
                 });
 
