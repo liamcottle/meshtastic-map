@@ -17,6 +17,8 @@ root.resolvePath = (origin, target) => path.join(__dirname, "protos", target);
 root.loadSync('meshtastic/mqtt.proto');
 const HardwareModel = root.lookupEnum("HardwareModel");
 const Role = root.lookupEnum("Config.DeviceConfig.Role");
+const RegionCode = root.lookupEnum("Config.LoRaConfig.RegionCode");
+const ModemPreset = root.lookupEnum("Config.LoRaConfig.ModemPreset");
 
 // appends extra info for node objects returned from api
 function formatNodeInfo(node) {
@@ -25,6 +27,8 @@ function formatNodeInfo(node) {
         node_id_hex: "!" + node.node_id.toString(16),
         hardware_model_name: HardwareModel.valuesById[node.hardware_model] ?? "UNKNOWN",
         role_name: Role.valuesById[node.role] ?? "UNKNOWN",
+        region_name: RegionCode.valuesById[node.region] ?? "UNKNOWN",
+        modem_preset_name: ModemPreset.valuesById[node.modem_preset] ?? "UNKNOWN",
     };
 }
 
