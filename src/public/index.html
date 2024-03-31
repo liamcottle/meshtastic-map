@@ -106,7 +106,7 @@
 <div id="app">
 
     <div class="flex flex-col h-full w-full overflow-hidden">
-        <div class="flex flex-col h-full">
+        <div class="flex flex-col h-full" :class="{ 'xl:mr-[28rem]': selectedNode != null }">
 
             <!-- header -->
             <div class="flex bg-white p-2 border-gray-300 border-b h-16">
@@ -489,23 +489,23 @@
                 leave-active-class="transition-opacity duration-300 ease-linear"
                 leave-from-class="opacity-100"
                 leave-to-class="opacity-0">
-            <div v-show="selectedNode != null" @click="selectedNode = null" class="fixed inset-0 bg-gray-900 bg-opacity-75"></div>
+            <div v-show="selectedNode != null" @click="selectedNode = null" class="fixed xl:hidden inset-0 bg-gray-900 bg-opacity-75"></div>
         </transition>
 
         <!-- sidebar -->
         <transition
                 enter-active-class="transition duration-300 ease-in-out transform"
-                enter-from-class="-translate-x-full"
+                enter-from-class="-translate-x-full xl:translate-x-full"
                 enter-to-class="translate-x-0"
                 leave-active-class="transition duration-300 ease-in-out transform"
-                leave-from-class="translate-x-0"
-                leave-to-class="-translate-x-full">
-            <div v-show="selectedNode != null" class="fixed top-0 left-0 bottom-0">
+                leave-from-class="-translate-x-0 xl:translate-x-0"
+                leave-to-class="-translate-x-full xl:-translate-x-full">
+            <div v-show="selectedNode != null" class="fixed top-0 left-0 xl:[left:unset] xl:right-0 bottom-0">
                 <div v-if="selectedNode != null" class="w-screen max-w-md overflow-hidden">
-                    <div class="flex h-full flex-col bg-white shadow-xl">
+                    <div class="flex h-full flex-col bg-white shadow-xl xl:border-l">
 
                         <!-- slideover header -->
-                        <div class="p-2 border-b border-gray-200 shadow">
+                        <div class="p-2 border-b">
                             <div class="flex items-start justify-between">
                                 <div>
                                     <h2 class="font-bold">Node Info</h2>
