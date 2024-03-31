@@ -605,6 +605,12 @@ client.on("message", async (topic, message) => {
 
             const mapReport = MapReport.decode(envelope.packet.decoded.payload);
 
+            // ignore map reports from firmware versions that allowed 0 second interval which spams extreme amounts of map reports
+            if(mapReport.firmwareVersion === "2.3.0.5f47ca1"
+                || mapReport.firmwareVersion === "2.3.1.4fa7f5a"){
+                return;
+            }
+
             if(logKnownPacketTypes) {
                 console.log("MAP_REPORT_APP", {
                     from: envelope.packet.from.toString(16),
