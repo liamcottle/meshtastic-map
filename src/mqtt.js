@@ -630,6 +630,12 @@ client.on("message", async (topic, message) => {
                     latitude: mapReport.latitudeI,
                     longitude: mapReport.longitudeI,
                     altitude: mapReport.altitude !== 0 ? mapReport.altitude : null,
+                    firmware_version: mapReport.firmwareVersion,
+                    region: mapReport.region,
+                    modem_preset: mapReport.modemPreset,
+                    has_default_channel: mapReport.hasDefaultChannel,
+                    position_precision: mapReport.positionPrecision,
+                    num_online_local_nodes: mapReport.numOnlineLocalNodes,
                 };
 
                 await prisma.node.upsert({

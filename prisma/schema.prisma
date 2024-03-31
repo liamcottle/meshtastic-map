@@ -22,6 +22,13 @@ model Node {
   role           Int
   is_licensed    Boolean?
 
+  firmware_version       String?
+  region                 Int?
+  modem_preset           Int?
+  has_default_channel    Boolean?
+  position_precision     Int?
+  num_online_local_nodes Int?
+
   latitude            Int?
   longitude           Int?
   altitude            Int?
