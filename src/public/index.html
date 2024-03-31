@@ -2218,6 +2218,89 @@
             mqttStatus = `<span class="text-blue-700">Offline</span>`;
         }
 
+        // determine lora frequency range based on region_name
+        // https://github.com/meshtastic/firmware/blob/a4c22321fca6fc8da7bab157c3812055603512ba/src/mesh/RadioInterface.cpp#L21
+        var loraFrequencyRange = null;
+        switch(node.region_name){
+            case "US": {
+                loraFrequencyRange = "902-928 MHz";
+                break;
+            }
+            case "EU_433": {
+                loraFrequencyRange = "433-434 MHz";
+                break;
+            }
+            case "EU_868": {
+                loraFrequencyRange = "869.4-869.65 MHz";
+                break;
+            }
+            case "CN": {
+                loraFrequencyRange = "470-510 MHz";
+                break;
+            }
+            case "JP": {
+                loraFrequencyRange = "920.8-927.8 MHz";
+                break;
+            }
+            case "ANZ": {
+                loraFrequencyRange = "915-928 MHz";
+                break;
+            }
+            case "RU": {
+                loraFrequencyRange = "868.7-869.2 MHz";
+                break;
+            }
+            case "KR": {
+                loraFrequencyRange = "920-923 MHz";
+                break;
+            }
+            case "TW": {
+                loraFrequencyRange = "920-925 MHz";
+                break;
+            }
+            case "IN": {
+                loraFrequencyRange = "865-867 MHz";
+                break;
+            }
+            case "NZ_865": {
+                loraFrequencyRange = "864-868 MHz";
+                break;
+            }
+            case "TH": {
+                loraFrequencyRange = "920-925 MHz";
+                break;
+            }
+            case "UA_433": {
+                loraFrequencyRange = "433-434.7 MHz";
+                break;
+            }
+            case "UA_868": {
+                loraFrequencyRange = "868-868.6 MHz";
+                break;
+            }
+            case "MY_433": {
+                loraFrequencyRange = "433-435 MHz";
+                break;
+            }
+            case "MY_919": {
+                loraFrequencyRange = "919-924 MHz";
+                break;
+            }
+            case "SG_923": {
+                loraFrequencyRange = "917-925 MHz";
+                break;
+            }
+            case "LORA_24": {
+                // loraFrequencyRange = "2400-2483.5 MHz";
+                loraFrequencyRange = "2.4-2.4835 GHz";
+                break;
+            }
+            case "UNSET": {
+                loraFrequencyRange = "902-928 MHz";
+                break;
+            }
+        }
+
         var tooltip = `<img class="mb-4 w-40 mx-auto" src="/images/devices/${node.hardware_model_name}.png" onerror="this.classList.add('hidden')"/>` +
             `<b>${node.long_name}</b>` +
             `<br/>Short Name: ${node.short_name}` +
@@ -2226,6 +2309,7 @@
             `<br/>Hardware: ${node.hardware_model_name}` +
             (node.firmware_version != null ? `<br/>Firmware: ${node.firmware_version}` : '') +
             (node.region_name != null ? `<br/>LoRa Region: ${node.region_name}` : '') +
+            (loraFrequencyRange != null ? `<br/>LoRa Frequency: ${loraFrequencyRange}` : '') +
             (node.modem_preset_name != null ? `<br/>Modem Preset: ${node.modem_preset_name}` : '') +
             (node.has_default_channel != null ? `<br/>Has Default Channel: ${node.has_default_channel ? "Yes" : "No"}` : '');
 
