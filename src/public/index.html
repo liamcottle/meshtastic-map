@@ -2224,7 +2224,10 @@
             `<br/>MQTT Status: ${mqttStatus}` +
             `<br/><br/>Role: ${node.role_name}` +
             `<br/>Hardware: ${node.hardware_model_name}` +
-            `<br/>Firmware: ${node.firmware_version || '???'}`;
+            `<br/>Firmware: ${node.firmware_version || '???'}` +
+            `<br/>Region: ${node.region_name || '???'}` +
+            `<br/>Modem Preset : ${node.modem_preset_name || '???'}` +
+            `<br/>Has Default Channel : ${node.has_default_channel != null ? (node.has_default_channel ? "Yes" : "No") : "???"}`;
 
         if(node.battery_level){
             if(node.battery_level > 100){
