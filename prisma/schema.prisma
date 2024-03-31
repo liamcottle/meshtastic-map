@@ -14,13 +14,13 @@ datasource db {
 }
 
 model Node {
-  id             BigInt  @id @default(autoincrement())
-  node_id        BigInt  @unique
+  id             BigInt   @id @default(autoincrement())
+  node_id        BigInt   @unique
   long_name      String
   short_name     String
   hardware_model Int
-  is_licensed    Boolean
   role           Int
+  is_licensed    Boolean?
 
   latitude            Int?
   longitude           Int?

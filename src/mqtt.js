@@ -603,10 +603,6 @@ client.on("message", async (topic, message) => {
 
         else if(portnum === 73) {
 
-            if(!collectMapReports){
-                return;
-            }
-
             const mapReport = MapReport.decode(envelope.packet.decoded.payload);
 
             if(logKnownPacketTypes) {
@@ -614,6 +610,38 @@ client.on("message", async (topic, message) => {
                     from: envelope.packet.from.toString(16),
                     map_report: mapReport,
                 });
+            }
+
+            // create or update node in db
+            try {
+
+                // data to set on node
+                const data = {
+                    long_name: mapReport.longName,
+                    short_name: mapReport.shortName,
+                    hardware_model: mapReport.hwModel,
+                    role: mapReport.role,
+                    latitude: mapReport.latitudeI,
+                    longitude: mapReport.longitudeI,
+                    altitude: mapReport.altitude !== 0 ? mapReport.altitude : null,
+                };
+
+                await prisma.node.upsert({
+                    where: {
+                        node_id: envelope.packet.from,
+                    },
+                    create: {
+                        node_id: envelope.packet.from,
+                        ...data,
+                    },
+                    update: data,
+                });
+            } catch (e) {
+                console.error(e);
+            }
+
+            if(!collectMapReports){
+                return;
             }
 
             try {
