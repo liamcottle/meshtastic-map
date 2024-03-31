@@ -177,6 +177,28 @@ To connect to your own MQTT server, you could do something like the following;
 node src/mqtt.js --mqtt-broker-url mqtt://mqtt.example.com --mqtt-username username --mqtt-password password --decryption-keys 1PG7OiApB1nwvP+rz05pAQ==
 ```
 
+## MQTT Connection Status
+
+The map shows a different coloured icon for nodes based on their connection state to MQTT.
+
+- `Green`: Online (connected to MQTT)
+- `Blue`: Offline (disconnected from MQTT)
+
+This works by listening to `/stat/!ID` topics on the MQTT server.
+
+When a node connects to MQTT it publishes `online` to the topic, and when the MQTT server detects the client has disconnected (via an [LWT](https://www.hivemq.com/blog/mqtt-essentials-part-9-last-will-and-testament/)) it publishes `offline` to the topic.
+
+The Meshtastic [firmware configures](https://github.com/meshtastic/firmware/blob/279464f96d5139920b017d437501233737daf407/src/mqtt/MQTT.cpp#L330) an [LWT](https://www.hivemq.com/blog/mqtt-essentials-part-9-last-will-and-testament/) (Last Will and Testament), which the MQTT server publishes upon client disconnect.
+
+After a node boots up, there is a ~30 second delay before the `online` state is published.
+After a node disconnects from MQTT, there is a ~30 second delay before the `offline` state is published.
+
+If your node is using the `MQTT Client Proxy` feature, where the node sends packets to your Android/iOS device, this will not work as expected.
+
+As of the time of writing these docs, the mobile devices do not correctly configure the LWT for the node being proxied, and thus you can't detect if your node went offline.
+
+Your node will stay "stuck" in the `online` state in the MQTT server.
+
 ## Contributing
 
 If you have a feature request, or find a bug, please [open an issue](https://github.com/liamcottle/meshtastic-map/issues) here on GitHub.
