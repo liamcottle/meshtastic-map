@@ -25,10 +25,10 @@ function formatNodeInfo(node) {
     return {
         ...node,
         node_id_hex: "!" + node.node_id.toString(16),
-        hardware_model_name: HardwareModel.valuesById[node.hardware_model] ?? "UNKNOWN",
-        role_name: Role.valuesById[node.role] ?? "UNKNOWN",
-        region_name: RegionCode.valuesById[node.region] ?? "UNKNOWN",
-        modem_preset_name: ModemPreset.valuesById[node.modem_preset] ?? "UNKNOWN",
+        hardware_model_name: HardwareModel.valuesById[node.hardware_model] ?? null,
+        role_name: Role.valuesById[node.role] ?? null,
+        region_name: RegionCode.valuesById[node.region] ?? null,
+        modem_preset_name: ModemPreset.valuesById[node.modem_preset] ?? null,
     };
 }
 
