@@ -193,7 +193,7 @@ The Meshtastic [firmware configures](https://github.com/meshtastic/firmware/blob
 After a node boots up, there is a ~30 second delay before the `online` state is published.
 After a node disconnects from MQTT, there is a ~30 second delay before the `offline` state is published.
 
-When using the `MQTT Client Proxy` feature, your node sends/receives packets to/from your Android/iOS device, and then your device connects to MQTT and proxies the messages.
+This works well when your node connects to MQTT over WiFi, however, when using the `MQTT Client Proxy` feature, your node sends/receives packets to/from your Android/iOS device, and then your device connects to MQTT and proxies the messages.
 
 ```
 Meshtastic Node <-> Android/iOS <-> MQTT
