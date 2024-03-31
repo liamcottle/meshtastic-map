@@ -43,12 +43,6 @@
         }
 
         .icon-offline {
-            background-color: #dc2626;
-            border-radius: 25px;
-            border: 1px solid white;
-        }
-
-        .icon-unknown {
             background-color: #2563eb;
             border-radius: 25px;
             border: 1px solid white;
@@ -1651,11 +1645,6 @@
         iconSize: [16, 16], // increase from 12px to 16px to make hover easier
     });
 
-    var iconUnknown = L.divIcon({
-        className: 'icon-unknown',
-        iconSize: [16, 16], // increase from 12px to 16px to make hover easier
-    });
-
     // create legend
     var legendLayerGroup = new L.LayerGroup();
     var legend = L.control({position: 'bottomleft'});
@@ -1665,8 +1654,7 @@
         div.style.padding = '12px';
         div.innerHTML = `<div style="margin-bottom:6px;"><strong>MQTT Connection</strong></div>`
             + `<div style="display:flex"><div class="icon-online" style="width:12px;height:12px;margin-right:4px;margin-top:auto;margin-bottom:auto;"></div> Connected</div>`
-            + `<div style="display:flex"><div class="icon-offline" style="width:12px;height:12px;margin-right:4px;margin-top:auto;margin-bottom:auto;"></div> Disconnected</div>`
-            + `<div style="display:flex"><div class="icon-unknown" style="width:12px;height:12px;margin-right:4px;margin-top:auto;margin-bottom:auto;"></div> Not Seen Yet</div>`;
+            + `<div style="display:flex"><div class="icon-offline" style="width:12px;height:12px;margin-right:4px;margin-top:auto;margin-bottom:auto;"></div> Disconnected</div>`;
         return div;
     };
 
@@ -1970,11 +1958,9 @@
                 }
 
                 // icon based on mqtt connection state
-                var icon = iconUnknown;
+                var icon = iconOffline;
                 if(node.mqtt_connection_state === "online"){
                     icon = iconOnline;
-                } else if(node.mqtt_connection_state === "offline"){
-                    icon = iconOffline;
                 }
 
                 // create node marker
@@ -2227,9 +2213,9 @@
         if(node.mqtt_connection_state === "online"){
             mqttStatus = `<span class="text-green-700">Online</span> ${mqttStatusLastUpdated}`;
         } else if(node.mqtt_connection_state === "offline"){
-            mqttStatus = `<span class="text-red-700">Offline</span> ${mqttStatusLastUpdated}`;
+            mqttStatus = `<span class="text-blue-700">Offline</span> ${mqttStatusLastUpdated}`;
         } else {
-            mqttStatus = `<span class="text-blue-700">Not Seen Yet</span>`;
+            mqttStatus = `<span class="text-blue-700">Offline</span>`;
         }
 
         var tooltip = `<img class="mb-4 w-40 mx-auto" src="/images/devices/${node.hardware_model_name}.png" onerror="this.classList.add('hidden')"/>` +
