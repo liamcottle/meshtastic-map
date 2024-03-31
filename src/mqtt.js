@@ -636,6 +636,7 @@ client.on("message", async (topic, message) => {
                     has_default_channel: mapReport.hasDefaultChannel,
                     position_precision: mapReport.positionPrecision,
                     num_online_local_nodes: mapReport.numOnlineLocalNodes,
+                    position_updated_at: new Date(),
                 };
 
                 await prisma.node.upsert({
@@ -648,6 +649,7 @@ client.on("message", async (topic, message) => {
                     },
                     update: data,
                 });
+
             } catch (e) {
                 console.error(e);
             }
