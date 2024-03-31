@@ -42,6 +42,18 @@
             border: 1px solid white;
         }
 
+        .icon-offline {
+            background-color: #dc2626;
+            border-radius: 25px;
+            border: 1px solid white;
+        }
+
+        .icon-unknown {
+            background-color: #2563eb;
+            border-radius: 25px;
+            border: 1px solid white;
+        }
+
         .waypoint-label {
             font-size: 26px;
             background-color: transparent;
@@ -1119,8 +1131,8 @@
             }
         } catch(e) {}
 
-        // no overlays enabled by default
-        return [];
+        // overlays enabled by default
+        return ["Legend"];
 
     }
 
@@ -1634,14 +1646,27 @@
         iconSize: [16, 16], // increase from 12px to 16px to make hover easier
     });
 
+    var iconOffline = L.divIcon({
+        className: 'icon-offline',
+        iconSize: [16, 16], // increase from 12px to 16px to make hover easier
+    });
+
+    var iconUnknown = L.divIcon({
+        className: 'icon-unknown',
+        iconSize: [16, 16], // increase from 12px to 16px to make hover easier
+    });
+
     // create legend
+    var legendLayerGroup = new L.LayerGroup();
     var legend = L.control({position: 'bottomleft'});
     legend.onAdd = function (map) {
-        var div = L.DomUtil.create('div', 'info legend');
+        var div = L.DomUtil.create('div', 'leaflet-control-layers');
         div.style.backgroundColor = 'white';
         div.style.padding = '12px';
-        div.innerHTML = `<div style="margin-bottom:6px;"><strong>Legend</strong></div>`
-            + `<div style="display:flex"><div class="icon-online" style="width:12px;height:12px;margin-right:4px;margin-top:auto;margin-bottom:auto;"></div> ONLINE</div>`;
+        div.innerHTML = `<div style="margin-bottom:6px;"><strong>MQTT Connection</strong></div>`
+            + `<div style="display:flex"><div class="icon-online" style="width:12px;height:12px;margin-right:4px;margin-top:auto;margin-bottom:auto;"></div> Connected</div>`
+            + `<div style="display:flex"><div class="icon-offline" style="width:12px;height:12px;margin-right:4px;margin-top:auto;margin-bottom:auto;"></div> Disconnected</div>`
+            + `<div style="display:flex"><div class="icon-unknown" style="width:12px;height:12px;margin-right:4px;margin-top:auto;margin-bottom:auto;"></div> Not Seen Yet</div>`;
         return div;
     };
 
@@ -1652,9 +1677,21 @@
     };
 
     var overlays = {
+        "Legend": legendLayerGroup,
         "Neighbours": neighboursLayerGroup,
         "Waypoints": waypointsLayerGroup,
     };
+
+    // handle adding/remove legend on map (can't use L.Control as an overlay, so we toggle an empty L.LayerGroup)
+    map.on('overlayadd overlayremove', function(event) {
+        if(event.name === "Legend"){
+            if(event.type === "overlayadd"){
+                map.addControl(legend);
+            } else if(event.type === "overlayremove"){
+                map.removeControl(legend);
+            }
+        }
+    });
 
     // add layers to control ui
     L.control.layers(baseLayers, overlays).addTo(map);
@@ -1664,6 +1701,9 @@
 
     // enable overlay layers based on config
     const enabledOverlayLayers = getConfigMapEnabledOverlayLayers();
+    if(enabledOverlayLayers.includes("Legend")){
+        legendLayerGroup.addTo(map);
+    }
     if(enabledOverlayLayers.includes("Neighbours")){
         neighboursLayerGroup.addTo(map);
     }
@@ -1929,7 +1969,13 @@
                     node.longitude = (longitude += 360);
                 }
 
-                var icon = iconOnline; // todo status
+                // icon based on mqtt connection state
+                var icon = iconUnknown;
+                if(node.mqtt_connection_state === "online"){
+                    icon = iconOnline;
+                } else if(node.mqtt_connection_state === "offline"){
+                    icon = iconOffline;
+                }
 
                 // create node marker
                 var marker = L.marker([node.latitude, node.longitude], {
@@ -2176,12 +2222,14 @@
     function getTooltipContentForNode(node) {
 
         // human friendly connection state
-        var mqttStatus = "???";
+        var mqttStatus = "";
         var mqttStatusLastUpdated = node.mqtt_connection_state_updated_at ? `(${moment(new Date(node.mqtt_connection_state_updated_at)).fromNow()})` : "";
         if(node.mqtt_connection_state === "online"){
             mqttStatus = `<span class="text-green-700">Online</span> ${mqttStatusLastUpdated}`;
         } else if(node.mqtt_connection_state === "offline"){
             mqttStatus = `<span class="text-red-700">Offline</span> ${mqttStatusLastUpdated}`;
+        } else {
+            mqttStatus = `<span class="text-blue-700">Not Seen Yet</span>`;
         }
 
         var tooltip = `<img class="mb-4 w-40 mx-auto" src="/images/devices/${node.hardware_model_name}.png" onerror="this.classList.add('hidden')"/>` +
