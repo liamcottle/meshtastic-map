@@ -2299,89 +2299,33 @@
     }
 
     function getRegionFrequencyRange(regionName) {
+
         // determine lora frequency range based on region_name
         // https://github.com/meshtastic/firmware/blob/a4c22321fca6fc8da7bab157c3812055603512ba/src/mesh/RadioInterface.cpp#L21
-        var loraFrequencyRange = null;
-        switch(regionName){
-            case "US": {
-                loraFrequencyRange = "902-928 MHz";
-                break;
-            }
-            case "EU_433": {
-                loraFrequencyRange = "433-434 MHz";
-                break;
-            }
-            case "EU_868": {
-                loraFrequencyRange = "869.4-869.65 MHz";
-                break;
-            }
-            case "CN": {
-                loraFrequencyRange = "470-510 MHz";
-                break;
-            }
-            case "JP": {
-                loraFrequencyRange = "920.8-927.8 MHz";
-                break;
-            }
-            case "ANZ": {
-                loraFrequencyRange = "915-928 MHz";
-                break;
-            }
-            case "RU": {
-                loraFrequencyRange = "868.7-869.2 MHz";
-                break;
-            }
-            case "KR": {
-                loraFrequencyRange = "920-923 MHz";
-                break;
-            }
-            case "TW": {
-                loraFrequencyRange = "920-925 MHz";
-                break;
-            }
-            case "IN": {
-                loraFrequencyRange = "865-867 MHz";
-                break;
-            }
-            case "NZ_865": {
-                loraFrequencyRange = "864-868 MHz";
-                break;
-            }
-            case "TH": {
-                loraFrequencyRange = "920-925 MHz";
-                break;
-            }
-            case "UA_433": {
-                loraFrequencyRange = "433-434.7 MHz";
-                break;
-            }
-            case "UA_868": {
-                loraFrequencyRange = "868-868.6 MHz";
-                break;
-            }
-            case "MY_433": {
-                loraFrequencyRange = "433-435 MHz";
-                break;
-            }
-            case "MY_919": {
-                loraFrequencyRange = "919-924 MHz";
-                break;
-            }
-            case "SG_923": {
-                loraFrequencyRange = "917-925 MHz";
-                break;
-            }
-            case "LORA_24": {
-                // loraFrequencyRange = "2400-2483.5 MHz";
-                loraFrequencyRange = "2.4-2.4835 GHz";
-                break;
-            }
-            case "UNSET": {
-                loraFrequencyRange = "902-928 MHz";
-                break;
-            }
+        const regionNameToLoraFrequencyRange = {
+            "US": "902-928 MHz",
+            "EU_433": "433-434 MHz",
+            "EU_868": "869.4-869.65 MHz",
+            "CN": "470-510 MHz",
+            "JP": "920.8-927.8 MHz",
+            "ANZ": "915-928 MHz",
+            "RU": "868.7-869.2 MHz",
+            "KR": "920-923 MHz",
+            "TW": "920-925 MHz",
+            "IN": "865-867 MHz",
+            "NZ_865": "864-868 MHz",
+            "TH": "920-925 MHz",
+            "UA_433": "433-434.7 MHz",
+            "UA_868": "868-868.6 MHz",
+            "MY_433": "433-435 MHz",
+            "MY_919": "919-924 MHz",
+            "SG_923": "917-925 MHz",
+            "LORA_24": "2.4-2.4835 GHz",
+            "UNSET": "902-928 MHz",
         }
-        return loraFrequencyRange;
+
+        return regionNameToLoraFrequencyRange[regionName] ?? null;
+
     }
 
     function getTooltipContentForNode(node) {
