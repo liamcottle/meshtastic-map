@@ -596,6 +596,22 @@
                                         </div>
                                     </li>
 
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="truncate">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Firmware</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span v-if="selectedNode.firmware">{{ selectedNode.firmware }}</span>
+                                                            <span v-else class="text-gray-500">???</span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
                                 </ul>
                             </div>
 
