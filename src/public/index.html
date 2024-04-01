@@ -1967,6 +1967,8 @@
                 var marker = L.marker([node.latitude, node.longitude], {
                     icon: icon,
                     tagName: node.node_id,
+                    // we want to show online nodes above offline, but without needing to use separate layer groups
+                    zIndexOffset: node.mqtt_connection_state === "online" ? 1000 : -1000,
                 }).on('click', function(event) {
                     // close tooltip on click to prevent tooltip and popup showing at same time
                     event.target.closeTooltip();
