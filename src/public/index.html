@@ -2347,14 +2347,14 @@
             `<b>${node.long_name}</b>` +
             `<br/>Short Name: ${node.short_name}` +
             `<br/>MQTT Status: ${mqttStatus}` +
+            (node.num_online_local_nodes != null ? `<br/>Local Nodes Online: ${node.num_online_local_nodes}` : '') +
             `<br/><br/>Role: ${node.role_name}` +
             `<br/>Hardware: ${node.hardware_model_name}` +
             (node.firmware_version != null ? `<br/>Firmware: ${node.firmware_version}` : '') +
             (node.region_name != null ? `<br/>LoRa Region: ${node.region_name}` : '') +
             (loraFrequencyRange != null ? `<br/>LoRa Frequency: ${loraFrequencyRange}` : '') +
             (node.modem_preset_name != null ? `<br/>Modem Preset: ${node.modem_preset_name}` : '') +
-            (node.has_default_channel != null ? `<br/>Has Default Channel: ${node.has_default_channel ? "Yes" : "No"}` : '') +
-            (node.num_online_local_nodes != null ? `<br/>Local Nodes Online: ${node.num_online_local_nodes}` : '');
+            (node.has_default_channel != null ? `<br/>Has Default Channel: ${node.has_default_channel ? "Yes" : "No"}` : '');
 
         if(node.battery_level){
             if(node.battery_level > 100){
