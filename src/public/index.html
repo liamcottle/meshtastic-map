@@ -615,6 +615,78 @@
                                 </ul>
                             </div>
 
+                            <!-- lora config -->
+                            <div>
+                                <div class="bg-gray-200 p-2 font-semibold">LoRa Config</div>
+                                <ul role="list" class="flex-1 divide-y divide-gray-200">
+
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="truncate">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Region</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span v-if="selectedNode.region_name">{{ selectedNode.region_name }}</span>
+                                                            <span v-else class="text-gray-500">???</span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="truncate">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Frequency</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span v-if="selectedNode.region_name">{{ getRegionFrequencyRange(selectedNode.region_name) }}</span>
+                                                            <span v-else class="text-gray-500">???</span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="truncate">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Modem Preset</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span v-if="selectedNode.modem_preset_name">{{ selectedNode.modem_preset_name }}</span>
+                                                            <span v-else class="text-gray-500">???</span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="truncate">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Has Default Channel</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span v-if="selectedNode.has_default_channel != null">{{ selectedNode.has_default_channel ? "Yes" : "No" }}</span>
+                                                            <span v-else class="text-gray-500">???</span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                </ul>
+                            </div>
+
                             <!-- telemetry -->
                             <div>
                                 <div class="bg-gray-200 p-2 font-semibold">Telemetry</div>
@@ -1570,6 +1642,9 @@
                 this.isShowingInfoModal = false;
                 window.setConfigHasSeenInfoModal(true);
             },
+            getRegionFrequencyRange: function(regionName) {
+                return window.getRegionFrequencyRange(regionName);
+            },
         },
         computed: {
             searchedNodes() {
@@ -2223,23 +2298,11 @@
 
     }
 
-    function getTooltipContentForNode(node) {
-
-        // human friendly connection state
-        var mqttStatus = "";
-        var mqttStatusLastUpdated = node.mqtt_connection_state_updated_at ? `(${moment(new Date(node.mqtt_connection_state_updated_at)).fromNow()})` : "";
-        if(node.mqtt_connection_state === "online"){
-            mqttStatus = `<span class="text-green-700">Online</span> ${mqttStatusLastUpdated}`;
-        } else if(node.mqtt_connection_state === "offline"){
-            mqttStatus = `<span class="text-blue-700">Offline</span> ${mqttStatusLastUpdated}`;
-        } else {
-            mqttStatus = `<span class="text-blue-700">Offline</span>`;
-        }
-
+    function getRegionFrequencyRange(regionName) {
         // determine lora frequency range based on region_name
         // https://github.com/meshtastic/firmware/blob/a4c22321fca6fc8da7bab157c3812055603512ba/src/mesh/RadioInterface.cpp#L21
         var loraFrequencyRange = null;
-        switch(node.region_name){
+        switch(regionName){
             case "US": {
                 loraFrequencyRange = "902-928 MHz";
                 break;
@@ -2318,6 +2381,23 @@
                 break;
             }
         }
+        return loraFrequencyRange;
+    }
+
+    function getTooltipContentForNode(node) {
+
+        // human friendly connection state
+        var mqttStatus = "";
+        var mqttStatusLastUpdated = node.mqtt_connection_state_updated_at ? `(${moment(new Date(node.mqtt_connection_state_updated_at)).fromNow()})` : "";
+        if(node.mqtt_connection_state === "online"){
+            mqttStatus = `<span class="text-green-700">Online</span> ${mqttStatusLastUpdated}`;
+        } else if(node.mqtt_connection_state === "offline"){
+            mqttStatus = `<span class="text-blue-700">Offline</span> ${mqttStatusLastUpdated}`;
+        } else {
+            mqttStatus = `<span class="text-blue-700">Offline</span>`;
+        }
+
+        var loraFrequencyRange = getRegionFrequencyRange(node.region_name);
 
         var tooltip = `<img class="mb-4 w-40 mx-auto" src="/images/devices/${node.hardware_model_name}.png" onerror="this.classList.add('hidden')"/>` +
             `<b>${node.long_name}</b>` +
