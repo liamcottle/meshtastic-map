@@ -949,7 +949,7 @@
                                         <div class="relative flex items-center">
                                             <div class="block flex-1 p-2">
                                                 <div class="flex space-x-2">
-                                                    <input type="text" readonly class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" :value="`https://meshtastic.liamcottle.net/?node_id=${selectedNode.node_id}`">
+                                                    <input type="text" readonly class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" :value="getShareLinkForNode(selectedNode.node_id)">
                                                 </div>
                                             </div>
                                         </div>
@@ -1653,6 +1653,9 @@
             getRegionFrequencyRange: function(regionName) {
                 return window.getRegionFrequencyRange(regionName);
             },
+            getShareLinkForNode: function(nodeId) {
+                return window.location.origin + `/?node_id=${nodeId}`;
+            }
         },
         computed: {
             searchedNodes() {
