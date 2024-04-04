@@ -1190,6 +1190,17 @@
                                 <div class="text-xs text-gray-600">Sets lat/lng/zoom as query parameters.</div>
                             </div>
 
+                            <!-- configEnableMapAnimations -->
+                            <div class="p-2">
+                                <div class="flex items-start">
+                                    <div class="flex items-center h-5">
+                                        <input type="checkbox" v-model="configEnableMapAnimations" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300" required>
+                                    </div>
+                                    <label class="ml-2 text-sm font-medium text-gray-900">Enable Map Animations</label>
+                                </div>
+                                <div class="text-xs text-gray-600">Map will animate flying to nodes.</div>
+                            </div>
+
                         </div>
 
                     </div>
@@ -1204,7 +1215,7 @@
 <script>
 
     function getConfigHasSeenInfoModal() {
-        return localStorage.getItem("config_has_seen_info_modal") === "true"
+        return localStorage.getItem("config_has_seen_info_modal") === "true";
     }
 
     function setConfigHasSeenInfoModal(value) {
@@ -1212,11 +1223,28 @@
     }
 
     function getConfigAutoUpdatePositionInUrl() {
-        return localStorage.getItem("config_auto_update_position_in_url") === "true"
+        return localStorage.getItem("config_auto_update_position_in_url") === "true";
     }
 
     function setConfigAutoUpdatePositionInUrl(value) {
         return localStorage.setItem("config_auto_update_position_in_url", value);
+    }
+
+    function getConfigEnableMapAnimations() {
+
+        const value = localStorage.getItem("config_enable_map_animations");
+
+        // enable animations by default
+        if(value === null){
+            return true;
+        }
+
+        return value === "true";
+
+    }
+
+    function setConfigEnableMapAnimations(value) {
+        return localStorage.setItem("config_enable_map_animations", value);
     }
 
     function getConfigMapEnabledOverlayLayers() {
@@ -1284,6 +1312,7 @@
                 configNeighboursMaxDistanceInMeters: window.getConfigNeighboursMaxDistanceInMeters(),
                 configZoomLevelGoToNode: window.getConfigZoomLevelGoToNode(),
                 configAutoUpdatePositionInUrl: window.getConfigAutoUpdatePositionInUrl(),
+                configEnableMapAnimations: window.getConfigEnableMapAnimations(),
 
                 isShowingHardwareModels: false,
                 hardwareModelStats: null,
@@ -1716,6 +1745,9 @@
             configAutoUpdatePositionInUrl() {
                 window.setConfigAutoUpdatePositionInUrl(this.configAutoUpdatePositionInUrl);
             },
+            configEnableMapAnimations() {
+                window.setConfigEnableMapAnimations(this.configEnableMapAnimations);
+            },
         },
     }).mount('#app');
 </script>
@@ -1928,7 +1960,7 @@
         // fly to node marker
         const shouldAnimate = animate != null ? animate : true;
         map.flyTo(nodeMarker.getLatLng(), zoom || getConfigZoomLevelGoToNode(), {
-            animate: shouldAnimate,
+            animate: getConfigEnableMapAnimations() ? shouldAnimate : false,
         });
 
         // open tooltip for node
