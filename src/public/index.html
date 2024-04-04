@@ -36,14 +36,20 @@
 
     <style>
 
-        .icon-online {
+        .icon-mqtt-connected {
             background-color: #16a34a;
             border-radius: 25px;
             border: 1px solid white;
         }
 
-        .icon-offline {
+        .icon-mqtt-disconnected {
             background-color: #2563eb;
+            border-radius: 25px;
+            border: 1px solid white;
+        }
+
+        .icon-offline {
+            background-color: #dc2626;
             border-radius: 25px;
             border: 1px solid white;
         }
@@ -1165,6 +1171,30 @@
                                 </select>
                             </div>
 
+                            <!-- configNodesOfflineAgeInSeconds -->
+                            <div class="p-2">
+                                <label class="block text-sm font-medium text-gray-900">Nodes Offline Age</label>
+                                <div class="text-xs text-gray-600 mb-2">Nodes not updated within this time will show as red icons. Reload to update map.</div>
+                                <select v-model="configNodesOfflineAgeInSeconds" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                    <option :value="null">Don't show as offline</option>
+                                    <option value="900">15 minutes</option>
+                                    <option value="1800">30 minutes</option>
+                                    <option value="2700">45 minutes</option>
+                                    <option value="3600">1 hour</option>
+                                    <option value="7200">2 hour</option>
+                                    <option value="10800">3 hours</option>
+                                    <option value="21600">6 hours</option>
+                                    <option value="43200">12 hours</option>
+                                    <option value="86400">24 hours</option>
+                                    <option value="172800">2 days</option>
+                                    <option value="259200">3 days</option>
+                                    <option value="345600">4 days</option>
+                                    <option value="432000">5 days</option>
+                                    <option value="518400">6 days</option>
+                                    <option value="604800">7 days</option>
+                                </select>
+                            </div>
+
                             <!-- configNeighboursMaxDistanceInMeters -->
                             <div class="p-2">
                                 <label class="block text-sm font-medium text-gray-900">Neighbours Max Distance (meters)</label>
@@ -1278,6 +1308,19 @@
         }
     }
 
+    function getConfigNodesOfflineAgeInSeconds() {
+        const value = localStorage.getItem("config_nodes_offline_age_in_seconds");
+        return value != null ? parseInt(value) : null;
+    }
+
+    function setConfigNodesOfflineAgeInSeconds(value) {
+        if(value != null){
+            return localStorage.setItem("config_nodes_offline_age_in_seconds", value);
+        } else {
+            return localStorage.removeItem("config_nodes_offline_age_in_seconds");
+        }
+    }
+
     function getConfigNeighboursMaxDistanceInMeters() {
         const value = localStorage.getItem("config_neighbours_max_distance_in_meters");
         return value != null ? parseInt(value) : null;
@@ -1309,6 +1352,7 @@
             return {
 
                 configNodesMaxAgeInSeconds: window.getConfigNodesMaxAgeInSeconds(),
+                configNodesOfflineAgeInSeconds: window.getConfigNodesOfflineAgeInSeconds(),
                 configNeighboursMaxDistanceInMeters: window.getConfigNeighboursMaxDistanceInMeters(),
                 configZoomLevelGoToNode: window.getConfigZoomLevelGoToNode(),
                 configAutoUpdatePositionInUrl: window.getConfigAutoUpdatePositionInUrl(),
@@ -1736,6 +1780,9 @@
             configNodesMaxAgeInSeconds() {
                 window.setConfigNodesMaxAgeInSeconds(this.configNodesMaxAgeInSeconds);
             },
+            configNodesOfflineAgeInSeconds() {
+                window.setConfigNodesOfflineAgeInSeconds(this.configNodesOfflineAgeInSeconds);
+            },
             configNeighboursMaxDistanceInMeters() {
                 window.setConfigNeighboursMaxDistanceInMeters(this.configNeighboursMaxDistanceInMeters);
             },
@@ -1792,8 +1839,13 @@
     var waypointsLayerGroup = new L.LayerGroup();
 
     // create icons
-    var iconOnline = L.divIcon({
-        className: 'icon-online',
+    var iconMqttConnected = L.divIcon({
+        className: 'icon-mqtt-connected',
+        iconSize: [16, 16], // increase from 12px to 16px to make hover easier
+    });
+
+    var iconMqttDisconnected = L.divIcon({
+        className: 'icon-mqtt-disconnected',
         iconSize: [16, 16], // increase from 12px to 16px to make hover easier
     });
 
@@ -1809,9 +1861,10 @@
         var div = L.DomUtil.create('div', 'leaflet-control-layers');
         div.style.backgroundColor = 'white';
         div.style.padding = '12px';
-        div.innerHTML = `<div style="margin-bottom:6px;"><strong>MQTT Connection</strong></div>`
-            + `<div style="display:flex"><div class="icon-online" style="width:12px;height:12px;margin-right:4px;margin-top:auto;margin-bottom:auto;"></div> Connected</div>`
-            + `<div style="display:flex"><div class="icon-offline" style="width:12px;height:12px;margin-right:4px;margin-top:auto;margin-bottom:auto;"></div> Disconnected</div>`;
+        div.innerHTML = `<div style="margin-bottom:6px;"><strong>Legend</strong></div>`
+            + `<div style="display:flex"><div class="icon-mqtt-connected" style="width:12px;height:12px;margin-right:4px;margin-top:auto;margin-bottom:auto;"></div> MQTT Connected</div>`
+            + `<div style="display:flex"><div class="icon-mqtt-disconnected" style="width:12px;height:12px;margin-right:4px;margin-top:auto;margin-bottom:auto;"></div> MQTT Disconnected</div>`
+            + `<div style="display:flex"><div class="icon-offline" style="width:12px;height:12px;margin-right:4px;margin-top:auto;margin-bottom:auto;"></div> Offline Too Long</div>`;
         return div;
     };
 
@@ -2115,9 +2168,19 @@
                 }
 
                 // icon based on mqtt connection state
-                var icon = iconOffline;
+                var icon = iconMqttDisconnected;
                 if(node.mqtt_connection_state === "online"){
-                    icon = iconOnline;
+                    icon = iconMqttConnected;
+                }
+
+                // use offline icon for nodes older than configured node offline age
+                const now = moment();
+                const configNodesOfflineAgeInSeconds = getConfigNodesOfflineAgeInSeconds();
+                if(configNodesOfflineAgeInSeconds){
+                    const lastUpdatedAgeInMillis = now.diff(moment(node.updated_at));
+                    if(lastUpdatedAgeInMillis > configNodesOfflineAgeInSeconds * 1000){
+                        icon = iconOffline;
+                    }
                 }
 
                 // create node marker
