@@ -942,7 +942,14 @@
 
                             <!-- share -->
                             <div>
-                                <div class="bg-gray-200 p-2 font-semibold">Share Link</div>
+                                <div class="flex bg-gray-200 p-2 font-semibold">
+                                    <div class="my-auto">Share Link</div>
+                                    <div class="ml-auto">
+                                        <button @click="copyShareLinkForNode(selectedNode.node_id)" type="button" class="rounded bg-white px-2 py-1 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                            Copy
+                                        </button>
+                                    </div>
+                                </div>
                                 <ul role="list" class="flex-1 divide-y divide-gray-200">
 
                                     <li>
@@ -1655,7 +1662,23 @@
             },
             getShareLinkForNode: function(nodeId) {
                 return window.location.origin + `/?node_id=${nodeId}`;
-            }
+            },
+            copyShareLinkForNode: function(nodeId) {
+
+                // make sure copy to clipboard is supported
+                if(!navigator.clipboard || !navigator.clipboard.writeText){
+                    alert("Clipboard not supported. Site must be served via https on iOS.");
+                    return;
+                }
+
+                // copy share link to clipboard
+                const url = this.getShareLinkForNode(nodeId);
+                navigator.clipboard.writeText(url);
+
+                // tell use we copied it
+                alert("Copied to clipboard!");
+
+            },
         },
         computed: {
             searchedNodes() {
