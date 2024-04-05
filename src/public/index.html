@@ -20,6 +20,7 @@
     <!-- leaflet map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <script src="plugins/leaflet.polylineoffset.js"></script>
     <script src="plugins/leaflet.markercluster/leaflet.markercluster.js"></script>
     <link rel="stylesheet" href="plugins/leaflet.markercluster/MarkerCluster.css"/>
     <link rel="stylesheet" href="plugins/leaflet.markercluster/MarkerCluster.Default.css"/>
@@ -2288,6 +2289,7 @@
             }
 
             // add node neighbours
+            var polylineOffset = 0;
             const neighbours = node.neighbours ?? [];
             for(const neighbour of neighbours){
 
@@ -2319,7 +2321,11 @@
                     ], {
                         color: '#2563eb',
                         opacity: 0.5,
+                        offset: polylineOffset,
                     }).addTo(neighboursLayerGroup);
+
+                    // increase offset so next neighbour does not overlay other neighbours from self
+                    polylineOffset += 2;
 
                     // default to showing distance in meters
                     var distance = `${distanceInMeters} meters`;
