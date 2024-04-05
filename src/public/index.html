@@ -21,6 +21,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
     <script src="plugins/leaflet.polylineoffset.js"></script>
+    <script src="plugins/leaflet.geometryutil.js"></script>
+    <script src="plugins/leaflet-arrowheads.js"></script>
     <script src="plugins/leaflet.markercluster/leaflet.markercluster.js"></script>
     <link rel="stylesheet" href="plugins/leaflet.markercluster/MarkerCluster.css"/>
     <link rel="stylesheet" href="plugins/leaflet.markercluster/MarkerCluster.Default.css"/>
@@ -1872,6 +1874,7 @@
     // create layer groups
     var nodesLayerGroup = new L.LayerGroup();
     var neighboursLayerGroup = new L.LayerGroup();
+    var nodeNeighboursLayerGroup = new L.LayerGroup();
     var nodesClusteredLayerGroup = L.markerClusterGroup({
         showCoverageOnHover: false,
         disableClusteringAtZoom: 10, // zoom level where goToNode zooms to
@@ -2137,6 +2140,234 @@
 
         // fire callback to vuejs handler
         window._onNodeClick(node);
+
+    }
+
+    function cleanUpNodeNeighbours() {
+
+        // close tooltips and popups
+        closeAllPopups();
+        closeAllTooltips();
+
+        // turn off neighbours layer
+        neighboursLayerGroup.removeFrom(map);
+
+        // setup node neighbours layer
+        nodeNeighboursLayerGroup.clearLayers();
+        nodeNeighboursLayerGroup.removeFrom(map);
+        nodeNeighboursLayerGroup.addTo(map);
+
+    }
+
+    function showNodeNeighboursThatWeHeard(id) {
+
+        cleanUpNodeNeighbours();
+
+        // find node
+        const node = findNodeById(id);
+        if(!node){
+            return;
+        }
+
+        // find node marker
+        const nodeMarker = findNodeMarkerById(node.node_id);
+        if(!nodeMarker){
+            return;
+        }
+
+        // ensure we have neighbours to show
+        const neighbours = node.neighbours ?? [];
+        if(neighbours.length === 0){
+            return;
+        }
+
+        // add node neighbours
+        for(const neighbour of neighbours){
+
+            // fixme: skipping zero snr? saw some crazy long neighbours with zero snr...
+            if(neighbour.snr === 0){
+                continue;
+            }
+
+            // find neighbour node
+            const neighbourNode = findNodeById(neighbour.node_id);
+            if(!neighbourNode){
+                continue;
+            }
+
+            // find neighbour node marker
+            const neighbourNodeMarker = findNodeMarkerById(neighbour.node_id);
+            if(!neighbourNodeMarker){
+                continue;
+            }
+
+            // calculate distance in meters between nodes (rounded to 2 decimal places)
+            const distanceInMeters = nodeMarker.getLatLng().distanceTo(neighbourNodeMarker.getLatLng()).toFixed(2);
+
+            // don't show this neighbour connection if further than config allows
+            const configNeighboursMaxDistanceInMeters = getConfigNeighboursMaxDistanceInMeters();
+            if(configNeighboursMaxDistanceInMeters != null && parseFloat(distanceInMeters) > configNeighboursMaxDistanceInMeters){
+                continue;
+            }
+
+            // add neighbour line to map
+            const line = L.polyline([
+                neighbourNodeMarker.getLatLng(), // from neighbour
+                nodeMarker.getLatLng(), // to us
+            ], {
+                color: '#2563eb',
+                opacity: 0.5,
+            }).arrowheads({
+                size: '10px',
+                fill: true,
+                offsets: {
+                    start: '25px',
+                    end: '25px',
+                },
+            }).addTo(nodeNeighboursLayerGroup);
+
+            // default to showing distance in meters
+            var distance = `${distanceInMeters} meters`;
+
+            // scale to distance in kms
+            if(distanceInMeters >= 1000){
+                const distanceInKilometers = (distanceInMeters / 1000).toFixed(2);
+                distance = `${distanceInKilometers} kilometers`;
+            }
+
+            const tooltip = `<b>${escapeString(node.long_name)}</b> heard <b>${escapeString(neighbourNode.long_name)}</b>`
+                + `<br/>SNR: ${neighbour.snr}dB`
+                + `<br/>Distance: ${distance}`
+                + `<br/><br/>ID: ${node.node_id} heard ${neighbourNode.node_id}`
+                + `<br/>Hex ID: ${node.node_id_hex} heard ${neighbourNode.node_id_hex}`
+                + (node.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(node.neighbours_updated_at)).fromNow()}` : '');
+
+            line.bindTooltip(tooltip, {
+                sticky: true,
+                opacity: 1,
+                interactive: true,
+            })
+                .bindPopup(tooltip)
+                .on('click', function(event) {
+                    // close tooltip on click to prevent tooltip and popup showing at same time
+                    event.target.closeTooltip();
+                });
+
+        }
+
+    }
+
+    function showNodeNeighboursThatHeardUs(id) {
+
+        cleanUpNodeNeighbours();
+
+        // find node
+        const node = findNodeById(id);
+        if(!node){
+            return;
+        }
+
+        // find node marker
+        const nodeMarker = findNodeMarkerById(node.node_id);
+        if(!nodeMarker){
+            return;
+        }
+
+        // find all nodes that have us as a neighbour
+        const neighbourNodeInfos = [];
+        for(const nodeThatMayHaveHeardUs of nodes){
+
+            // find our node in this nodes neighbours
+            const nodeNeighbours = nodeThatMayHaveHeardUs.neighbours ?? [];
+            const neighbour = nodeNeighbours.find(function(neighbour) {
+                return neighbour.node_id.toString() === node.node_id.toString();
+            });
+
+            // we exist as a neighbour
+            if(neighbour){
+                neighbourNodeInfos.push({
+                    node: nodeThatMayHaveHeardUs,
+                    neighbour: neighbour,
+                });
+            }
+
+        }
+
+        // ensure we have neighbours to show
+        if(neighbourNodeInfos.length === 0){
+            return;
+        }
+
+        // add node neighbours
+        for(const neighbourNodeInfo of neighbourNodeInfos){
+
+            const neighbourNode = neighbourNodeInfo.node;
+            const neighbour = neighbourNodeInfo.neighbour;
+
+            // fixme: skipping zero snr? saw some crazy long neighbours with zero snr...
+            if(neighbour.snr === 0){
+                continue;
+            }
+
+            // find neighbour node marker
+            const neighbourNodeMarker = findNodeMarkerById(neighbourNode.node_id);
+            if(!neighbourNodeMarker){
+                continue;
+            }
+
+            // calculate distance in meters between nodes (rounded to 2 decimal places)
+            const distanceInMeters = neighbourNodeMarker.getLatLng().distanceTo(nodeMarker.getLatLng()).toFixed(2);
+
+            // don't show this neighbour connection if further than config allows
+            const configNeighboursMaxDistanceInMeters = getConfigNeighboursMaxDistanceInMeters();
+            if(configNeighboursMaxDistanceInMeters != null && parseFloat(distanceInMeters) > configNeighboursMaxDistanceInMeters){
+                continue;
+            }
+
+            // add neighbour line to map
+            const line = L.polyline([
+                nodeMarker.getLatLng(), // from us
+                neighbourNodeMarker.getLatLng(), // to neighbour
+            ], {
+                color: '#2563eb',
+                opacity: 0.5,
+            }).arrowheads({
+                size: '10px',
+                fill: true,
+                offsets: {
+                    start: '25px',
+                    end: '25px',
+                },
+            }).addTo(nodeNeighboursLayerGroup);
+
+            // default to showing distance in meters
+            var distance = `${distanceInMeters} meters`;
+
+            // scale to distance in kms
+            if(distanceInMeters >= 1000){
+                const distanceInKilometers = (distanceInMeters / 1000).toFixed(2);
+                distance = `${distanceInKilometers} kilometers`;
+            }
+
+            const tooltip = `<b>${escapeString(neighbourNode.long_name)}</b> heard <b>${escapeString(node.long_name)}</b>`
+                + `<br/>SNR: ${neighbour.snr}dB`
+                + `<br/>Distance: ${distance}`
+                + `<br/><br/>ID: ${neighbourNode.node_id} heard ${node.node_id}`
+                + `<br/>Hex ID: ${neighbourNode.node_id_hex} heard ${node.node_id_hex}`
+                + (neighbourNode.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(neighbourNode.neighbours_updated_at)).fromNow()}` : '');
+
+            line.bindTooltip(tooltip, {
+                sticky: true,
+                opacity: 1,
+                interactive: true,
+            })
+                .bindPopup(tooltip)
+                .on('click', function(event) {
+                    // close tooltip on click to prevent tooltip and popup showing at same time
+                    event.target.closeTooltip();
+                });
+
+        }
 
     }
 
@@ -2574,7 +2805,9 @@
         tooltip += (node.position_updated_at ? `<br/>Position Updated: ${moment(new Date(node.position_updated_at)).fromNow()}` : '');
 
         // show details button
-        tooltip += `<br/><br/><button onclick="showNodeDetails(${node.node_id});" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200">Show Full Details</button>`;
+        tooltip += `<br/><br/><button onclick="showNodeDetails(${node.node_id});" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200 mb-1">Show Full Details</button>`;
+        tooltip += `<br/><button onclick="showNodeNeighboursThatWeHeard(${node.node_id});" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200 mb-1">Show Neighbours (We Heard)</button>`;
+        tooltip += `<br/><button onclick="showNodeNeighboursThatHeardUs(${node.node_id});" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200">Show Neighbours (Heard Us)</button>`;
 
         return tooltip;
 
