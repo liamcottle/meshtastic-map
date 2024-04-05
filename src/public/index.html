@@ -2235,7 +2235,7 @@
                 distance = `${distanceInKilometers} kilometers`;
             }
 
-            const tooltip = `<b>${escapeString(node.long_name)}</b> heard <b>${escapeString(neighbourNode.long_name)}</b>`
+            const tooltip = `<b>${escapeString(node.short_name)}</b> heard <b>${escapeString(neighbourNode.short_name)}</b>`
                 + `<br/>SNR: ${neighbour.snr}dB`
                 + `<br/>Distance: ${distance}`
                 + `<br/><br/>ID: ${node.node_id} heard ${neighbourNode.node_id}`
@@ -2349,7 +2349,7 @@
                 distance = `${distanceInKilometers} kilometers`;
             }
 
-            const tooltip = `<b>${escapeString(neighbourNode.long_name)}</b> heard <b>${escapeString(node.long_name)}</b>`
+            const tooltip = `<b>${escapeString(neighbourNode.short_name)}</b> heard <b>${escapeString(node.short_name)}</b>`
                 + `<br/>SNR: ${neighbour.snr}dB`
                 + `<br/>Distance: ${distance}`
                 + `<br/><br/>ID: ${neighbourNode.node_id} heard ${node.node_id}`
