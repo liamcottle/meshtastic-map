@@ -2127,6 +2127,12 @@
 
     }
 
+    // escape strings for tooltips etc, to prevent html/script injection
+    // not used in vuejs, as that auto escapes
+    function escapeString(string) {
+        return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
     function onNodesUpdated(updatedNodes) {
 
         // clear nodes cache
@@ -2285,7 +2291,7 @@
                         distance = `${distanceInKilometers} kilometers`;
                     }
 
-                    const tooltip = `<b>${node.long_name}</b> heard <b>${neighbourNode.long_name}</b>`
+                    const tooltip = `<b>${escapeString(node.long_name)}</b> heard <b>${escapeString(neighbourNode.long_name)}</b>`
                         + `<br/>SNR: ${neighbour.snr}dB`
                         + `<br/>Distance: ${distance}`
                         + `<br/><br/>ID: ${neighbourNode.node_id} -> ${node.node_id}`
@@ -2473,8 +2479,8 @@
         var loraFrequencyRange = getRegionFrequencyRange(node.region_name);
 
         var tooltip = `<img class="mb-4 w-40 mx-auto" src="/images/devices/${node.hardware_model_name}.png" onerror="this.classList.add('hidden')"/>` +
-            `<b>${node.long_name}</b>` +
-            `<br/>Short Name: ${node.short_name}` +
+            `<b>${escapeString(node.long_name)}</b>` +
+            `<br/>Short Name: ${escapeString(node.short_name)}` +
             `<br/>MQTT Status: ${mqttStatus}` +
             (node.num_online_local_nodes != null ? `<br/>Local Nodes Online: ${node.num_online_local_nodes}` : '') +
             `<br/><br/>Role: ${node.role_name}` +
@@ -2524,8 +2530,8 @@
         // get from node name
         var fromNode = findNodeById(waypoint.from);
 
-        var tooltip = `<b>${waypoint.name}</b>` +
-            (waypoint.description ? `<br/>${waypoint.description}` : '') +
+        var tooltip = `<b>${escapeString(waypoint.name)}</b>` +
+            (waypoint.description ? `<br/>${escapeString(waypoint.description)}` : '') +
             `<br/><br/>Expires: ${moment(new Date(waypoint.expire * 1000)).fromNow()}` +
             `<br/>Lat/Lng: ${waypoint.latitude}, ${waypoint.longitude}` +
             `<br/><br/>From ID: ${waypoint.from}` +
@@ -2533,7 +2539,7 @@
 
         // show node name this waypoint is from, if possible
         if(fromNode != null){
-            tooltip += `<br/>From Node: <a href="#" onclick="goToNode(${waypoint.from})">${fromNode.long_name || 'Unnamed Node'}</a>`;
+            tooltip += `<br/>From Node: <a href="#" onclick="goToNode(${waypoint.from})">${escapeString(fromNode.long_name) || 'Unnamed Node'}</a>`;
         } else {
             tooltip += `<br/>From Node: ???`;
         }
