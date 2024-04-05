@@ -279,13 +279,8 @@ app.get('/api/v1/stats/hardware-models', async (req, res) => {
 app.get('/api/v1/waypoints', async (req, res) => {
     try {
 
-        // get waypoints from db that have not expired yet
+        // get waypoints from db
         const waypoints = await prisma.waypoint.findMany({
-            where: {
-                expire: {
-                    gte: Math.floor(Date.now() / 1000), // now in seconds
-                },
-            },
             orderBy: {
                 id: 'desc',
             },
@@ -306,8 +301,14 @@ app.get('/api/v1/waypoints', async (req, res) => {
 
         }
 
+        // we only want waypoints that haven't expired yet
+        const nonExpiredWayPoints = uniqueWaypoints.filter((waypoint) => {
+            const nowInSeconds = Math.floor(Date.now() / 1000);
+            return waypoint.expire >= nowInSeconds;
+        });
+
         res.json({
-            waypoints: uniqueWaypoints,
+            waypoints: nonExpiredWayPoints,
         });
 
     } catch(err) {
