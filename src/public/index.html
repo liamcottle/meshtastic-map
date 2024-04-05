@@ -1195,6 +1195,28 @@
                                 </select>
                             </div>
 
+                            <!-- configWaypointsMaxAgeInSeconds -->
+                            <div class="p-2">
+                                <label class="block text-sm font-medium text-gray-900">Waypoints Max Age</label>
+                                <div class="text-xs text-gray-600 mb-2">Waypoints not updated within this time are hidden. Reload to update map.</div>
+                                <select v-model="configWaypointsMaxAgeInSeconds" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                    <option :value="null">Show All</option>
+                                    <option value="900">15 minutes</option>
+                                    <option value="1800">30 minutes</option>
+                                    <option value="3600">1 hour</option>
+                                    <option value="10800">3 hours</option>
+                                    <option value="21600">6 hours</option>
+                                    <option value="43200">12 hours</option>
+                                    <option value="86400">24 hours</option>
+                                    <option value="172800">2 days</option>
+                                    <option value="259200">3 days</option>
+                                    <option value="345600">4 days</option>
+                                    <option value="432000">5 days</option>
+                                    <option value="518400">6 days</option>
+                                    <option value="604800">7 days</option>
+                                </select>
+                            </div>
+
                             <!-- configNeighboursMaxDistanceInMeters -->
                             <div class="p-2">
                                 <label class="block text-sm font-medium text-gray-900">Neighbours Max Distance (meters)</label>
@@ -1321,6 +1343,19 @@
         }
     }
 
+    function getConfigWaypointsMaxAgeInSeconds() {
+        const value = localStorage.getItem("config_waypoints_max_age_in_seconds");
+        return value != null ? parseInt(value) : null;
+    }
+
+    function setConfigWaypointsMaxAgeInSeconds(value) {
+        if(value != null){
+            return localStorage.setItem("config_waypoints_max_age_in_seconds", value);
+        } else {
+            return localStorage.removeItem("config_waypoints_max_age_in_seconds");
+        }
+    }
+
     function getConfigNeighboursMaxDistanceInMeters() {
         const value = localStorage.getItem("config_neighbours_max_distance_in_meters");
         return value != null ? parseInt(value) : null;
@@ -1353,6 +1388,7 @@
 
                 configNodesMaxAgeInSeconds: window.getConfigNodesMaxAgeInSeconds(),
                 configNodesOfflineAgeInSeconds: window.getConfigNodesOfflineAgeInSeconds(),
+                configWaypointsMaxAgeInSeconds: window.getConfigWaypointsMaxAgeInSeconds(),
                 configNeighboursMaxDistanceInMeters: window.getConfigNeighboursMaxDistanceInMeters(),
                 configZoomLevelGoToNode: window.getConfigZoomLevelGoToNode(),
                 configAutoUpdatePositionInUrl: window.getConfigAutoUpdatePositionInUrl(),
@@ -1782,6 +1818,9 @@
             },
             configNodesOfflineAgeInSeconds() {
                 window.setConfigNodesOfflineAgeInSeconds(this.configNodesOfflineAgeInSeconds);
+            },
+            configWaypointsMaxAgeInSeconds() {
+                window.setConfigWaypointsMaxAgeInSeconds(this.configWaypointsMaxAgeInSeconds);
             },
             configNeighboursMaxDistanceInMeters() {
                 window.setConfigNeighboursMaxDistanceInMeters(this.configNeighboursMaxDistanceInMeters);
@@ -2326,6 +2365,16 @@
 
         // add nodes
         for(var waypoint of updatedWaypoints){
+
+            // skip waypoints older than configured waypoint max age
+            const now = moment();
+            const configWaypointsMaxAgeInSeconds = getConfigWaypointsMaxAgeInSeconds();
+            if(configWaypointsMaxAgeInSeconds){
+                const lastUpdatedAgeInMillis = now.diff(moment(waypoint.updated_at));
+                if(lastUpdatedAgeInMillis > configWaypointsMaxAgeInSeconds * 1000){
+                    continue;
+                }
+            }
 
             // skip expired waypoints
             if(waypoint.expire < Date.now() / 1000){
