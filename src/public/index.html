@@ -2874,6 +2874,11 @@
             tooltip += `<br/>Air Util: ${Number(node.air_util_tx).toFixed(2)}%`;
         }
 
+        // ignore alt above 42949000 due to https://github.com/meshtastic/firmware/issues/3109
+        if(node.altitude && node.altitude < 42949000){
+            tooltip += `<br/>Altitude: ${node.altitude}m`;
+        }
+
         // bottom info
         tooltip += `<br/><br/>ID: ${node.node_id}`;
         tooltip += `<br/>Hex ID: ${node.node_id_hex}`;
