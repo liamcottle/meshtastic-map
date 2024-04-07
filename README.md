@@ -64,6 +64,8 @@ My version of the map is available at https://meshtastic.liamcottle.net
 
 ## TODO
 
+- use proper vuejs build process
+- don't use hosted javascript deps so we can run fully offline
 - dedupe packets to prevent spamming database
 - track gateway id and channel for packets
 
