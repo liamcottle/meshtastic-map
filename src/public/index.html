@@ -1265,6 +1265,47 @@
 
     </div>
 
+    <!-- node neighbours modal -->
+    <div class="relative z-sidebar" role="dialog" aria-modal="true">
+
+        <!-- sidebar -->
+        <transition
+                enter-active-class="transition duration-300 ease-in-out transform"
+                enter-from-class="translate-y-full"
+                enter-to-class="translate-y-0"
+                leave-active-class="transition duration-300 ease-in-out transform"
+                leave-from-class="translate-y-0"
+                leave-to-class="translate-y-full">
+            <div v-show="selectedNodeToShowNeighbours != null" class="fixed left-0 right-0 bottom-0">
+                <div v-if="selectedNodeToShowNeighbours != null" class="mx-auto w-screen max-w-md p-4">
+                    <div class="flex h-full flex-col bg-white shadow-xl rounded-xl">
+                        <div class="p-2">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h2 class="font-bold">{{ selectedNodeToShowNeighbours.short_name }} Neighbours</h2>
+                                    <h3 v-if="selectedNodeToShowNeighboursType === 'we_heard'" class="text-sm">Nodes heard by {{ selectedNodeToShowNeighbours.short_name }}</h3>
+                                    <h3 v-if="selectedNodeToShowNeighboursType === 'heard_us'" class="text-sm">Nodes that heard {{ selectedNodeToShowNeighbours.short_name }}</h3>
+                                </div>
+                                <div class="my-auto ml-3 flex h-7 items-center">
+                                    <a href="javascript:void(0)" class="rounded-full" @click="dismissShowingNodeNeighbours">
+                                        <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
+                                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M18 6l-12 12"></path>
+                                                <path d="M6 6l12 12"></path>
+                                            </svg>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+    </div>
+
 </div>
 
 <script>
@@ -1414,6 +1455,9 @@
 
                 selectedTraceRoute: null,
 
+                selectedNodeToShowNeighbours: null,
+                selectedNodeToShowNeighboursType: null,
+
                 moment: window.moment,
 
             };
@@ -1435,6 +1479,18 @@
                 this.loadNodeDeviceMetrics(node.node_id);
                 this.loadNodeMqttMetrics(node.node_id);
                 this.loadNodeTraceroutes(node.node_id);
+            };
+
+            // handle node callback from outside of vue
+            window._onShowNodeNeighboursWeHeardClick = (node) => {
+                this.selectedNodeToShowNeighbours = node;
+                this.selectedNodeToShowNeighboursType = 'we_heard';
+            };
+
+            // handle node callback from outside of vue
+            window._onShowNodeNeighboursHeardUsClick = (node) => {
+                this.selectedNodeToShowNeighbours = node;
+                this.selectedNodeToShowNeighboursType = 'heard_us';
             };
 
             // handle nodes updated callback from outside of vue
@@ -1791,6 +1847,10 @@
                 alert("Copied to clipboard!");
 
             },
+            dismissShowingNodeNeighbours: function() {
+                window._onHideNodeNeighboursClick();
+                this.selectedNodeToShowNeighbours = null;
+            },
         },
         computed: {
             searchedNodes() {
@@ -2143,6 +2203,11 @@
 
     }
 
+    function getColourForSnr(snr) {
+        if(snr >= 0) return "#16a34a"; // good
+        if(snr < 0) return "#dc2626"; // bad
+    }
+
     function cleanUpNodeNeighbours() {
 
         // close tooltips and popups
@@ -2174,6 +2239,9 @@
         if(!nodeMarker){
             return;
         }
+
+        // show overlay for node neighbours
+        window._onShowNodeNeighboursWeHeardClick(node);
 
         // ensure we have neighbours to show
         const neighbours = node.neighbours ?? [];
@@ -2215,8 +2283,9 @@
                 neighbourNodeMarker.getLatLng(), // from neighbour
                 nodeMarker.getLatLng(), // to us
             ], {
-                color: '#2563eb',
-                opacity: 0.5,
+                color: getColourForSnr(neighbour.snr),
+                weight: 5,
+                opacity: 1,
             }).arrowheads({
                 size: '10px',
                 fill: true,
@@ -2272,6 +2341,9 @@
         if(!nodeMarker){
             return;
         }
+
+        // show overlay for node neighbours
+        window._onShowNodeNeighboursHeardUsClick(node);
 
         // find all nodes that have us as a neighbour
         const neighbourNodeInfos = [];
@@ -2329,8 +2401,9 @@
                 nodeMarker.getLatLng(), // from us
                 neighbourNodeMarker.getLatLng(), // to neighbour
             ], {
-                color: '#2563eb',
-                opacity: 0.5,
+                color: getColourForSnr(neighbour.snr),
+                weight: 5,
+                opacity: 1,
             }).arrowheads({
                 size: '10px',
                 fill: true,
@@ -2378,6 +2451,7 @@
         clearAllNeighbours();
         clearAllWaypoints();
         clearNodeOutline();
+        cleanUpNodeNeighbours();
     }
 
     // returns true if the element or one of its parents has the class classname
@@ -2806,8 +2880,8 @@
 
         // show details button
         tooltip += `<br/><br/><button onclick="showNodeDetails(${node.node_id});" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200 mb-1">Show Full Details</button>`;
-        tooltip += `<br/><button onclick="showNodeNeighboursThatWeHeard(${node.node_id});" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200 mb-1">Show Neighbours (We Heard)</button>`;
-        tooltip += `<br/><button onclick="showNodeNeighboursThatHeardUs(${node.node_id});" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200">Show Neighbours (Heard Us)</button>`;
+        tooltip += `<br/><button onclick="showNodeNeighboursThatHeardUs(${node.node_id});" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200 mb-1">Show Neighbours (Heard Us)</button>`;
+        tooltip += `<br/><button onclick="showNodeNeighboursThatWeHeard(${node.node_id});" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200">Show Neighbours (We Heard)</button>`;
 
         return tooltip;
 
@@ -2839,6 +2913,10 @@
         return tooltip;
 
     }
+
+    window._onHideNodeNeighboursClick = function() {
+        cleanUpNodeNeighbours();
+    };
 
     // parse url params
     var queryParams = new URLSearchParams(location.search);
