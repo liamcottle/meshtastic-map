@@ -39,6 +39,11 @@
 
     <style>
 
+        /* used to prevent ui flicker before vuejs loads */
+        [v-cloak] {
+            display: none;
+        }
+
         .icon-mqtt-connected {
             background-color: #16a34a;
             border-radius: 25px;
@@ -118,7 +123,7 @@
 
 </head>
 <body class="h-full bg-gray-200">
-<div id="app">
+<div id="app" v-cloak>
 
     <div class="flex flex-col h-full w-full overflow-hidden">
         <div class="flex flex-col h-full">
