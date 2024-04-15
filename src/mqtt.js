@@ -587,7 +587,9 @@ client.on("message", async (topic, message) => {
             try {
                 await prisma.traceRoute.create({
                     data: {
-                        node_id: envelope.packet.from,
+                        from_id: envelope.packet.from,
+                        to_id: envelope.packet.to,
+                        want_response: envelope.packet.decoded.wantResponse,
                         route: routeDiscovery.route,
                         channel: envelope.packet.channel,
                         packet_id: envelope.packet.id,

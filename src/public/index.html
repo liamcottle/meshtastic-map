@@ -894,7 +894,7 @@
                                                 <div class="block flex-1 px-4 py-2">
                                                     <div class="relative flex min-w-0 flex-1 items-center">
                                                         <div>
-                                                            <p class="text-sm font-medium text-gray-900">{{ traceroute.route.length }} hops {{ traceroute.channel_id ? `on ${traceroute.channel_id}` : '' }}</p>
+                                                            <p class="text-sm font-medium text-gray-900">{{ JSON.parse(traceroute.route).length }} hops {{ traceroute.channel_id ? `on ${traceroute.channel_id}` : '' }}</p>
                                                             <div class="text-sm text-gray-700">Gated {{ moment(new Date(traceroute.updated_at)).fromNow() }}</div>
                                                         </div>
                                                     </div>
@@ -1106,14 +1106,14 @@
                                             <div class="h-4 w-4 rounded-full bg-gray-100 ring-1 ring-gray-300"></div>
                                         </div>
                                         <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
-                                            <div class="font-medium text-gray-900">{{ findNodeById(selectedTraceRoute.node_id)?.long_name || '???' }}</div>
-                                            <div>Hex ID: !{{ Number(selectedTraceRoute.node_id).toString(16) }}</div>
+                                            <div class="font-medium text-gray-900">{{ findNodeById(selectedTraceRoute.to_id)?.long_name || '???' }}</div>
+                                            <div>Hex ID: !{{ Number(selectedTraceRoute.to_id).toString(16) }}</div>
                                             <div>Started the traceroute</div>
                                         </div>
                                     </li>
 
                                     <!-- middleman nodes -->
-                                    <li :onclick="`goToNode(${route})`" v-for="route of selectedTraceRoute.route" class="relative flex gap-x-4">
+                                    <li :onclick="`goToNode(${route})`" v-for="route of JSON.parse(selectedTraceRoute.route)" class="relative flex gap-x-4">
                                         <div class="absolute left-0 top-0 flex w-6 justify-center -bottom-6">
                                             <div class="w-px bg-gray-200"></div>
                                         </div>
@@ -1124,6 +1124,21 @@
                                             <div class="font-medium text-gray-900">{{ findNodeById(route)?.long_name || '???' }}</div>
                                             <div>Hex ID: !{{ Number(route).toString(16) }}</div>
                                             <div>Forwarded the packet</div>
+                                        </div>
+                                    </li>
+
+                                    <!-- Last node -->
+                                    <li :onclick="`goToNode(${route})`" v-if="selectedTraceRoute.from_id" class="relative flex gap-x-4">
+                                        <div class="absolute left-0 top-0 flex w-6 justify-center -bottom-6">
+                                            <div class="w-px bg-gray-200"></div>
+                                        </div>
+                                        <div class="my-auto relative flex h-6 w-6 flex-none items-center justify-center bg-white">
+                                            <div class="h-4 w-4 rounded-full bg-gray-100 ring-1 ring-gray-300"></div>
+                                        </div>
+                                        <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                                            <div class="font-medium text-gray-900">{{ findNodeById(selectedTraceRoute.from_id)?.long_name || '???' }}</div>
+                                            <div>Hex ID: !{{ Number(selectedTraceRoute.from_id).toString(16) }}</div>
+                                            <div>Replied to traceroute</div>
                                         </div>
                                     </li>
 
