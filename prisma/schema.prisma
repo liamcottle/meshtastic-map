@@ -38,6 +38,7 @@ model Node {
   voltage             Decimal?
   channel_utilization Decimal?
   air_util_tx         Decimal?
+  uptime_seconds      BigInt?
 
   neighbour_broadcast_interval_secs Int?
   neighbours                        Json?

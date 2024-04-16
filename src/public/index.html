@@ -841,6 +841,22 @@
                                         </div>
                                     </li>
 
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="w-full">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Uptime</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span v-if="selectedNode.uptime_seconds">{{ selectedNode.uptime_seconds }} seconds</span>
+                                                            <span v-else class="text-gray-500">???</span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
                                 </ul>
                             </div>
 
