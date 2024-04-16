@@ -162,11 +162,11 @@ model TextMessage {
 }
 
 model TraceRoute {
-  id      BigInt @id @default(autoincrement())
-  from_id BigInt @default(0)
-  to_id   BigInt @default(0)
-  want_response  Boolean @default(true)
-  route   Json
+  id            BigInt  @id @default(autoincrement())
+  to            BigInt
+  from          BigInt
+  want_response Boolean
+  route         Json
 
   channel    Int?
   packet_id  BigInt?
@@ -178,8 +178,8 @@ model TraceRoute {
 
   @@index(created_at)
   @@index(updated_at)
-  @@index(from_id)
-  @@index(to_id)
+  @@index(to)
+  @@index(from)
   @@map("traceroutes")
 }
 

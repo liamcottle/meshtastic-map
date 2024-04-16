@@ -284,7 +284,7 @@ app.get('/api/v1/nodes/:nodeId/traceroutes', async (req, res) => {
         // get latest traceroutes
         // We want replies where want_response is false and it will be "to" the
         // requester.
-        const traceroutes = await prisma.$queryRaw`SELECT * FROM traceroutes WHERE want_response = false and to_id = ${node.node_id} and gateway_id is not null order by id desc limit ${count}`;
+        const traceroutes = await prisma.$queryRaw`SELECT * FROM traceroutes WHERE want_response = false and \`to\` = ${node.node_id} and gateway_id is not null order by id desc limit ${count}`;
 
         res.json({
             traceroutes: traceroutes,
