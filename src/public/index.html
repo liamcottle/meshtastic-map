@@ -163,7 +163,7 @@
                         <template v-if="searchedNodes.length > 0">
 
                             <div @click="onSearchResultNodeClick(node)" class="p-2 hover:bg-gray-100 cursor-pointer" v-for="node of searchedNodes">
-                                <div class="text-gray-900">{{ node.long_name !== '' ? node.long_name : "-" }}</div>
+                                <div class="text-gray-900" :class="{ 'text-red-500': node.latitude == null || node.longitude == null }">{{ node.long_name !== '' ? node.long_name : "-" }}</div>
                                 <div class="flex space-x-1 text-sm text-gray-700">
                                     <div>Short Name: {{ node.short_name !== '' ? node.short_name : "-" }}</div>
                                     <div class="text-gray-500">/</div>
@@ -1894,7 +1894,12 @@
                 this.isShowingMobileSearch = false;
 
                 // go to node
-                window.goToNode(node.node_id);
+                if(window.goToNode(node.node_id)){
+                    return;
+                }
+
+                // fallback to showing node details since we can't go to the node
+                window.showNodeDetails(node.node_id);
 
             },
             dismissInfoModal: function() {
@@ -2172,14 +2177,14 @@
         var node = findNodeById(id);
         if(!node){
             alert("Could not find node: " + id);
-            return;
+            return false;
         }
 
         // find node marker by id
         var nodeMarker = findNodeMarkerById(id);
         if(!nodeMarker){
             alert("Could not find node on map: " + id);
-            return;
+            return false;
         }
 
         // close all popups and tooltips
@@ -2200,6 +2205,9 @@
             interactive: true, // allow clicking buttons inside tooltip
             permanent: true, // don't auto dismiss when clicking buttons inside tooltip
         });
+
+        // successfully went to node
+        return true;
 
     }
 
@@ -2573,6 +2581,9 @@
                 }
             }
 
+            // add to cache
+            nodes.push(node);
+
             // skip nodes without position
             if(!node.latitude || !node.longitude){
                 continue;
@@ -2652,7 +2663,6 @@
                 });
 
                 // add to cache
-                nodes.push(node);
                 nodeMarkers[node.node_id] = marker;
 
             }
