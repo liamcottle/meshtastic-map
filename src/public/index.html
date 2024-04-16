@@ -894,8 +894,8 @@
                                                 <div class="block flex-1 px-4 py-2">
                                                     <div class="relative flex min-w-0 flex-1 items-center">
                                                         <div>
-                                                            <p class="text-sm font-medium text-gray-900">{{ traceroute.route.length }} hops {{ traceroute.channel_id ? `on ${traceroute.channel_id}` : '' }}</p>
-                                                            <div class="text-sm text-gray-700">Gated {{ moment(new Date(traceroute.updated_at)).fromNow() }}</div>
+                                                            <p class="text-sm text-gray-900"><span class="font-medium">{{ findNodeById(traceroute.to)?.long_name || '???' }}</span> to <span class="font-medium">{{ findNodeById(traceroute.from)?.long_name || '???' }}</span></p>
+                                                            <div class="text-sm text-gray-700">{{ moment(new Date(traceroute.updated_at)).fromNow() }} - {{ traceroute.route.length }} hops {{ traceroute.channel_id ? `on ${traceroute.channel_id}` : '' }}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1075,7 +1075,7 @@
                             <div class="flex items-start justify-between">
                                 <div>
                                     <h2 class="font-bold">Traceroute #{{ selectedTraceRoute.id }}</h2>
-                                    <h3 class="text-sm">{{ moment(new Date(selectedTraceRoute.updated_at)).fromNow() }}</h3>
+                                    <h3 class="text-sm">{{ moment(new Date(selectedTraceRoute.updated_at)).fromNow() }} - {{ selectedTraceRoute.route.length }} hops {{ selectedTraceRoute.channel_id ? `on ${selectedTraceRoute.channel_id}` : '' }}</h3>
                                 </div>
                                 <div class="my-auto ml-3 flex h-7 items-center">
                                     <a href="javascript:void(0)" class="rounded-full" @click="selectedTraceRoute = null">
@@ -1098,7 +1098,7 @@
                                 <ul role="list" class="space-y-6">
 
                                     <!-- node that initiated traceroute -->
-                                    <li :onclick="`goToNode(${selectedTraceRoute.node_id})`" class="relative flex gap-x-4">
+                                    <li :onclick="`goToNode(${selectedTraceRoute.to})`" class="relative flex gap-x-4">
                                         <div class="absolute left-0 top-0 flex w-6 justify-center top-6 -bottom-6">
                                             <div class="w-px bg-gray-200"></div>
                                         </div>
@@ -1106,8 +1106,8 @@
                                             <div class="h-4 w-4 rounded-full bg-gray-100 ring-1 ring-gray-300"></div>
                                         </div>
                                         <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
-                                            <div class="font-medium text-gray-900">{{ findNodeById(selectedTraceRoute.node_id)?.long_name || '???' }}</div>
-                                            <div>Hex ID: !{{ Number(selectedTraceRoute.node_id).toString(16) }}</div>
+                                            <div class="font-medium text-gray-900">{{ findNodeById(selectedTraceRoute.to)?.long_name || '???' }}</div>
+                                            <div>Hex ID: !{{ Number(selectedTraceRoute.to).toString(16) }}</div>
                                             <div>Started the traceroute</div>
                                         </div>
                                     </li>
@@ -1127,7 +1127,22 @@
                                         </div>
                                     </li>
 
-                                    <!-- last node in route -->
+                                    <!-- node that replied to traceroute -->
+                                    <li :onclick="`goToNode(${route})`" v-if="selectedTraceRoute.from" class="relative flex gap-x-4">
+                                        <div class="absolute left-0 top-0 flex w-6 justify-center -bottom-6">
+                                            <div class="w-px bg-gray-200"></div>
+                                        </div>
+                                        <div class="my-auto relative flex h-6 w-6 flex-none items-center justify-center bg-white">
+                                            <div class="h-4 w-4 rounded-full bg-gray-100 ring-1 ring-gray-300"></div>
+                                        </div>
+                                        <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                                            <div class="font-medium text-gray-900">{{ findNodeById(selectedTraceRoute.from)?.long_name || '???' }}</div>
+                                            <div>Hex ID: !{{ Number(selectedTraceRoute.from).toString(16) }}</div>
+                                            <div>Replied to traceroute</div>
+                                        </div>
+                                    </li>
+
+                                    <!-- node that gated traceroute to mqtt -->
                                     <li :onclick="`goToNode(${route})`" v-if="selectedTraceRoute.gateway_id" class="relative flex gap-x-4">
                                         <div class="absolute left-0 top-0 flex w-6 justify-center h-6">
                                             <div class="w-px bg-gray-200"></div>

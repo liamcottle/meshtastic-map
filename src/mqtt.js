@@ -579,7 +579,9 @@ client.on("message", async (topic, message) => {
 
             if(logKnownPacketTypes) {
                 console.log("TRACEROUTE_APP", {
+                    to: envelope.packet.to.toString(16),
                     from: envelope.packet.from.toString(16),
+                    want_response: envelope.packet.decoded.wantResponse,
                     route_discovery: routeDiscovery,
                 });
             }
@@ -587,7 +589,9 @@ client.on("message", async (topic, message) => {
             try {
                 await prisma.traceRoute.create({
                     data: {
-                        node_id: envelope.packet.from,
+                        to: envelope.packet.to,
+                        from: envelope.packet.from,
+                        want_response: envelope.packet.decoded.wantResponse,
                         route: routeDiscovery.route,
                         channel: envelope.packet.channel,
                         packet_id: envelope.packet.id,
