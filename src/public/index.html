@@ -1128,7 +1128,7 @@
                                     </li>
 
                                     <!-- node that replied to traceroute -->
-                                    <li :onclick="`goToNode(${route})`" v-if="selectedTraceRoute.from" class="relative flex gap-x-4">
+                                    <li :onclick="`goToNode(${selectedTraceRoute.from})`" v-if="selectedTraceRoute.from" class="relative flex gap-x-4">
                                         <div class="absolute left-0 top-0 flex w-6 justify-center -bottom-6">
                                             <div class="w-px bg-gray-200"></div>
                                         </div>
@@ -1143,7 +1143,7 @@
                                     </li>
 
                                     <!-- node that gated traceroute to mqtt -->
-                                    <li :onclick="`goToNode(${route})`" v-if="selectedTraceRoute.gateway_id" class="relative flex gap-x-4">
+                                    <li :onclick="`goToNode(${selectedTraceRoute.gateway_id})`" v-if="selectedTraceRoute.gateway_id" class="relative flex gap-x-4">
                                         <div class="absolute left-0 top-0 flex w-6 justify-center h-6">
                                             <div class="w-px bg-gray-200"></div>
                                         </div>
