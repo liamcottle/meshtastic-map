@@ -1439,6 +1439,14 @@
         return localStorage.setItem("config_enable_map_animations", value);
     }
 
+    function getConfigMapSelectedTileLayer() {
+        return localStorage.getItem("config_map_selected_tile_layer") || "OpenStreetMap";
+    }
+
+    function setConfigMapSelectedTileLayer(layer) {
+        return localStorage.setItem("config_map_selected_tile_layer", layer);
+    }
+
     function getConfigMapEnabledOverlayLayers() {
 
         try {
@@ -2030,7 +2038,7 @@
     var openStreetMapTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 22, // increase from 18 to 22
         attribution: 'Tiles &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Data from <a target="_blank" href="https://meshtastic.org/docs/software/integrations/mqtt/">Meshtastic</a>',
-    }).addTo(map);
+    });
 
     var esriWorldImageryTileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 21, // esri doesn't have tiles closer than this
@@ -2048,6 +2056,18 @@
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         attribution: 'Tiles &copy; Google | Data from <a target="_blank" href="https://meshtastic.org/docs/software/integrations/mqtt/">Meshtastic</a>'
     });
+
+    var tileLayers = {
+        "OpenStreetMap": openStreetMapTileLayer,
+        "Esri Satellite": esriWorldImageryTileLayer,
+        "Google Satellite": googleSatelliteTileLayer,
+        "Google Hybrid": googleHybridTileLayer,
+    };
+
+    // use tile layer based on config
+    const selectedTileLayerName = getConfigMapSelectedTileLayer();
+    const selectedTileLayer = tileLayers[selectedTileLayerName] || openStreetMapTileLayer;
+    selectedTileLayer.addTo(map);
 
     // create layer groups
     var nodesLayerGroup = new L.LayerGroup();
@@ -2089,12 +2109,10 @@
         return div;
     };
 
-    var tileLayers = {
-        "OpenStreetMap": openStreetMapTileLayer,
-        "Esri Satellite": esriWorldImageryTileLayer,
-        "Google Satellite": googleSatelliteTileLayer,
-        "Google Hybrid": googleHybridTileLayer,
-    };
+    // handle baselayerchange to update tile layer preference
+    map.on('baselayerchange', function(event) {
+        setConfigMapSelectedTileLayer(event.name);
+    });
 
     // handle adding/remove legend on map (can't use L.Control as an overlay, so we toggle an empty L.LayerGroup)
     map.on('overlayadd overlayremove', function(event) {
