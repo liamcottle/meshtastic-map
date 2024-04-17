@@ -2037,6 +2037,12 @@
         attribution: 'Tiles &copy; <a href="https://developers.arcgis.com/documentation/mapping-apis-and-services/deployment/basemap-attribution/">Esri</a> | Data from <a target="_blank" href="https://meshtastic.org/docs/software/integrations/mqtt/">Meshtastic</a>'
     });
 
+    var googleHybridTileLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+        maxZoom: 21,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: 'Tiles &copy; Google | Data from <a target="_blank" href="https://meshtastic.org/docs/software/integrations/mqtt/">Meshtastic</a>'
+    });
+
     // create layer groups
     var nodesLayerGroup = new L.LayerGroup();
     var neighboursLayerGroup = new L.LayerGroup();
@@ -2080,6 +2086,7 @@
     var tileLayers = {
         "Map": openStreetMapTileLayer,
         "Satellite": esriWorldImageryTileLayer,
+        "Google Hybrid": googleHybridTileLayer,
     };
 
     // handle adding/remove legend on map (can't use L.Control as an overlay, so we toggle an empty L.LayerGroup)
