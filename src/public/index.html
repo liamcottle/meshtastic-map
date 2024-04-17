@@ -2027,12 +2027,12 @@
     // remove leaflet link
     map.attributionControl.setPrefix('');
 
-    var openStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    var openStreetMapTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 22, // increase from 18 to 22
         attribution: 'Tiles &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Data from <a target="_blank" href="https://meshtastic.org/docs/software/integrations/mqtt/">Meshtastic</a>',
     }).addTo(map);
 
-    var esriWorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    var esriWorldImageryTileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 21, // esri doesn't have tiles closer than this
         attribution: 'Tiles &copy; <a href="https://developers.arcgis.com/documentation/mapping-apis-and-services/deployment/basemap-attribution/">Esri</a> | Data from <a target="_blank" href="https://meshtastic.org/docs/software/integrations/mqtt/">Meshtastic</a>'
     });
@@ -2078,8 +2078,8 @@
     };
 
     var tileLayers = {
-        "Map": openStreetMap,
-        "Satellite": esriWorldImagery,
+        "Map": openStreetMapTileLayer,
+        "Satellite": esriWorldImageryTileLayer,
     };
 
     // handle adding/remove legend on map (can't use L.Control as an overlay, so we toggle an empty L.LayerGroup)
