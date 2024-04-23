@@ -483,7 +483,7 @@
                                         <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
                                         <div class="relative flex min-w-0 flex-1 items-center">
                                             <span class="relative inline-block flex-shrink-0 mr-4">
-                                                <img class="h-20 w-20 rounded object-contain" :src="`/images/devices/${hardwareModel.hardware_model_name}.png`" alt="" onerror="if(this.src != 'https://placehold.co/512x512?text=No+Image') this.src = 'https://placehold.co/512x512?text=No+Image';">
+                                                <img class="h-20 w-20 rounded object-contain" :src="hardwareModel.hardware_model_image_url ? hardwareModel.hardware_model_image_url : `https://placehold.co/512x512?text=No+Image`" alt="">
                                             </span>
                                             <div class="truncate">
                                                 <p class="truncate text-sm font-medium text-gray-900">{{ hardwareModel.hardware_model_name }}</p>
@@ -553,7 +553,7 @@
 
                             <div class="flex flex-col my-2">
                                 <div class="mx-auto">
-                                    <img class="h-48 w-48 rounded object-contain" :src="`/images/devices/${selectedNode.hardware_model_name}.png`" alt="" onerror="if(this.src != 'https://placehold.co/512x512?text=No+Image') this.src = 'https://placehold.co/512x512?text=No+Image';">
+                                    <img class="h-48 w-48 rounded object-contain" :src="selectedNode.hardware_model_image_url ? selectedNode.hardware_model_image_url : `https://placehold.co/512x512?text=No+Image`" alt="">
                                 </div>
                             </div>
 
@@ -2983,7 +2983,8 @@
 
         var loraFrequencyRange = getRegionFrequencyRange(node.region_name);
 
-        var tooltip = `<img class="mb-4 w-40 mx-auto" src="/images/devices/${node.hardware_model_name}.png" onerror="this.classList.add('hidden')"/>` +
+        var tooltip = "" +
+            (node.hardware_model_image_url != null ? `<img v-if="node.hardware_model_image_url != null" class="mb-4 w-40 mx-auto" src="${node.hardware_model_image_url}"/>` : "") +
             `<b>${escapeString(node.long_name)}</b>` +
             `<br/>Short Name: ${escapeString(node.short_name)}` +
             `<br/>MQTT Status: ${mqttStatus}` +

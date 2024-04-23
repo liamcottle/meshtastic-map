@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const protobufjs = require("protobufjs");
@@ -20,12 +21,42 @@ const Role = root.lookupEnum("Config.DeviceConfig.Role");
 const RegionCode = root.lookupEnum("Config.LoRaConfig.RegionCode");
 const ModemPreset = root.lookupEnum("Config.LoRaConfig.ModemPreset");
 
+// convert relative url to full url based on request host
+function getFullUrl(req, relativeUrl) {
+    return `${req.protocol}://${req.get('host')}/${relativeUrl}`;
+}
+
+// get relative url for a hardware model image
+function getHardwareModelImageUrl(req, hardwareModelName) {
+
+    // get web and local path to device images
+    const deviceImagesWebPath = "images/devices";
+    const deviceImagesLocalPath = path.join(__dirname, "public", deviceImagesWebPath);
+
+    // determine device image name based on hardware model name
+    const deviceImageFileName = `${hardwareModelName}.png`;
+
+    // get web and local path to image for requested hardware model
+    const deviceImageLocalPath = path.join(deviceImagesLocalPath, deviceImageFileName);
+    const deviceImageWebPath = `${deviceImagesWebPath}/${hardwareModelName}.png`;
+
+    // we have a device image for this hardware model
+    if(fs.existsSync(deviceImageLocalPath)){
+        return getFullUrl(req, deviceImageWebPath);
+    }
+
+    return null;
+
+}
+
 // appends extra info for node objects returned from api
-function formatNodeInfo(node) {
+function formatNodeInfo(req, node) {
+    const hardwareModelName = HardwareModel.valuesById[node.hardware_model] ?? null;
     return {
         ...node,
         node_id_hex: "!" + node.node_id.toString(16),
-        hardware_model_name: HardwareModel.valuesById[node.hardware_model] ?? null,
+        hardware_model_name: hardwareModelName,
+        hardware_model_image_url: getHardwareModelImageUrl(req, hardwareModelName ?? "UNKNOWN"),
         role_name: Role.valuesById[node.role] ?? null,
         region_name: RegionCode.valuesById[node.region] ?? null,
         modem_preset_name: ModemPreset.valuesById[node.modem_preset] ?? null,
@@ -78,7 +109,7 @@ app.get('/api/v1/nodes', async (req, res) => {
 
         const nodesWithInfo = [];
         for(const node of nodes){
-            nodesWithInfo.push(formatNodeInfo(node));
+            nodesWithInfo.push(formatNodeInfo(req, node));
         }
 
         res.json({
@@ -114,7 +145,7 @@ app.get('/api/v1/nodes/:nodeId', async (req, res) => {
         }
 
         res.json({
-            node: formatNodeInfo(node),
+            node: formatNodeInfo(req, node),
         });
 
     } catch(err) {
@@ -315,10 +346,12 @@ app.get('/api/v1/stats/hardware-models', async (req, res) => {
         });
 
         const hardwareModelStats = results.map((result) => {
+           const hardwareModelName = HardwareModel.valuesById[result.hardware_model] ?? "UNKNOWN";
            return {
                count: result._count.hardware_model,
                hardware_model: result.hardware_model,
-               hardware_model_name: HardwareModel.valuesById[result.hardware_model] ?? "UNKNOWN",
+               hardware_model_name: hardwareModelName,
+               hardware_model_image_url: getHardwareModelImageUrl(req, hardwareModelName),
            };
         });
 
