@@ -223,7 +223,7 @@ MIT
 
 This project is not affiliated with or endorsed by the Meshtastic project.
 
-The Meshtastic logo trademark is the trademark of Meshtastic LLC.
+The Meshtastic logo is the trademark of Meshtastic LLC.
 
 ## References
 
