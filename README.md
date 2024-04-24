@@ -129,6 +129,8 @@ node src/index.js
 # Server running at http://127.0.0.1:8080
 ```
 
+> Note: You can also use a custom port with `--port 8123`
+
 ## Upgrading
 
 Run the following commands from inside the `meshtastic-map` repo.
