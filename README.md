@@ -110,6 +110,8 @@ Add a database [connection string for prisma](https://www.prisma.io/docs/getting
 DATABASE_URL="mysql://root@localhost:3306/meshtastic-map?connection_limit=100"
 ```
 
+> Note: Some queries are MySQL specific. Other db providers have not been tested.
+
 Migrate the database.
 
 ```
