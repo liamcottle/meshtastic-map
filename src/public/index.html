@@ -6,7 +6,7 @@
     <title>Meshtastic Map</title>
     <meta name="title" content="Meshtastic Map">
     <meta name="description" content="An interactive map of all Meshtastic nodes.">
-    <link rel="icon" type="image/png" href="https://meshtastic.liamcottle.net/icon.png"/>
+    <link rel="icon" type="image/png" href="/icon.png"/>
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -15,11 +15,11 @@
     <meta property="og:description" content="An interactive map of all Meshtastic nodes.">
 
     <!-- tailwind css -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script src="assets/js/tailwindcss/tailwind-v3.4.3-forms-v0.5.7.js"></script>
 
     <!-- leaflet map -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <link rel="stylesheet" href="assets/js/leaflet@1.9.3/dist/leaflet.css" />
+    <script src="assets/js/leaflet@1.9.3/dist/leaflet.js"></script>
     <script src="plugins/leaflet.polylineoffset.js"></script>
     <script src="plugins/leaflet.geometryutil.js"></script>
     <script src="plugins/leaflet-arrowheads.js"></script>
@@ -32,14 +32,16 @@
     <link rel="stylesheet" href="plugins/leaflet.groupedlayercontrol/leaflet.groupedlayercontrol.css"/>
 
     <!-- moment -->
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="assets/js/moment@2.29.1/moment.min.js"></script>
 
     <!-- vuejs -->
-    <script src="https://unpkg.com/vue@3"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="assets/js/vue@3.4.26/dist/vue.global.js"></script>
+
+    <!-- axios -->
+    <script src="assets/js/axios@1.6.8/dist/axios.min.js"></script>
 
     <!-- chart js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="assets/js/chart.js@4.4.2/dist/chart.umd.js"></script>
 
     <style>
 
@@ -489,7 +491,7 @@
                                         <div class="absolute inset-0 group-hover:bg-gray-100" aria-hidden="true"></div>
                                         <div class="relative flex min-w-0 flex-1 items-center">
                                             <span class="relative inline-block flex-shrink-0 mr-4">
-                                                <img class="h-20 w-20 rounded object-contain" :src="`/images/devices/${hardwareModel.hardware_model_name}.png`" alt="" onerror="if(this.src != 'https://placehold.co/512x512?text=No+Image') this.src = 'https://placehold.co/512x512?text=No+Image';">
+                                                <img class="h-20 w-20 rounded object-contain" :src="`/images/devices/${hardwareModel.hardware_model_name}.png`" alt="" onerror="if(this.src != '/images/no_image.png') this.src = '/images/no_image.png';">
                                             </span>
                                             <div class="truncate">
                                                 <p class="truncate text-sm font-medium text-gray-900">{{ hardwareModel.hardware_model_name }}</p>
@@ -559,7 +561,7 @@
 
                             <div class="flex flex-col my-2">
                                 <div class="mx-auto">
-                                    <img class="h-48 w-48 rounded object-contain" :src="`/images/devices/${selectedNode.hardware_model_name}.png`" alt="" onerror="if(this.src != 'https://placehold.co/512x512?text=No+Image') this.src = 'https://placehold.co/512x512?text=No+Image';">
+                                    <img class="h-48 w-48 rounded object-contain" :src="`/images/devices/${selectedNode.hardware_model_name}.png`" alt="" onerror="if(this.src != '/images/no_image.png') this.src = '/images/no_image.png';">
                                 </div>
                             </div>
 
