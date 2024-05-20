@@ -2071,6 +2071,7 @@
 
     // create layer groups
     var nodesLayerGroup = new L.LayerGroup();
+    var nodesRouterGroup = new L.LayerGroup();
     var neighboursLayerGroup = new L.LayerGroup();
     var nodeNeighboursLayerGroup = new L.LayerGroup();
     var nodesClusteredLayerGroup = L.markerClusterGroup({
@@ -2129,6 +2130,7 @@
     L.control.groupedLayers(tileLayers, {
         "Nodes": {
             "All": nodesLayerGroup,
+            "Routers": nodesRouterGroup,
             "Clustered": nodesClusteredLayerGroup,
             "None": new L.LayerGroup(),
         },
@@ -2694,6 +2696,9 @@
                 // add marker to node layer groups
                 marker.addTo(nodesLayerGroup);
                 nodesClusteredLayerGroup.addLayer(marker);
+								if(node.role_name == "ROUTER" || node.role_name == "ROUTER_CLIENT"){
+                    marker.addTo(nodesRouterGroup);
+                }
 
                 // show tooltip on desktop only
                 if(!isMobile()){
