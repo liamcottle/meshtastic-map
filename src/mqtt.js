@@ -720,6 +720,7 @@ client.on("message", async (topic, message) => {
                     || portnum === 65 // ignore STORE_FORWARD_APP
                     || portnum === 66 // ignore RANGE_TEST_APP
                     || portnum === 72 // ignore ATAK_PLUGIN
+                    || portnum === 257 // ignore ATAK_FORWARDER
                 ){
                     return;
                 }
