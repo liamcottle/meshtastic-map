@@ -116,6 +116,31 @@ model DeviceMetric {
   @@map("device_metrics")
 }
 
+model Position {
+  id      BigInt @id @default(autoincrement())
+  node_id BigInt
+
+  to         BigInt
+  from       BigInt
+  channel    Int?
+  packet_id  BigInt?
+  channel_id String?
+  gateway_id BigInt?
+
+  latitude  Int?
+  longitude Int?
+  altitude  Int?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@index(created_at)
+  @@index(updated_at)
+  @@index(node_id)
+  @@index(packet_id)
+  @@map("positions")
+}
+
 model ServiceEnvelope {
   id         BigInt  @id @default(autoincrement())
   mqtt_topic String

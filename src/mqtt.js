@@ -37,6 +37,11 @@ const optionsList = [
         description: "This option will save all received service envelopes to the database.",
     },
     {
+        name: "collect-positions",
+        type: Boolean,
+        description: "This option will save all received positions to the database.",
+    },
+    {
         name: "collect-text-messages",
         type: Boolean,
         description: "This option will save all received text messages to the database.",
@@ -99,6 +104,7 @@ const mqttBrokerUrl = options["mqtt-broker-url"] ?? "mqtt://mqtt.meshtastic.org"
 const mqttUsername = options["mqtt-username"] ?? "meshdev";
 const mqttPassword = options["mqtt-password"] ?? "large4cats";
 const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
+const collectPositions = options["collect-positions"] ?? false;
 const collectTextMessages = options["collect-text-messages"] ?? false;
 const collectWaypoints = options["collect-waypoints"] ?? true;
 const collectNeighbourInfo = options["collect-neighbour-info"] ?? false;
@@ -358,6 +364,45 @@ client.on("message", async (topic, message) => {
                 } catch (e) {
                     console.error(e);
                 }
+            }
+
+            if(!collectPositions){
+                return;
+            }
+
+            try {
+
+                // find an existing position with duplicate information created in the last 60 seconds
+                const existingDuplicatePosition = await prisma.position.findFirst({
+                    where: {
+                        node_id: envelope.packet.from,
+                        packet_id: envelope.packet.id,
+                        created_at: {
+                            gte: new Date(Date.now() - 60000), // created in the last 60 seconds
+                        },
+                    }
+                });
+
+                // create position if no duplicates found
+                if(!existingDuplicatePosition){
+                    await prisma.position.create({
+                        data: {
+                            node_id: envelope.packet.from,
+                            to: envelope.packet.to,
+                            from: envelope.packet.from,
+                            channel: envelope.packet.channel,
+                            packet_id: envelope.packet.id,
+                            channel_id: envelope.channelId,
+                            gateway_id: envelope.gatewayId ? BigInt('0x' + envelope.gatewayId.replaceAll("!", "")) : null, // convert hex id "!f96a92f0" to bigint
+                            latitude: position.latitudeI,
+                            longitude: position.longitudeI,
+                            altitude: position.altitude,
+                        },
+                    });
+                }
+
+            } catch (e) {
+                console.error(e);
             }
 
         }
