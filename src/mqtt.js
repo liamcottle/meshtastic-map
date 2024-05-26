@@ -238,8 +238,20 @@ function decrypt(packet) {
             // create decryption iv/nonce for this packet
             const nonceBuffer = createNonce(packet.id, packet.from);
 
-            // create aes-128-ctr decipher
-            const decipher = crypto.createDecipheriv('aes-128-ctr', key, nonceBuffer);
+            // determine algorithm based on key length
+            var algorithm = null;
+            if(key.length === 16){
+                algorithm = "aes-128-ctr";
+            } else if(key.length === 32){
+                algorithm = "aes-256-ctr";
+            } else {
+                // skip this key, try the next one...
+                console.error(`Invalid decryption key length: ${key.length}`);
+                continue;
+            }
+
+            // create decipher
+            const decipher = crypto.createDecipheriv(algorithm, key, nonceBuffer);
 
             // decrypt encrypted packet
             const decryptedBuffer = Buffer.concat([decipher.update(packet.encrypted), decipher.final()]);
