@@ -246,7 +246,7 @@ function decrypt(packet) {
                 algorithm = "aes-256-ctr";
             } else {
                 // skip this key, try the next one...
-                console.error(`Invalid decryption key length: ${key.length}`);
+                console.error(`Skipping decryption key with invalid length: ${key.length}`);
                 continue;
             }
 
