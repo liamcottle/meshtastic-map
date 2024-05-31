@@ -2696,7 +2696,7 @@
                 // add marker to node layer groups
                 marker.addTo(nodesLayerGroup);
                 nodesClusteredLayerGroup.addLayer(marker);
-								if(node.role_name == "ROUTER" || node.role_name == "ROUTER_CLIENT"){
+								if(node.role_name == "ROUTER" || node.role_name == "ROUTER_CLIENT" || node.role_name == "REPEATER"){
                     marker.addTo(nodesRouterGroup);
                 }
 
