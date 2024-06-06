@@ -40,6 +40,10 @@ model Node {
   air_util_tx         Decimal?
   uptime_seconds      BigInt?
 
+  temperature         Decimal?
+  relative_humidity   Decimal?
+  barometric_pressure Decimal?
+
   neighbour_broadcast_interval_secs Int?
   neighbours                        Json?
   neighbours_updated_at             DateTime?

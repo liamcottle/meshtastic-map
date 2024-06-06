@@ -666,6 +666,11 @@ client.on("message", async (topic, message) => {
                 const current = telemetry.environmentMetrics.current !== 0 ? telemetry.environmentMetrics.current : null;
                 const iaq = telemetry.environmentMetrics.iaq !== 0 ? telemetry.environmentMetrics.iaq : null;
 
+                // set metrics to update on node table
+                data.temperature = temperature;
+                data.relative_humidity = relativeHumidity;
+                data.barometric_pressure = barometricPressure;
+
                 // create environment metric
                 try {
 
