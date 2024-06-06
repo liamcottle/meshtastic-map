@@ -84,6 +84,11 @@ const optionsList = [
         description: "Device Metrics older than this many seconds will be purged from the database.",
     },
     {
+        name: "purge-environment-metrics-after-seconds",
+        type: Number,
+        description: "Environment Metrics older than this many seconds will be purged from the database.",
+    },
+    {
         name: "purge-nodes-unheard-for-seconds",
         type: Number,
         description: "Nodes that haven't been heard from in this many seconds will be purged from the database.",
@@ -131,6 +136,7 @@ const decryptionKeys = options["decryption-keys"] ?? [
 const purgeIntervalSeconds = options["purge-interval-seconds"] ?? 10;
 const purgeNodesUnheardForSeconds = options["purge-nodes-unheard-for-seconds"] ?? null;
 const purgeDeviceMetricsAfterSeconds = options["purge-device-metrics-after-seconds"] ?? null;
+const purgeEnvironmentMetricsAfterSeconds = options["purge-environment-metrics-after-seconds"] ?? null;
 const purgePositionsAfterSeconds = options["purge-positions-after-seconds"] ?? null;
 
 // create mqtt client
@@ -158,6 +164,7 @@ if(purgeIntervalSeconds){
     setInterval(async () => {
         await purgeUnheardNodes();
         await purgeOldDeviceMetrics();
+        await purgeOldEnvironmentMetrics();
         await purgeOldPositions();
     }, purgeIntervalSeconds * 1000);
 }
@@ -205,6 +212,32 @@ async function purgeOldDeviceMetrics() {
                 created_at: {
                     // last updated before x seconds ago
                     lt: new Date(Date.now() - purgeDeviceMetricsAfterSeconds * 1000),
+                },
+            }
+        });
+    } catch(e) {
+        // do nothing
+    }
+
+}
+
+/**
+ * Purges all environment metrics from the database that are older than the configured timeframe.
+ */
+async function purgeOldEnvironmentMetrics() {
+
+    // make sure seconds provided
+    if(!purgeEnvironmentMetricsAfterSeconds){
+        return;
+    }
+
+    // delete all environment metrics that are older than the configured purge time
+    try {
+        await prisma.environmentMetric.deleteMany({
+            where: {
+                created_at: {
+                    // last updated before x seconds ago
+                    lt: new Date(Date.now() - purgeEnvironmentMetricsAfterSeconds * 1000),
                 },
             }
         });
