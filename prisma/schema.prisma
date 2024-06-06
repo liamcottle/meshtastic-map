@@ -116,6 +116,29 @@ model DeviceMetric {
   @@map("device_metrics")
 }
 
+model EnvironmentMetric {
+  id        BigInt  @id @default(autoincrement())
+  node_id   BigInt
+  packet_id BigInt?
+
+  temperature         Decimal?
+  relative_humidity   Decimal?
+  barometric_pressure Decimal?
+  gas_resistance      Decimal?
+  voltage             Decimal?
+  current             Decimal?
+  iaq                 Int?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@index(created_at)
+  @@index(updated_at)
+  @@index(node_id)
+  @@index(packet_id)
+  @@map("environment_metrics")
+}
+
 model Position {
   id      BigInt @id @default(autoincrement())
   node_id BigInt

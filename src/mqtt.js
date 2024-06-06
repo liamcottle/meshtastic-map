@@ -654,6 +654,55 @@ client.on("message", async (topic, message) => {
 
             }
 
+            // handle environment metrics
+            if(telemetry.environmentMetrics){
+
+                // get metric values
+                const temperature = telemetry.environmentMetrics.temperature !== 0 ? telemetry.environmentMetrics.temperature : null;
+                const relativeHumidity = telemetry.environmentMetrics.relativeHumidity !== 0 ? telemetry.environmentMetrics.relativeHumidity : null;
+                const barometricPressure = telemetry.environmentMetrics.barometricPressure !== 0 ? telemetry.environmentMetrics.barometricPressure : null;
+                const gasResistance = telemetry.environmentMetrics.gasResistance !== 0 ? telemetry.environmentMetrics.gasResistance : null;
+                const voltage = telemetry.environmentMetrics.voltage !== 0 ? telemetry.environmentMetrics.voltage : null;
+                const current = telemetry.environmentMetrics.current !== 0 ? telemetry.environmentMetrics.current : null;
+                const iaq = telemetry.environmentMetrics.iaq !== 0 ? telemetry.environmentMetrics.iaq : null;
+
+                // create environment metric
+                try {
+
+                    // find an existing metric with duplicate information created in the last 15 seconds
+                    const existingDuplicateEnvironmentMetric = await prisma.environmentMetric.findFirst({
+                        where: {
+                            node_id: envelope.packet.from,
+                            packet_id: envelope.packet.id,
+                            created_at: {
+                                gte: new Date(Date.now() - 15000), // created in the last 15 seconds
+                            },
+                        }
+                    })
+
+                    // create metric if no duplicates found
+                    if(!existingDuplicateEnvironmentMetric){
+                        await prisma.environmentMetric.create({
+                            data: {
+                                node_id: envelope.packet.from,
+                                packet_id: envelope.packet.id,
+                                temperature: temperature,
+                                relative_humidity: relativeHumidity,
+                                barometric_pressure: barometricPressure,
+                                gas_resistance: gasResistance,
+                                voltage: voltage,
+                                current: current,
+                                iaq: iaq,
+                            },
+                        });
+                    }
+
+                } catch (e) {
+                    console.error(e);
+                }
+
+            }
+
             // update node telemetry in db
             if(Object.keys(data).length > 0){
                 try {
