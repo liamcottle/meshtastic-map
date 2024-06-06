@@ -703,6 +703,53 @@ client.on("message", async (topic, message) => {
 
             }
 
+            // handle power metrics
+            if(telemetry.powerMetrics){
+
+                // get metric values
+                const ch1Voltage = telemetry.powerMetrics.ch1Voltage !== 0 ? telemetry.powerMetrics.ch1Voltage : null;
+                const ch1Current = telemetry.powerMetrics.ch1Current !== 0 ? telemetry.powerMetrics.ch1Current : null;
+                const ch2Voltage = telemetry.powerMetrics.ch2Voltage !== 0 ? telemetry.powerMetrics.ch2Voltage : null;
+                const ch2Current = telemetry.powerMetrics.ch2Current !== 0 ? telemetry.powerMetrics.ch2Current : null;
+                const ch3Voltage = telemetry.powerMetrics.ch3Voltage !== 0 ? telemetry.powerMetrics.ch3Voltage : null;
+                const ch3Current = telemetry.powerMetrics.ch3Current !== 0 ? telemetry.powerMetrics.ch3Current : null;
+
+                // create power metric
+                try {
+
+                    // find an existing metric with duplicate information created in the last 15 seconds
+                    const existingDuplicatePowerMetric = await prisma.powerMetric.findFirst({
+                        where: {
+                            node_id: envelope.packet.from,
+                            packet_id: envelope.packet.id,
+                            created_at: {
+                                gte: new Date(Date.now() - 15000), // created in the last 15 seconds
+                            },
+                        }
+                    })
+
+                    // create metric if no duplicates found
+                    if(!existingDuplicatePowerMetric){
+                        await prisma.powerMetric.create({
+                            data: {
+                                node_id: envelope.packet.from,
+                                packet_id: envelope.packet.id,
+                                ch1_voltage: ch1Voltage,
+                                ch1_current: ch1Current,
+                                ch2_voltage: ch2Voltage,
+                                ch2_current: ch2Current,
+                                ch3_voltage: ch3Voltage,
+                                ch3_current: ch3Current,
+                            },
+                        });
+                    }
+
+                } catch (e) {
+                    console.error(e);
+                }
+
+            }
+
             // update node telemetry in db
             if(Object.keys(data).length > 0){
                 try {

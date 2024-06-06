@@ -139,6 +139,28 @@ model EnvironmentMetric {
   @@map("environment_metrics")
 }
 
+model PowerMetric {
+  id        BigInt  @id @default(autoincrement())
+  node_id   BigInt
+  packet_id BigInt?
+
+  ch1_voltage Decimal?
+  ch1_current Decimal?
+  ch2_voltage Decimal?
+  ch2_current Decimal?
+  ch3_voltage Decimal?
+  ch3_current Decimal?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@index(created_at)
+  @@index(updated_at)
+  @@index(node_id)
+  @@index(packet_id)
+  @@map("power_metrics")
+}
+
 model Position {
   id      BigInt @id @default(autoincrement())
   node_id BigInt
