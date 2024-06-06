@@ -32,6 +32,11 @@ const optionsList = [
         description: "MQTT Password (e.g: large4cats)",
     },
     {
+        name: "mqtt-topic",
+        type: String,
+        description: "MQTT Topic to subscribe to (e.g: msh/#)",
+    },
+    {
         name: "collect-service-envelopes",
         type: Boolean,
         description: "This option will save all received service envelopes to the database.",
@@ -108,6 +113,7 @@ if(options.help){
 const mqttBrokerUrl = options["mqtt-broker-url"] ?? "mqtt://mqtt.meshtastic.org";
 const mqttUsername = options["mqtt-username"] ?? "meshdev";
 const mqttPassword = options["mqtt-password"] ?? "large4cats";
+const mqttTopic = options["mqtt-topic"] ?? "#";
 const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
 const collectPositions = options["collect-positions"] ?? false;
 const collectTextMessages = options["collect-text-messages"] ?? false;
@@ -269,7 +275,7 @@ function decrypt(packet) {
 
 // subscribe to everything when connected
 client.on("connect", () => {
-    client.subscribe("#");
+    client.subscribe(mqttTopic);
 });
 
 // handle message received
