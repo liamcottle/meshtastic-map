@@ -79,6 +79,11 @@ const optionsList = [
         description: "How long to wait between each automatic database purge.",
     },
     {
+        name: "purge-device-metrics-after-seconds",
+        type: Number,
+        description: "Device Metrics older than this many seconds will be purged from the database.",
+    },
+    {
         name: "purge-nodes-unheard-for-seconds",
         type: Number,
         description: "Nodes that haven't been heard from in this many seconds will be purged from the database.",
@@ -125,6 +130,7 @@ const decryptionKeys = options["decryption-keys"] ?? [
 ];
 const purgeIntervalSeconds = options["purge-interval-seconds"] ?? 10;
 const purgeNodesUnheardForSeconds = options["purge-nodes-unheard-for-seconds"] ?? null;
+const purgeDeviceMetricsAfterSeconds = options["purge-device-metrics-after-seconds"] ?? null;
 const purgePositionsAfterSeconds = options["purge-positions-after-seconds"] ?? null;
 
 // create mqtt client
@@ -151,6 +157,7 @@ const Waypoint = root.lookupType("Waypoint");
 if(purgeIntervalSeconds){
     setInterval(async () => {
         await purgeUnheardNodes();
+        await purgeOldDeviceMetrics();
         await purgeOldPositions();
     }, purgeIntervalSeconds * 1000);
 }
@@ -172,6 +179,32 @@ async function purgeUnheardNodes() {
                 updated_at: {
                     // last updated before x seconds ago
                     lt: new Date(Date.now() - purgeNodesUnheardForSeconds * 1000),
+                },
+            }
+        });
+    } catch(e) {
+        // do nothing
+    }
+
+}
+
+/**
+ * Purges all device metrics from the database that are older than the configured timeframe.
+ */
+async function purgeOldDeviceMetrics() {
+
+    // make sure seconds provided
+    if(!purgeDeviceMetricsAfterSeconds){
+        return;
+    }
+
+    // delete all device metrics that are older than the configured purge time
+    try {
+        await prisma.deviceMetric.deleteMany({
+            where: {
+                created_at: {
+                    // last updated before x seconds ago
+                    lt: new Date(Date.now() - purgeDeviceMetricsAfterSeconds * 1000),
                 },
             }
         });
