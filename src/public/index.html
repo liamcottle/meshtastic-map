@@ -2071,10 +2071,13 @@
 
     // create layer groups
     var nodesLayerGroup = new L.LayerGroup();
-    var nodesRouterGroup = new L.LayerGroup();
     var neighboursLayerGroup = new L.LayerGroup();
     var nodeNeighboursLayerGroup = new L.LayerGroup();
     var nodesClusteredLayerGroup = L.markerClusterGroup({
+        showCoverageOnHover: false,
+        disableClusteringAtZoom: 10, // zoom level where node clustering is disabled
+    });
+    var nodesRouterLayerGroup = L.markerClusterGroup({
         showCoverageOnHover: false,
         disableClusteringAtZoom: 10, // zoom level where node clustering is disabled
     });
@@ -2130,7 +2133,7 @@
     L.control.groupedLayers(tileLayers, {
         "Nodes": {
             "All": nodesLayerGroup,
-            "Routers": nodesRouterGroup,
+            "Routers": nodesRouterLayerGroup,
             "Clustered": nodesClusteredLayerGroup,
             "None": new L.LayerGroup(),
         },
@@ -2696,8 +2699,12 @@
                 // add marker to node layer groups
                 marker.addTo(nodesLayerGroup);
                 nodesClusteredLayerGroup.addLayer(marker);
-								if(node.role_name == "ROUTER" || node.role_name == "ROUTER_CLIENT" || node.role_name == "REPEATER"){
-                    marker.addTo(nodesRouterGroup);
+
+                // add markers for routers and repeaters to routers layer group
+                if(node.role_name === "ROUTER"
+                    || node.role_name === "ROUTER_CLIENT"
+                    || node.role_name === "REPEATER"){
+                    nodesRouterLayerGroup.addLayer(marker);
                 }
 
                 // show tooltip on desktop only
