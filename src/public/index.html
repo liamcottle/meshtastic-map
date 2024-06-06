@@ -864,6 +864,68 @@
                                 </ul>
                             </div>
 
+                            <!-- environment metrics -->
+                            <div>
+                                <div class="bg-gray-200 p-2 font-semibold">Environment Metrics</div>
+                                <ul role="list" class="flex-1 divide-y divide-gray-200">
+
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="w-full">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Temperature</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span v-if="selectedNode.temperature">{{ Number(selectedNode.temperature).toFixed(0) }}ºC</span>
+                                                            <span v-else class="text-gray-500">???</span>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <canvas id="temperatureChart" style="width:150px;height:50px;"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="w-full">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Relative Humidity</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span v-if="selectedNode.relative_humidity">{{ Number(selectedNode.relative_humidity).toFixed(0) }}%</span>
+                                                            <span v-else class="text-gray-500">???</span>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <canvas id="relativeHumidityChart" style="width:150px;height:50px;"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="w-full">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Barometric Pressure</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span v-if="selectedNode.barometric_pressure">{{ Number(selectedNode.barometric_pressure).toFixed(1) }}hPa</span>
+                                                            <span v-else class="text-gray-500">???</span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                </ul>
+                            </div>
+
                             <!-- mqtt -->
                             <div>
                                 <div class="bg-gray-200 p-2">
@@ -1554,6 +1616,7 @@
 
                 selectedNode: null,
                 selectedNodeDeviceMetrics: [],
+                selectedNodeEnvironmentMetrics: [],
                 selectedNodeMqttMetrics: [],
                 selectedNodeTraceroutes: [],
 
@@ -1581,6 +1644,7 @@
             window._onNodeClick = (node) => {
                 this.selectedNode = node;
                 this.loadNodeDeviceMetrics(node.node_id);
+                this.loadNodeEnvironmentMetrics(node.node_id);
                 this.loadNodeMqttMetrics(node.node_id);
                 this.loadNodeTraceroutes(node.node_id);
             };
@@ -1627,6 +1691,20 @@
                 }).catch(() => {
                     this.selectedNodeDeviceMetrics = [];
                     this.renderDeviceMetricCharts();
+                });
+            },
+            loadNodeEnvironmentMetrics: function(nodeId) {
+                window.axios.get(`/api/v1/nodes/${nodeId}/environment-metrics`, {
+                    params: {
+                        count: 100,
+                    },
+                }).then((response) => {
+                    // reverse response, as it's newest to oldest, but we want oldest to newest
+                    this.selectedNodeEnvironmentMetrics = response.data.environment_metrics.reverse();
+                    this.renderEnvironmentMetricCharts();
+                }).catch(() => {
+                    this.selectedNodeEnvironmentMetrics = [];
+                    this.renderEnvironmentMetricCharts();
                 });
             },
             loadNodeMqttMetrics: function(nodeId) {
@@ -1882,6 +1960,136 @@
                             y: {
                                 display: false, // Hide y-axis labels
                                 min: -5,
+                                max: 100,
+                            },
+                        },
+                        plugins: {
+                            legend: {
+                                display: false, // Hide the legend
+                            },
+                            tooltip: {
+                                yAlign: 'top',
+                                intersect: false,
+                                displayColors: false,
+                                callbacks: {
+                                    label: (item) => item.formattedValue + "%",
+                                },
+                            },
+                        },
+                        elements: {
+                            point: {
+                                radius: 0, // Set the radius to 0 to hide the dots
+                            },
+                        },
+                    }
+                });
+
+            },
+            renderEnvironmentMetricCharts: function() {
+                this.updateTemperatureChart();
+                this.updateRelativeHumidityChart();
+            },
+            updateTemperatureChart: function() {
+
+                // get chart context
+                const ctx = window.document.getElementById('temperatureChart')?.getContext('2d');
+                if(!ctx){
+                    return;
+                }
+
+                // get temperature metrics
+                const environmentMetrics = this.selectedNodeEnvironmentMetrics.filter((environmentMetric) => {
+                    return environmentMetric.temperature != null;
+                });
+
+                new window.Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: environmentMetrics.map((environmentMetric) => {
+                            return new Date(environmentMetric.created_at).toLocaleTimeString();
+                        }),
+                        datasets: [{
+                            label: 'Temperature',
+                            data: environmentMetrics.map((environmentMetric) => {
+                                return environmentMetric.temperature;
+                            }),
+                            borderColor: '#22c55e',
+                            backgroundColor: '#e5e7eb',
+                            fill: true,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                display: false, // Hide x-axis labels
+                            },
+                            y: {
+                                display: false, // Hide y-axis labels
+                                min: -25,
+                                max: 100,
+                            },
+                        },
+                        plugins: {
+                            legend: {
+                                display: false, // Hide the legend
+                            },
+                            tooltip: {
+                                yAlign: 'top',
+                                intersect: false,
+                                displayColors: false,
+                                callbacks: {
+                                    label: (item) => item.formattedValue + "ºC",
+                                },
+                            },
+                        },
+                        elements: {
+                            point: {
+                                radius: 0, // Set the radius to 0 to hide the dots
+                            },
+                        },
+                    }
+                });
+
+            },
+            updateRelativeHumidityChart: function() {
+
+                // get chart context
+                const ctx = window.document.getElementById('relativeHumidityChart')?.getContext('2d');
+                if(!ctx){
+                    return;
+                }
+
+                // get temperature metrics
+                const environmentMetrics = this.selectedNodeEnvironmentMetrics.filter((environmentMetric) => {
+                    return environmentMetric.relative_humidity != null;
+                });
+
+                new window.Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: environmentMetrics.map((environmentMetric) => {
+                            return new Date(environmentMetric.created_at).toLocaleTimeString();
+                        }),
+                        datasets: [{
+                            label: 'Relative Humidity',
+                            data: environmentMetrics.map((environmentMetric) => {
+                                return environmentMetric.relative_humidity;
+                            }),
+                            borderColor: '#22c55e',
+                            backgroundColor: '#e5e7eb',
+                            fill: true,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                display: false, // Hide x-axis labels
+                            },
+                            y: {
+                                display: false, // Hide y-axis labels
+                                min: 0,
                                 max: 100,
                             },
                         },
