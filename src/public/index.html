@@ -2077,6 +2077,10 @@
         showCoverageOnHover: false,
         disableClusteringAtZoom: 10, // zoom level where node clustering is disabled
     });
+    var nodesRouterLayerGroup = L.markerClusterGroup({
+        showCoverageOnHover: false,
+        disableClusteringAtZoom: 10, // zoom level where node clustering is disabled
+    });
     var waypointsLayerGroup = new L.LayerGroup();
 
     // create icons
@@ -2129,6 +2133,7 @@
     L.control.groupedLayers(tileLayers, {
         "Nodes": {
             "All": nodesLayerGroup,
+            "Routers": nodesRouterLayerGroup,
             "Clustered": nodesClusteredLayerGroup,
             "None": new L.LayerGroup(),
         },
@@ -2694,6 +2699,13 @@
                 // add marker to node layer groups
                 marker.addTo(nodesLayerGroup);
                 nodesClusteredLayerGroup.addLayer(marker);
+
+                // add markers for routers and repeaters to routers layer group
+                if(node.role_name === "ROUTER"
+                    || node.role_name === "ROUTER_CLIENT"
+                    || node.role_name === "REPEATER"){
+                    nodesRouterLayerGroup.addLayer(marker);
+                }
 
                 // show tooltip on desktop only
                 if(!isMobile()){
