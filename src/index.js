@@ -251,6 +251,50 @@ app.get('/api/v1/nodes/:nodeId/environment-metrics', async (req, res) => {
     }
 });
 
+app.get('/api/v1/nodes/:nodeId/power-metrics', async (req, res) => {
+    try {
+
+        const nodeId = parseInt(req.params.nodeId);
+        const count = req.query.count ? parseInt(req.query.count) : undefined;
+
+        // find node
+        const node = await prisma.node.findFirst({
+            where: {
+                node_id: nodeId,
+            },
+        });
+
+        // make sure node exists
+        if(!node){
+            res.status(404).json({
+                message: "Not Found",
+            });
+            return;
+        }
+
+        // get latest power metrics
+        const powerMetrics = await prisma.powerMetric.findMany({
+            where: {
+                node_id: node.node_id,
+            },
+            orderBy: {
+                id: 'desc',
+            },
+            take: count,
+        });
+
+        res.json({
+            power_metrics: powerMetrics,
+        });
+
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({
+            message: "Something went wrong, try again later.",
+        });
+    }
+});
+
 app.get('/api/v1/nodes/:nodeId/mqtt-metrics', async (req, res) => {
     try {
 
