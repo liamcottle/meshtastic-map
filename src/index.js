@@ -171,9 +171,9 @@ app.get('/api/v1/nodes/:nodeId/device-metrics', async (req, res) => {
 
         // find node
         const node = await prisma.node.findFirst({
-           where: {
-               node_id: nodeId,
-           },
+            where: {
+                node_id: nodeId,
+            },
         });
 
         // make sure node exists
@@ -197,6 +197,50 @@ app.get('/api/v1/nodes/:nodeId/device-metrics', async (req, res) => {
 
         res.json({
             device_metrics: deviceMetrics,
+        });
+
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({
+            message: "Something went wrong, try again later.",
+        });
+    }
+});
+
+app.get('/api/v1/nodes/:nodeId/environment-metrics', async (req, res) => {
+    try {
+
+        const nodeId = parseInt(req.params.nodeId);
+        const count = req.query.count ? parseInt(req.query.count) : undefined;
+
+        // find node
+        const node = await prisma.node.findFirst({
+            where: {
+                node_id: nodeId,
+            },
+        });
+
+        // make sure node exists
+        if(!node){
+            res.status(404).json({
+                message: "Not Found",
+            });
+            return;
+        }
+
+        // get latest environment metrics
+        const environmentMetrics = await prisma.environmentMetric.findMany({
+            where: {
+                node_id: node.node_id,
+            },
+            orderBy: {
+                id: 'desc',
+            },
+            take: count,
+        });
+
+        res.json({
+            environment_metrics: environmentMetrics,
         });
 
     } catch(err) {
