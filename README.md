@@ -74,6 +74,7 @@ My version of the map is available at https://meshtastic.liamcottle.net
 - not affiliated with meshtastic info
 - donate link
 - login/register to add nodes to the map manually
+
   - need to prevent spam
   - captcha for reg
   - limit how many nodes can be added from an account
@@ -159,7 +160,7 @@ node src/mqtt.js --help
 ```
 Meshtastic MQTT Collector
 
-  Collects and processes service envelopes from a Meshtastic MQTT server. 
+  Collects and processes service envelopes from a Meshtastic MQTT server.
 
 Options
 
@@ -167,6 +168,7 @@ Options
   --mqtt-broker-url string                      MQTT Broker URL (e.g: mqtt://mqtt.meshtastic.org)
   --mqtt-username string                        MQTT Username (e.g: meshdev)
   --mqtt-password string                        MQTT Password (e.g: large4cats)
+  --mqtt-topic                                  MQTT Topic to subscribe to (e.g: msh/#)
   --collect-service-envelopes                   This option will save all received service envelopes to the database.
   --collect-text-messages                       This option will save all received text messages to the database.
   --collect-waypoints                           This option will save all received waypoints to the database.
