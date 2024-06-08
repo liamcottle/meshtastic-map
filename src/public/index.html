@@ -3143,7 +3143,15 @@
 
             // go to node id if provided
             if(goToNodeId){
-                goToNode(goToNodeId, false, zoom);
+
+                // go to node
+                if(window.goToNode(goToNodeId, false, zoom)){
+                    return;
+                }
+
+                // fallback to showing node details since we can't go to the node
+                window.showNodeDetails(goToNodeId);
+
             }
 
         });
