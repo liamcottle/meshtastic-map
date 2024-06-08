@@ -1,5 +1,6 @@
 const path = require('path');
 const express = require('express');
+const compression = require('compression');
 const protobufjs = require("protobufjs");
 const commandLineArgs = require("command-line-args");
 const commandLineUsage = require("command-line-usage");
@@ -71,6 +72,9 @@ function formatNodeInfo(node) {
 }
 
 const app = express();
+
+// enable compression
+app.use(compression());
 
 // serve files inside the public folder from /
 app.use('/', express.static(path.join(__dirname, 'public')));
