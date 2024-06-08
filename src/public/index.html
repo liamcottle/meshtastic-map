@@ -852,7 +852,7 @@
                                                     <div class="w-full">
                                                         <p class="truncate text-sm font-medium text-gray-900">Uptime</p>
                                                         <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.uptime_seconds">{{ selectedNode.uptime_seconds }} seconds</span>
+                                                            <span v-if="selectedNode.uptime_seconds">{{ formatUptimeSeconds(selectedNode.uptime_seconds) }}</span>
                                                             <span v-else class="text-gray-500">???</span>
                                                         </p>
                                                     </div>
@@ -2451,6 +2451,15 @@
             dismissShowingNodeNeighbours: function() {
                 window._onHideNodeNeighboursClick();
                 this.selectedNodeToShowNeighbours = null;
+            },
+            formatUptimeSeconds: function(secondsToFormat) {
+                secondsToFormat = Number(secondsToFormat);
+                var days = Math.floor(secondsToFormat / (3600 * 24));
+                var hours = Math.floor((secondsToFormat % (3600 * 24)) / 3600);
+                var minutes = Math.floor((secondsToFormat % 3600) / 60);
+                var seconds = Math.floor(secondsToFormat % 60);
+                var daysPlural = days === 1 ? 'day' : 'days';
+                return `${days} ${daysPlural} ${hours}h ${minutes}m ${seconds}s`;
             },
         },
         computed: {
