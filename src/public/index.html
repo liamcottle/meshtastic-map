@@ -942,11 +942,7 @@
                                                                 <span v-if="selectedNodeLatestPowerMetric?.ch1_voltage">{{ Number(selectedNodeLatestPowerMetric.ch1_voltage).toFixed(2) }}V</span>
                                                                 <span v-else class="text-gray-500">???</span>
                                                             </span>
-                                                            <span class="text-gray-500"> / </span>
-                                                            <span>
-                                                                <span v-if="selectedNodeLatestPowerMetric?.ch1_current">{{ Number(selectedNodeLatestPowerMetric.ch1_current).toFixed(2) }}mA</span>
-                                                                <span v-else class="text-gray-500">???</span>
-                                                            </span>
+                                                            <span v-if="selectedNodeLatestPowerMetric?.ch1_current"> / {{ Number(selectedNodeLatestPowerMetric.ch1_current).toFixed(2) }}mA</span>
                                                         </p>
                                                     </div>
                                                     <div>
@@ -968,11 +964,7 @@
                                                                 <span v-if="selectedNodeLatestPowerMetric?.ch2_voltage">{{ Number(selectedNodeLatestPowerMetric.ch2_voltage).toFixed(2) }}V</span>
                                                                 <span v-else class="text-gray-500">???</span>
                                                             </span>
-                                                            <span class="text-gray-500"> / </span>
-                                                            <span>
-                                                                <span v-if="selectedNodeLatestPowerMetric?.ch2_current">{{ Number(selectedNodeLatestPowerMetric.ch2_current).toFixed(2) }}mA</span>
-                                                                <span v-else class="text-gray-500">???</span>
-                                                            </span>
+                                                            <span v-if="selectedNodeLatestPowerMetric?.ch2_current"> / {{ Number(selectedNodeLatestPowerMetric.ch2_current).toFixed(2) }}mA</span>
                                                         </p>
                                                     </div>
                                                     <div>
@@ -994,11 +986,7 @@
                                                                 <span v-if="selectedNodeLatestPowerMetric?.ch3_voltage">{{ Number(selectedNodeLatestPowerMetric.ch3_voltage).toFixed(2) }}V</span>
                                                                 <span v-else class="text-gray-500">???</span>
                                                             </span>
-                                                            <span class="text-gray-500"> / </span>
-                                                            <span>
-                                                                <span v-if="selectedNodeLatestPowerMetric?.ch3_current">{{ Number(selectedNodeLatestPowerMetric.ch3_current).toFixed(2) }}mA</span>
-                                                                <span v-else class="text-gray-500">???</span>
-                                                            </span>
+                                                            <span v-if="selectedNodeLatestPowerMetric?.ch3_current"> / {{ Number(selectedNodeLatestPowerMetric.ch3_current).toFixed(2) }}mA</span>
                                                         </p>
                                                     </div>
                                                     <div>
