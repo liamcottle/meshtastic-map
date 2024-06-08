@@ -926,6 +926,92 @@
                                 </ul>
                             </div>
 
+                            <!-- power metrics -->
+                            <div>
+                                <div class="bg-gray-200 p-2 font-semibold">Power Metrics</div>
+                                <ul role="list" class="flex-1 divide-y divide-gray-200">
+
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="w-full">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Channel 1</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span>
+                                                                <span v-if="selectedNodeLatestPowerMetric?.ch1_voltage">{{ Number(selectedNodeLatestPowerMetric.ch1_voltage).toFixed(2) }}V</span>
+                                                                <span v-else class="text-gray-500">???</span>
+                                                            </span>
+                                                            <span class="text-gray-500"> / </span>
+                                                            <span>
+                                                                <span v-if="selectedNodeLatestPowerMetric?.ch1_current">{{ Number(selectedNodeLatestPowerMetric.ch1_current).toFixed(2) }}mA</span>
+                                                                <span v-else class="text-gray-500">???</span>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <canvas id="ch1VoltageChart" style="width:150px;height:50px;"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="w-full">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Channel 2</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span>
+                                                                <span v-if="selectedNodeLatestPowerMetric?.ch2_voltage">{{ Number(selectedNodeLatestPowerMetric.ch2_voltage).toFixed(2) }}V</span>
+                                                                <span v-else class="text-gray-500">???</span>
+                                                            </span>
+                                                            <span class="text-gray-500"> / </span>
+                                                            <span>
+                                                                <span v-if="selectedNodeLatestPowerMetric?.ch2_current">{{ Number(selectedNodeLatestPowerMetric.ch2_current).toFixed(2) }}mA</span>
+                                                                <span v-else class="text-gray-500">???</span>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <canvas id="ch2VoltageChart" style="width:150px;height:50px;"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="relative flex items-center">
+                                            <div class="block flex-1 px-4 py-2">
+                                                <div class="relative flex min-w-0 flex-1 items-center">
+                                                    <div class="w-full">
+                                                        <p class="truncate text-sm font-medium text-gray-900">Channel 3</p>
+                                                        <p class="truncate text-sm text-gray-700">
+                                                            <span>
+                                                                <span v-if="selectedNodeLatestPowerMetric?.ch3_voltage">{{ Number(selectedNodeLatestPowerMetric.ch3_voltage).toFixed(2) }}V</span>
+                                                                <span v-else class="text-gray-500">???</span>
+                                                            </span>
+                                                            <span class="text-gray-500"> / </span>
+                                                            <span>
+                                                                <span v-if="selectedNodeLatestPowerMetric?.ch3_current">{{ Number(selectedNodeLatestPowerMetric.ch3_current).toFixed(2) }}mA</span>
+                                                                <span v-else class="text-gray-500">???</span>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <canvas id="ch3VoltageChart" style="width:150px;height:50px;"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                </ul>
+                            </div>
+
                             <!-- mqtt -->
                             <div>
                                 <div class="bg-gray-200 p-2">
@@ -1617,6 +1703,7 @@
                 selectedNode: null,
                 selectedNodeDeviceMetrics: [],
                 selectedNodeEnvironmentMetrics: [],
+                selectedNodePowerMetrics: [],
                 selectedNodeMqttMetrics: [],
                 selectedNodeTraceroutes: [],
 
@@ -1645,6 +1732,7 @@
                 this.selectedNode = node;
                 this.loadNodeDeviceMetrics(node.node_id);
                 this.loadNodeEnvironmentMetrics(node.node_id);
+                this.loadNodePowerMetrics(node.node_id);
                 this.loadNodeMqttMetrics(node.node_id);
                 this.loadNodeTraceroutes(node.node_id);
             };
@@ -1705,6 +1793,20 @@
                 }).catch(() => {
                     this.selectedNodeEnvironmentMetrics = [];
                     this.renderEnvironmentMetricCharts();
+                });
+            },
+            loadNodePowerMetrics: function(nodeId) {
+                window.axios.get(`/api/v1/nodes/${nodeId}/power-metrics`, {
+                    params: {
+                        count: 100,
+                    },
+                }).then((response) => {
+                    // reverse response, as it's newest to oldest, but we want oldest to newest
+                    this.selectedNodePowerMetrics = response.data.power_metrics.reverse();
+                    this.renderPowerMetricCharts();
+                }).catch(() => {
+                    this.selectedNodePowerMetrics = [];
+                    this.renderPowerMetricCharts();
                 });
             },
             loadNodeMqttMetrics: function(nodeId) {
@@ -2115,6 +2217,200 @@
                 });
 
             },
+            renderPowerMetricCharts: function() {
+                this.updateCh1VoltageChart();
+                this.updateCh2VoltageChart();
+                this.updateCh3VoltageChart();
+            },
+            updateCh1VoltageChart: function() {
+
+                // get chart context
+                const ctx = window.document.getElementById('ch1VoltageChart')?.getContext('2d');
+                if(!ctx){
+                    return;
+                }
+
+                // get ch1 voltage metrics
+                const powerMetrics = this.selectedNodePowerMetrics.filter((powerMetric) => {
+                    return powerMetric.ch1_voltage != null;
+                });
+
+                new window.Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: powerMetrics.map((powerMetric) => {
+                            return new Date(powerMetric.created_at).toLocaleTimeString();
+                        }),
+                        datasets: [{
+                            label: 'Voltage',
+                            data: powerMetrics.map((powerMetric) => {
+                                return powerMetric.ch1_voltage;
+                            }),
+                            borderColor: '#22c55e',
+                            backgroundColor: '#e5e7eb',
+                            fill: true,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                display: false, // Hide x-axis labels
+                            },
+                            y: {
+                                display: false, // Hide y-axis labels
+                                min: 0,
+                                max: 24,
+                            },
+                        },
+                        plugins: {
+                            legend: {
+                                display: false, // Hide the legend
+                            },
+                            tooltip: {
+                                yAlign: 'top',
+                                intersect: false,
+                                displayColors: false,
+                                callbacks: {
+                                    label: (item) => item.formattedValue + "V",
+                                },
+                            },
+                        },
+                        elements: {
+                            point: {
+                                radius: 0, // Set the radius to 0 to hide the dots
+                            },
+                        },
+                    }
+                });
+
+            },
+            updateCh2VoltageChart: function() {
+
+                // get chart context
+                const ctx = window.document.getElementById('ch2VoltageChart')?.getContext('2d');
+                if(!ctx){
+                    return;
+                }
+
+                // get ch1 voltage metrics
+                const powerMetrics = this.selectedNodePowerMetrics.filter((powerMetric) => {
+                    return powerMetric.ch2_voltage != null;
+                });
+
+                new window.Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: powerMetrics.map((powerMetric) => {
+                            return new Date(powerMetric.created_at).toLocaleTimeString();
+                        }),
+                        datasets: [{
+                            label: 'Voltage',
+                            data: powerMetrics.map((powerMetric) => {
+                                return powerMetric.ch2_voltage;
+                            }),
+                            borderColor: '#22c55e',
+                            backgroundColor: '#e5e7eb',
+                            fill: true,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                display: false, // Hide x-axis labels
+                            },
+                            y: {
+                                display: false, // Hide y-axis labels
+                                min: 0,
+                                max: 24,
+                            },
+                        },
+                        plugins: {
+                            legend: {
+                                display: false, // Hide the legend
+                            },
+                            tooltip: {
+                                yAlign: 'top',
+                                intersect: false,
+                                displayColors: false,
+                                callbacks: {
+                                    label: (item) => item.formattedValue + "V",
+                                },
+                            },
+                        },
+                        elements: {
+                            point: {
+                                radius: 0, // Set the radius to 0 to hide the dots
+                            },
+                        },
+                    }
+                });
+
+            },
+            updateCh3VoltageChart: function() {
+
+                // get chart context
+                const ctx = window.document.getElementById('ch3VoltageChart')?.getContext('2d');
+                if(!ctx){
+                    return;
+                }
+
+                // get ch1 voltage metrics
+                const powerMetrics = this.selectedNodePowerMetrics.filter((powerMetric) => {
+                    return powerMetric.ch3_voltage != null;
+                });
+
+                new window.Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: powerMetrics.map((powerMetric) => {
+                            return new Date(powerMetric.created_at).toLocaleTimeString();
+                        }),
+                        datasets: [{
+                            label: 'Voltage',
+                            data: powerMetrics.map((powerMetric) => {
+                                return powerMetric.ch3_voltage;
+                            }),
+                            borderColor: '#22c55e',
+                            backgroundColor: '#e5e7eb',
+                            fill: true,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                display: false, // Hide x-axis labels
+                            },
+                            y: {
+                                display: false, // Hide y-axis labels
+                                min: 0,
+                                max: 24,
+                            },
+                        },
+                        plugins: {
+                            legend: {
+                                display: false, // Hide the legend
+                            },
+                            tooltip: {
+                                yAlign: 'top',
+                                intersect: false,
+                                displayColors: false,
+                                callbacks: {
+                                    label: (item) => item.formattedValue + "V",
+                                },
+                            },
+                        },
+                        elements: {
+                            point: {
+                                radius: 0, // Set the radius to 0 to hide the dots
+                            },
+                        },
+                    }
+                });
+
+            },
             showTraceRoute: function(traceroute) {
                 this.selectedTraceRoute = traceroute;
             },
@@ -2190,6 +2486,10 @@
 
                 return nodes;
 
+            },
+            selectedNodeLatestPowerMetric() {
+                const [ latestPowerMetric ] = this.selectedNodePowerMetrics.slice(-1);
+                return latestPowerMetric;
             },
         },
         watch: {
