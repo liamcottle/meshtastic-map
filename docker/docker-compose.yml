@@ -1,41 +1,46 @@
 services:
+
+  # listens to mqtt packets and saves to database
   meshtastic-mqtt:
     container_name: meshtastic-mqtt
     depends_on:
-      - mariadb
+      - database
     build:
       context: ..
       dockerfile: docker/Dockerfile
     command: /app/docker/mqtt.sh
-    links:
-      - mariadb
-    env_file:
-      - ../.env
+    environment:
+      DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
+      WAIT_HOSTS: "database:3306"
+      MQTT_OPTS: "" # add any custom mqtt.js options here
 
-  meshmap:
-    container_name: meshmap
+  # runs the web map ui
+  meshtastic-map:
+    container_name: meshtastic-map
     depends_on:
-      - mariadb
+      - database
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    command: /app/docker/webapp.sh
+    command: /app/docker/map.sh
     ports:
       - 8080:8080/tcp
-    links:
-      - mariadb
-    env_file:
-      - ../.env
+    environment:
+      DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
+      WAIT_HOSTS: "database:3306"
+      MAP_OPTS: "" # add any custom index.js options here
 
-  mariadb:
-    container_name: mariadb
+  # runs the database to store everything from mqtt
+  database:
+    container_name: database
     image: bitnami/mariadb
     ports:
       - 3306:3306/tcp
-    env_file:
-      - ../.env
+    environment:
+      MARIADB_DATABASE: "meshtastic-map"
+      MARIADB_ROOT_PASSWORD: "password"
     volumes:
-      - mariadb_data:/bitnami/mariadb
+      - database_data:/bitnami/mariadb
     healthcheck:
       test: ['CMD', '/opt/bitnami/scripts/mariadb/healthcheck.sh']
       interval: 15s
@@ -44,4 +49,4 @@ services:
       start_interval: 5s
 
 volumes:
-  mariadb_data:
+  database_data:

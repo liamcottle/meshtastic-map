@@ -6,5 +6,5 @@ echo "Waiting for mysql"
 echo "Running migrations"
 npx prisma migrate dev
 
-echo "Starting webapp"
-exec node src/index.js
+echo "Starting map ui"
+exec node src/index.js ${MAP_OPTS}
