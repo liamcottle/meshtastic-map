@@ -213,6 +213,22 @@ As of the time of writing these docs, the mobile devices do not correctly config
 
 Your node will stay "stuck" in the `online` state in the MQTT server.
 
+## Docker Compose
+
+A [docker-compose.yml](./docker-compose.yml) is available. You can run the following command to launch everything;
+
+```
+docker compose up
+```
+
+This will:
+
+- Start a MariaDB database server.
+- Run the database migrations.
+- Start the MQTT collector.
+- Start the Map UI.
+- Expose the map on port 8080.
+
 ## Contributing
 
 If you have a feature request, or find a bug, please [open an issue](https://github.com/liamcottle/meshtastic-map/issues) here on GitHub.
