@@ -4,21 +4,22 @@ services:
   meshtastic-mqtt:
     container_name: meshtastic-mqtt
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     build:
       context: ..
       dockerfile: docker/Dockerfile
     command: /app/docker/mqtt.sh
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
-      WAIT_HOSTS: "database:3306"
       MQTT_OPTS: "" # add any custom mqtt.js options here
 
   # runs the web map ui
   meshtastic-map:
     container_name: meshtastic-map
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     build:
       context: ..
       dockerfile: docker/Dockerfile
@@ -27,7 +28,6 @@ services:
       - 8080:8080/tcp
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
-      WAIT_HOSTS: "database:3306"
       MAP_OPTS: "" # add any custom index.js options here
 
   # runs the database to store everything from mqtt
