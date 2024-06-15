@@ -7,8 +7,8 @@ services:
       database:
         condition: service_healthy
     build:
-      context: ..
-      dockerfile: docker/Dockerfile
+      context: .
+      dockerfile: ./Dockerfile
     command: /app/docker/mqtt.sh
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
@@ -21,8 +21,8 @@ services:
       database:
         condition: service_healthy
     build:
-      context: ..
-      dockerfile: docker/Dockerfile
+      context: .
+      dockerfile: ./Dockerfile
     command: /app/docker/map.sh
     ports:
       - 8080:8080/tcp
