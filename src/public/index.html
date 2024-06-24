@@ -876,7 +876,7 @@
                                                     <div class="w-full">
                                                         <p class="truncate text-sm font-medium text-gray-900">Temperature</p>
                                                         <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.temperature">{{ Number(selectedNode.temperature).toFixed(0) }}ºC</span>
+                                                            <span v-if="selectedNode.temperature">{{ formatTemperature(selectedNode.temperature) }}</span>
                                                             <span v-else class="text-gray-500">???</span>
                                                         </p>
                                                     </div>
@@ -1466,6 +1466,16 @@
                                 <input type="number" v-model="configZoomLevelGoToNode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                             </div>
 
+                            <!-- configTemperatureFormat -->
+                            <div class="p-2">
+                                <label class="block text-sm font-medium text-gray-900">Temperature Format</label>
+                                <div class="text-xs text-gray-600 mb-2">Metrics will be shown in the selected format.</div>
+                                <select v-model="configTemperatureFormat" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                    <option value="celsius">Celsius (ºC)</option>
+                                    <option value="fahrenheit">Fahrenheit (ºF)</option>
+                                </select>
+                            </div>
+
                             <!-- configAutoUpdatePositionInUrl -->
                             <div class="p-2">
                                 <div class="flex items-start">
@@ -1575,6 +1585,14 @@
         return localStorage.setItem("config_enable_map_animations", value);
     }
 
+    function getConfigTemperatureFormat() {
+        return localStorage.getItem("config_temperature_format") || "celsius";
+    }
+
+    function setConfigTemperatureFormat(format) {
+        return localStorage.setItem("config_temperature_format", format);
+    }
+
     function getConfigMapSelectedTileLayer() {
         return localStorage.getItem("config_map_selected_tile_layer") || "OpenStreetMap";
     }
@@ -1677,6 +1695,7 @@
                 configZoomLevelGoToNode: window.getConfigZoomLevelGoToNode(),
                 configAutoUpdatePositionInUrl: window.getConfigAutoUpdatePositionInUrl(),
                 configEnableMapAnimations: window.getConfigEnableMapAnimations(),
+                configTemperatureFormat: window.getConfigTemperatureFormat(),
 
                 isShowingHardwareModels: false,
                 hardwareModelStats: null,
@@ -2101,7 +2120,7 @@
                         datasets: [{
                             label: 'Temperature',
                             data: environmentMetrics.map((environmentMetric) => {
-                                return environmentMetric.temperature;
+                                return this.convertTemperature(environmentMetric.temperature);
                             }),
                             borderColor: '#22c55e',
                             backgroundColor: '#e5e7eb',
@@ -2117,7 +2136,7 @@
                             y: {
                                 display: false, // Hide y-axis labels
                                 min: -25,
-                                max: 100,
+                                max: 200,
                             },
                         },
                         plugins: {
@@ -2129,7 +2148,7 @@
                                 intersect: false,
                                 displayColors: false,
                                 callbacks: {
-                                    label: (item) => item.formattedValue + "ºC",
+                                    label: (item) => item.formattedValue + this.getTemperatureUnit(),
                                 },
                             },
                         },
@@ -2461,6 +2480,36 @@
                 var daysPlural = days === 1 ? 'day' : 'days';
                 return `${days} ${daysPlural} ${hours}h ${minutes}m ${seconds}s`;
             },
+            formatTemperature: function(celsius) {
+                switch(this.configTemperatureFormat){
+                    case "celsius": {
+                        return `${Number(celsius).toFixed(0)}ºC`;
+                    }
+                    case "fahrenheit": {
+                        const fahrenheit = this.celsiusToFahrenheit(celsius);
+                        return `${fahrenheit.toFixed(0)}ºF`;
+                    }
+                }
+            },
+            convertTemperature: function(celsius) {
+                switch(this.configTemperatureFormat){
+                    case "celsius": {
+                        return celsius;
+                    }
+                    case "fahrenheit": {
+                        return this.celsiusToFahrenheit(celsius);
+                    }
+                }
+            },
+            getTemperatureUnit: function() {
+                switch(this.configTemperatureFormat){
+                    case "celsius": return "ºC";
+                    case "fahrenheit": return "ºF";
+                }
+            },
+            celsiusToFahrenheit: function(celsius) {
+                return (celsius * 9/5) + 32;
+            },
         },
         computed: {
             searchedNodes() {
@@ -2510,6 +2559,9 @@
             },
             configEnableMapAnimations() {
                 window.setConfigEnableMapAnimations(this.configEnableMapAnimations);
+            },
+            configTemperatureFormat() {
+                window.setConfigTemperatureFormat(this.configTemperatureFormat);
             },
         },
     }).mount('#app');
