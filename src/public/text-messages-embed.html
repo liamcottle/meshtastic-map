@@ -1,0 +1,276 @@
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Meshtastic Messages</title>
+
+    <!-- tailwind css -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+
+    <!-- moment -->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+
+    <!-- vuejs -->
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <style>
+
+        /* used to prevent ui flicker before vuejs loads */
+        [v-cloak] {
+            display: none;
+        }
+
+    </style>
+
+</head>
+<body class="h-full">
+<div id="app" v-cloak>
+    <div class="h-full flex flex-col overflow-hidden">
+
+        <!-- load previous -->
+        <button @click="loadPrevious" type="button" class="w-full bg-gray-200 p-2 border-b hover:bg-gray-300">Load Previous</button>
+
+        <!-- messages -->
+        <div id="messages" class="h-full flex flex-col space-y-3 p-3 overflow-y-scroll">
+            <div :key="message.id" v-for="message of messages" class="flex flex-col max-w-xl items-start">
+
+                <!-- sender -->
+                <div class="text-xs text-gray-500">{{ getNodeName(message.from) }}</div>
+
+                <!-- message -->
+                <div class="border border-gray-300 rounded-xl shadow overflow-hidden bg-[#efefef]">
+                    <div class="w-full space-y-0.5 px-2.5 py-1" v-html="escapeMessageText(message.text)"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    Vue.createApp({
+        data() {
+            return {
+
+                to: null,
+                from: null,
+                channelId: null,
+                gatewayId: null,
+
+                isLoadingPrevious: false,
+                isLoadingMore: false,
+                shouldAutoScroll: true,
+
+                messages: [],
+                nodesById: {},
+
+                moment: window.moment,
+
+            };
+        },
+        mounted: function() {
+
+            // parse url params
+            const queryParams = new URLSearchParams(window.location.search);
+            this.to = queryParams.get('to');
+            this.from = queryParams.get('from');
+            this.channelId = queryParams.get('channel_id');
+            this.gatewayId = queryParams.get('gateway_id');
+            this.count = queryParams.get('count');
+
+            // listen for scrolling of messages list
+            document.getElementById("messages").addEventListener("scroll", (event) => {
+
+                // check if messages is scrolled to bottom
+                const element = event.target;
+                const isAtBottom = element.scrollTop === (element.scrollHeight - element.offsetHeight);
+
+                // we want to auto scroll if user is at bottom of messages list
+                this.shouldAutoScroll = isAtBottom;
+
+            });
+
+            this.initialLoad();
+
+        },
+        methods: {
+            async initialLoad() {
+
+                // load 1 page of previous messages
+                await this.loadPrevious();
+
+                // scroll to bottom
+                this.scrollToBottom();
+
+                // load more every few seconds
+                setInterval(async () => {
+                    await this.loadMore();
+                }, 2500);
+
+            },
+            async loadPrevious() {
+
+                // do nothing if already loading
+                if(this.isLoadingPrevious){
+                    return;
+                }
+
+                this.isLoadingPrevious = true;
+
+                try {
+
+                    const response = await window.axios.get('/api/v1/text-messages', {
+                        params: {
+                            to: this.to,
+                            from: this.from,
+                            channelId: this.channelId,
+                            gatewayId: this.gatewayId,
+                            count: this.count,
+                            order: "desc",
+                            last_id: this.oldestMessageId,
+                        },
+                    });
+
+                    // add messages to start of existing messages
+                    const messages = response.data.text_messages;
+                    for(const message of messages){
+                        this.messages.unshift(message);
+                    }
+
+                    // fetch node info
+                    for(const message of messages){
+                        await this.fetchNodeInfo(message.to);
+                        await this.fetchNodeInfo(message.from);
+                    }
+
+                } catch(e) {
+                    // do nothing
+                } finally {
+                    this.isLoadingPrevious = false;
+                }
+
+            },
+            async loadMore() {
+
+                // do nothing if already loading
+                if(this.isLoadingMore){
+                    return;
+                }
+
+                this.isLoadingMore = true;
+
+                try {
+
+                    const response = await window.axios.get('/api/v1/text-messages', {
+                        params: {
+                            to: this.to,
+                            from: this.from,
+                            channelId: this.channelId,
+                            gatewayId: this.gatewayId,
+                            count: this.count,
+                            order: "asc",
+                            last_id: this.latestMessageId,
+                        },
+                    });
+
+                    // add messages to end of existing messages
+                    const messages = response.data.text_messages;
+                    for(const message of messages){
+                        this.messages.push(message);
+                    }
+
+                    // scroll to bottom
+                    if(this.shouldAutoScroll){
+                        this.scrollToBottom();
+                    }
+
+                    // fetch node info
+                    for(const message of messages){
+                        await this.fetchNodeInfo(message.to);
+                        await this.fetchNodeInfo(message.from);
+                    }
+
+                } catch(e) {
+                    // do nothing
+                } finally {
+                    this.isLoadingMore = false;
+                }
+
+            },
+            async fetchNodeInfo(nodeId) {
+
+                // do nothing if already fetched
+                if(nodeId in this.nodesById){
+                    return;
+                }
+
+                // do nothing if broadcast address
+                if(nodeId.toString() === "4294967295"){
+                    return;
+                }
+
+                try {
+
+                    const response = await window.axios.get(`/api/v1/nodes/${nodeId}`);
+                    const node = response.data.node;
+
+                    if(node){
+                        this.nodesById[node.node_id] = node;
+                    }
+
+                } catch(e) {
+                    // do nothing
+                }
+
+            },
+            scrollToBottom: function() {
+                this.$nextTick(() => {
+                    var container = this.$el.querySelector("#messages");
+                    container.scrollTop = container.scrollHeight;
+                });
+            },
+            getNodeName(nodeId) {
+
+                // find node by id
+                const node = this.nodesById[nodeId];
+                if(!node){
+                    return "Unknown";
+                }
+
+                return `[${node.short_name}] ${node.long_name}`;
+
+            },
+            escapeMessageText(text) {
+                return text.replaceAll('<', '&lt;')
+                    .replaceAll('>', '&gt;')
+                    .replaceAll('\n', '<br/>');
+            },
+        },
+        computed: {
+            oldestMessageId() {
+
+                if(this.messages.length > 0){
+                    return this.messages[0].id;
+                }
+
+                return null;
+
+            },
+            latestMessageId() {
+
+                if(this.messages.length > 0){
+                    return this.messages[this.messages.length - 1].id;
+                }
+
+                return null;
+
+            }
+        },
+    }).mount('#app');
+</script>
+
+</body>
+</html>

@@ -472,6 +472,7 @@ app.get('/api/v1/text-messages', async (req, res) => {
         const from = req.query.from ?? undefined;
         const channelId = req.query.channel_id ?? undefined;
         const gatewayId = req.query.gateway_id ?? undefined;
+        const lastId = req.query.last_id ? parseInt(req.query.last_id) : undefined;
         const count = req.query.count ? parseInt(req.query.count) : 50;
         const order = req.query.order ?? "asc";
 
@@ -482,6 +483,13 @@ app.get('/api/v1/text-messages', async (req, res) => {
                 from: from,
                 channel_id: channelId,
                 gateway_id: gatewayId,
+                // when ordered oldest to newest (asc), only get records after last id
+                // when ordered newest to oldest (desc), only get records before last id
+                id: order === "asc" ? {
+                    gt: lastId,
+                } : {
+                    lt: lastId,
+                },
             },
             orderBy: {
                 id: order,
@@ -498,6 +506,10 @@ app.get('/api/v1/text-messages', async (req, res) => {
             message: "Something went wrong, try again later.",
         });
     }
+});
+
+app.get('/api/v1/text-messages/embed', async (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/text-messages-embed.html'));
 });
 
 app.get('/api/v1/waypoints', async (req, res) => {
