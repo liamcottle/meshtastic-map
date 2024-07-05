@@ -50,8 +50,13 @@
 
                 <!-- sender -->
                 <div class="text-xs text-gray-500">
-                    <span>{{ getNodeName(message.from) }}</span>
-                    <span v-if="message.to.toString() !== '4294967295'"> → {{ getNodeName(message.to) }}</span>
+                    <a target="_blank" :href="`/?node_id=${message.from}`" class="hover:text-blue-500">
+                        <span>{{ getNodeName(message.from) }}</span>
+                    </a>
+                    <span v-if="message.to.toString() !== '4294967295'">
+                        <span> → </span>
+                        <a target="_blank" :href="`/?node_id=${message.to}`" class="hover:text-blue-500">{{ getNodeName(message.to) }}</a>
+                    </span>
                 </div>
 
                 <!-- message -->
