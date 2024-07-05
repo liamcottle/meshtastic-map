@@ -49,7 +49,10 @@
             <div :key="message.id" v-for="message of reversedMessages" class="flex flex-col max-w-xl items-start my-1.5">
 
                 <!-- sender -->
-                <div class="text-xs text-gray-500">{{ getNodeName(message.from) }}</div>
+                <div class="text-xs text-gray-500">
+                    <span>{{ getNodeName(message.from) }}</span>
+                    <span v-if="message.to.toString() !== '4294967295'"> → {{ getNodeName(message.to) }}</span>
+                </div>
 
                 <!-- message -->
                 <div class="border border-gray-300 rounded-xl shadow overflow-hidden bg-[#efefef]">
