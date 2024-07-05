@@ -29,12 +29,10 @@
 <div id="app" v-cloak>
     <div class="h-full flex flex-col overflow-hidden">
 
-        <!-- load previous -->
-        <button @click="loadPrevious" type="button" class="w-full bg-gray-200 p-2 border-b hover:bg-gray-300">Load Previous</button>
-
-        <!-- messages -->
         <!-- note: must use flex-col-reverse to prevent ui scrolling when adding older messages to ui -->
         <div id="messages" class="h-full flex flex-col-reverse p-3 overflow-y-auto">
+
+            <!-- messages -->
             <div :key="message.id" v-for="message of reversedMessages" class="flex flex-col max-w-xl items-start my-1.5">
 
                 <!-- sender -->
@@ -46,6 +44,15 @@
                 </div>
 
             </div>
+
+            <!-- load previous -->
+            <button v-show="!isLoadingPrevious && hasMorePrevious" id="load-previous" @click="loadPrevious" type="button" class="flex space-x-2 mx-auto bg-gray-200 px-3 py-1 hover:bg-gray-300 rounded-full shadow">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                <span>Load Previous</span>
+            </button>
+
         </div>
 
     </div>
@@ -64,6 +71,8 @@
                 isLoadingPrevious: false,
                 isLoadingMore: false,
                 shouldAutoScroll: true,
+                loadPreviousObserver: null,
+                hasMorePrevious: true,
 
                 messages: [],
                 nodesById: {},
@@ -94,6 +103,14 @@
 
             });
 
+            // setup intersection observer
+            this.loadPreviousObserver = new IntersectionObserver((entries) => {
+                const loadMoreElement = entries[0];
+                if(loadMoreElement && loadMoreElement.isIntersecting){
+                    this.loadPrevious();
+                }
+            });
+
             this.initialLoad();
 
         },
@@ -105,6 +122,9 @@
 
                 // scroll to bottom
                 this.scrollToBottom();
+
+                // setup auto loading previous
+                this.loadPreviousObserver.observe(document.querySelector("#load-previous"));
 
                 // load more every few seconds
                 setInterval(async () => {
@@ -139,6 +159,11 @@
                     const messages = response.data.text_messages;
                     for(const message of messages){
                         this.messages.unshift(message);
+                    }
+
+                    // no more previous to load if previous list is empty
+                    if(messages.length === 0){
+                        this.hasMorePrevious = false;
                     }
 
                     // fetch node info
