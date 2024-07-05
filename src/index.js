@@ -464,6 +464,42 @@ app.get('/api/v1/stats/hardware-models', async (req, res) => {
     }
 });
 
+app.get('/api/v1/text-messages', async (req, res) => {
+    try {
+
+        // get query params
+        const to = req.query.to ?? undefined;
+        const from = req.query.from ?? undefined;
+        const channelId = req.query.channel_id ?? undefined;
+        const gatewayId = req.query.gateway_id ?? undefined;
+        const count = req.query.count ? parseInt(req.query.count) : 50;
+        const order = req.query.order ?? "asc";
+
+        // get text messages from db
+        const textMessages = await prisma.textMessage.findMany({
+            where: {
+                to: to,
+                from: from,
+                channel_id: channelId,
+                gateway_id: gatewayId,
+            },
+            orderBy: {
+                id: order,
+            },
+            take: count,
+        });
+
+        res.json({
+            text_messages: textMessages,
+        });
+
+    } catch(err) {
+        res.status(500).json({
+            message: "Something went wrong, try again later.",
+        });
+    }
+});
+
 app.get('/api/v1/waypoints', async (req, res) => {
     try {
 
