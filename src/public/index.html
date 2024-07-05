@@ -3610,6 +3610,12 @@
         tooltip += `<br/><br/><button onclick="showNodeDetails(${node.node_id});" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200 mb-1">Show Full Details</button>`;
         tooltip += `<br/><button onclick="showNodeNeighboursThatHeardUs(${node.node_id});" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200 mb-1">Show Neighbours (Heard Us)</button>`;
         tooltip += `<br/><button onclick="showNodeNeighboursThatWeHeard(${node.node_id});" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200">Show Neighbours (We Heard)</button>`;
+        tooltip += `<br/>`;
+        tooltip += `<div class="flex space-x-1 mt-1">`;
+        tooltip += `<a target="_blank" href="/api/v1/text-messages/embed?from=${node.node_id}" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200" style="color:unset !important;">Sent Msgs</a>`;
+        tooltip += `<a target="_blank" href="/api/v1/text-messages/embed?to=${node.node_id}" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200" style="color:unset !important;">Received Msgs</a>`;
+        tooltip += `<a target="_blank" href="/api/v1/text-messages/embed?gateway_id=${node.node_id}" class="border border-gray-300 bg-gray-100 p-1 w-full rounded hover:bg-gray-200" style="color:unset !important;">Gated Msgs</a>`;
+        tooltip += `</div>`;
 
         return tooltip;
 
