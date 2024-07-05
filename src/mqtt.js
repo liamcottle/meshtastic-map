@@ -103,6 +103,11 @@ const optionsList = [
         type: Number,
         description: "Positions older than this many seconds will be purged from the database.",
     },
+    {
+        name: "purge-text-messages-after-seconds",
+        type: Number,
+        description: "Text Messages older than this many seconds will be purged from the database.",
+    },
 ];
 
 // parse command line args
@@ -144,6 +149,7 @@ const purgeDeviceMetricsAfterSeconds = options["purge-device-metrics-after-secon
 const purgeEnvironmentMetricsAfterSeconds = options["purge-environment-metrics-after-seconds"] ?? null;
 const purgePowerMetricsAfterSeconds = options["purge-power-metrics-after-seconds"] ?? null;
 const purgePositionsAfterSeconds = options["purge-positions-after-seconds"] ?? null;
+const purgeTextMessagesAfterSeconds = options["purge-text-messages-after-seconds"] ?? null;
 
 // create mqtt client
 const client = mqtt.connect(mqttBrokerUrl, {
@@ -173,6 +179,7 @@ if(purgeIntervalSeconds){
         await purgeOldEnvironmentMetrics();
         await purgeOldPowerMetrics();
         await purgeOldPositions();
+        await purgeOldTextMessages();
     }, purgeIntervalSeconds * 1000);
 }
 
@@ -297,6 +304,32 @@ async function purgeOldPositions() {
                 created_at: {
                     // last updated before x seconds ago
                     lt: new Date(Date.now() - purgePositionsAfterSeconds * 1000),
+                },
+            }
+        });
+    } catch(e) {
+        // do nothing
+    }
+
+}
+
+/**
+ * Purges all text messages from the database that are older than the configured timeframe.
+ */
+async function purgeOldTextMessages() {
+
+    // make sure seconds provided
+    if(!purgeTextMessagesAfterSeconds){
+        return;
+    }
+
+    // delete all text messages that are older than the configured purge time
+    try {
+        await prisma.textMessage.deleteMany({
+            where: {
+                created_at: {
+                    // last updated before x seconds ago
+                    lt: new Date(Date.now() - purgeTextMessagesAfterSeconds * 1000),
                 },
             }
         });
