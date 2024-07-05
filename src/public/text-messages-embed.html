@@ -33,8 +33,9 @@
         <button @click="loadPrevious" type="button" class="w-full bg-gray-200 p-2 border-b hover:bg-gray-300">Load Previous</button>
 
         <!-- messages -->
-        <div id="messages" class="h-full flex flex-col space-y-3 p-3 overflow-y-scroll">
-            <div :key="message.id" v-for="message of messages" class="flex flex-col max-w-xl items-start">
+        <!-- note: must use flex-col-reverse to prevent ui scrolling when adding older messages to ui -->
+        <div id="messages" class="h-full flex flex-col-reverse p-3 overflow-y-auto">
+            <div :key="message.id" v-for="message of reversedMessages" class="flex flex-col max-w-xl items-start my-1.5">
 
                 <!-- sender -->
                 <div class="text-xs text-gray-500">{{ getNodeName(message.from) }}</div>
@@ -250,6 +251,10 @@
             },
         },
         computed: {
+            reversedMessages() {
+                // ensure a copy of the array is returned in reverse order
+                return this.messages.map((message) => message).reverse();
+            },
             oldestMessageId() {
 
                 if(this.messages.length > 0){
