@@ -110,6 +110,7 @@
             this.from = queryParams.get('from');
             this.channelId = queryParams.get('channel_id');
             this.gatewayId = queryParams.get('gateway_id');
+            this.directMessageNodeIds = queryParams.get('direct_message_node_ids');
             this.count = queryParams.get('count');
 
             // listen for scrolling of messages list
@@ -170,6 +171,7 @@
                             from: this.from,
                             channel_id: this.channelId,
                             gateway_id: this.gatewayId,
+                            direct_message_node_ids: this.directMessageNodeIds,
                             count: this.count,
                             order: "desc",
                             last_id: this.oldestMessageId,
@@ -217,6 +219,7 @@
                             from: this.from,
                             channel_id: this.channelId,
                             gateway_id: this.gatewayId,
+                            direct_message_node_ids: this.directMessageNodeIds,
                             count: this.count,
                             order: "asc",
                             last_id: this.latestMessageId,
