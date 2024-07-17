@@ -133,7 +133,7 @@ if(options.help){
 const mqttBrokerUrl = options["mqtt-broker-url"] ?? "mqtt://mqtt.meshtastic.org";
 const mqttUsername = options["mqtt-username"] ?? "meshdev";
 const mqttPassword = options["mqtt-password"] ?? "large4cats";
-const mqttTopic = options["mqtt-topic"] ?? "#";
+const mqttTopic = options["mqtt-topic"] ?? "msh/#";
 const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
 const collectPositions = options["collect-positions"] ?? false;
 const collectTextMessages = options["collect-text-messages"] ?? false;
