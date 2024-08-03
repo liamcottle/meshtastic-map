@@ -3,7 +3,7 @@ name: build-push
 on:
   push:
     branches:
-      - master
+      - devops/push-on-dockerhub
 
 jobs:
   docker:
