@@ -3,10 +3,10 @@ name: build-push
 on:
   push:
     branches:
-      - devops/push-on-dockerhub
+      - master
 
 jobs:
-  docker:
+  build-push:
     runs-on: ubuntu-latest
     steps:
       - name: Set up QEMU
