@@ -4,3 +4,4 @@
 *PLI.course int_size:16
 *GeoChat.message max_size:200
 *GeoChat.to max_size:120
+*GeoChat.to_callsign max_size:120

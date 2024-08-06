@@ -184,7 +184,7 @@ enum PortNum {
    * ENCODING: Protobuf
    */
   NEIGHBORINFO_APP = 71;
-  
+
   /*
    * ATAK Plugin
    * Portnum for payloads from the official Meshtastic ATAK plugin
@@ -195,6 +195,11 @@ enum PortNum {
    * Provides unencrypted information about a node for consumption by a map via MQTT
    */
   MAP_REPORT_APP = 73;
+
+  /*
+   * PowerStress based monitoring support (for automated power consumption testing)
+   */
+  POWERSTRESS_APP = 74;
 
   /*
    * Private applications should use portnums >= 256.

@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package meshtastic;
 
-import "meshtastic/mesh.proto";
 import "meshtastic/config.proto";
+import "meshtastic/mesh.proto";
 
 option csharp_namespace = "Meshtastic.Protobufs";
 option go_package = "github.com/meshtastic/go/generated";
@@ -49,8 +49,8 @@ message MapReport {
   string short_name = 2;
 
   /*
-  * Role of the node that applies specific settings for a particular use-case
-  */
+   * Role of the node that applies specific settings for a particular use-case
+   */
   Config.DeviceConfig.Role role = 3;
 
   /*
@@ -64,19 +64,19 @@ message MapReport {
   string firmware_version = 5;
 
   /*
-  * The region code for the radio (US, CN, EU433, etc...)
-  */
+   * The region code for the radio (US, CN, EU433, etc...)
+   */
   Config.LoRaConfig.RegionCode region = 6;
 
   /*
-  * Modem preset used by the radio (LongFast, MediumSlow, etc...)
-  */
+   * Modem preset used by the radio (LongFast, MediumSlow, etc...)
+   */
   Config.LoRaConfig.ModemPreset modem_preset = 7;
 
   /*
-  * Whether the node has a channel with default PSK and name (LongFast, MediumSlow, etc...)
-  * and it uses the default frequency slot given the region and modem preset.
-  */
+   * Whether the node has a channel with default PSK and name (LongFast, MediumSlow, etc...)
+   * and it uses the default frequency slot given the region and modem preset.
+   */
   bool has_default_channel = 8;
 
   /*

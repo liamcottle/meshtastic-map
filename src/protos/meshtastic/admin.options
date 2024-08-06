@@ -8,5 +8,5 @@
 *AdminMessage.get_ringtone_response max_size:231
 
 *HamParameters.call_sign max_size:8
-*HamParameters.short_name max_size:6
+*HamParameters.short_name max_size:5
 *NodeRemoteHardwarePinsResponse.node_remote_hardware_pins max_count:16
