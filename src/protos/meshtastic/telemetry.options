@@ -2,3 +2,4 @@
 # https://jpa.kapsi.fi/nanopb/docs/reference.html#proto-file-options
 
 *EnvironmentMetrics.iaq int_size:16
+*EnvironmentMetrics.wind_direction int_size:16

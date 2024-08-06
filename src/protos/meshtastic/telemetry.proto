@@ -77,6 +77,57 @@ message EnvironmentMetrics {
    * Belongs to Air Quality but is not particle but VOC measurement. Other VOC values can also be put in here.
    */
   uint32 iaq = 7;
+
+  /*
+   * RCWL9620 Doppler Radar Distance Sensor, used for water level detection. Float value in mm.
+   */
+  float distance = 8;
+
+  /*
+   * VEML7700 high accuracy ambient light(Lux) digital 16-bit resolution sensor.
+   */
+  float lux = 9;
+
+  /*
+   * VEML7700 high accuracy white light(irradiance) not calibrated digital 16-bit resolution sensor.
+   */
+  float white_lux = 10;
+
+  /*
+   * Infrared lux
+   */
+  float ir_lux = 11;
+
+  /*
+   * Ultraviolet lux
+   */
+  float uv_lux = 12;
+
+  /*
+   * Wind direction in degrees
+   * 0 degrees = North, 90 = East, etc...
+   */
+  uint32 wind_direction = 13;
+
+  /*
+   * Wind speed in m/s
+   */
+  float wind_speed = 14;
+
+  /*
+   * Weight in KG
+   */
+  float weight = 15;
+
+  /*
+   * Wind gust in m/s
+   */
+  float wind_gust = 16;
+
+  /*
+   * Wind lull in m/s
+   */
+  float wind_lull = 17;
 }
 
 /*
@@ -294,4 +345,69 @@ enum TelemetrySensorType {
    * BMP085/BMP180 High accuracy temperature and pressure (older Version of BMP280)
    */
   BMP085 = 15;
+
+  /*
+   * RCWL-9620 Doppler Radar Distance Sensor, used for water level detection
+   */
+  RCWL9620 = 16;
+
+  /*
+   * Sensirion High accuracy temperature and humidity
+   */
+  SHT4X = 17;
+
+  /*
+   * VEML7700 high accuracy ambient light(Lux) digital 16-bit resolution sensor.
+   */
+  VEML7700 = 18;
+
+  /*
+   * MLX90632 non-contact IR temperature sensor.
+   */
+  MLX90632 = 19;
+
+  /*
+   * TI OPT3001 Ambient Light Sensor
+   */
+  OPT3001 = 20;
+
+  /*
+   * Lite On LTR-390UV-01 UV Light Sensor
+   */
+  LTR390UV = 21;
+
+  /*
+   * AMS TSL25911FN RGB Light Sensor
+   */
+  TSL25911FN = 22;
+  
+  /*
+   * AHT10 Integrated temperature and humidity sensor
+   */
+  AHT10 = 23;
+
+  /*
+   * DFRobot Lark Weather station (temperature, humidity, pressure, wind speed and direction) 
+   */
+  DFROBOT_LARK = 24;
+  
+  /*
+   * NAU7802 Scale Chip or compatible
+   */
+  NAU7802 = 25;
+}
+
+/*
+ * NAU7802 Telemetry configuration, for saving to flash
+ */
+message Nau7802Config {
+  /*
+   * The offset setting for the NAU7802
+   */
+  int32 zeroOffset = 1;
+
+  /*
+   * The calibration factor for the NAU7802
+   */
+  float calibrationFactor = 2;
 }

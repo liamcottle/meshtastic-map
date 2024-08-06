@@ -85,17 +85,23 @@ message ChannelSettings {
   /*
    * Per-channel module settings.
    */
-   ModuleSettings module_settings = 7;
+  ModuleSettings module_settings = 7;
 }
 
 /*
  * This message is specifically for modules to store per-channel configuration data.
  */
 message ModuleSettings {
-/*
- * Bits of precision for the location sent in position packets.
- */
+  /*
+   * Bits of precision for the location sent in position packets.
+   */
   uint32 position_precision = 1;
+
+  /*
+   * Controls whether or not the phone / clients should mute the current channel
+   * Useful for noisy public channels you don't necessarily want to disable
+   */
+  bool is_client_muted = 2;
 }
 
 /*

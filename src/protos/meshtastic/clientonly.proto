@@ -40,11 +40,3 @@ message DeviceProfile {
    */
   optional LocalModuleConfig module_config = 5;
 }
-
-/* 
- * A heartbeat message is sent by a node to indicate that it is still alive.
- * This is currently only needed to keep serial connections alive.
- */
-message Heartbeat {
-  
-}

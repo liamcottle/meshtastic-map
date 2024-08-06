@@ -125,7 +125,7 @@ message ModuleConfig {
      * Whether the Module is enabled
      */
     bool enabled = 1;
-    
+
     /*
      * Interval in seconds of how often we should try to send our
      * Neighbor Info to the mesh
@@ -136,7 +136,7 @@ message ModuleConfig {
   /*
    * Detection Sensor Module Config
    */
-   message DetectionSensorConfig {
+  message DetectionSensorConfig {
     /*
      * Whether the Module is enabled
      */
@@ -254,6 +254,17 @@ message ModuleConfig {
      */
 
     uint32 paxcounter_update_interval = 2;
+
+    /*
+     * WiFi RSSI threshold. Defaults to -80
+     */
+    int32 wifi_threshold = 3;
+
+    /*
+     * BLE RSSI threshold. Defaults to -80
+     */
+    int32 ble_threshold = 4;
+
   }
 
   /*
@@ -293,6 +304,8 @@ message ModuleConfig {
       NMEA = 4;
       // NMEA messages specifically tailored for CalTopo
       CALTOPO = 5;
+      // Ecowitt WS85 weather station
+      WS85 = 6;
     }
 
     /*
@@ -457,6 +470,11 @@ message ModuleConfig {
      * TODO: REPLACE
      */
     uint32 history_return_window = 5;
+
+    /*
+     * Set to true to let this node act as a server that stores received messages and resends them upon request.
+     */
+    bool is_server = 6;
   }
 
   /*
@@ -542,15 +560,6 @@ message ModuleConfig {
      * air quality metrics to the mesh
      */
     bool power_screen_enabled = 10;
-
-
-
-
-
-
-
-
-
   }
 
   /*
@@ -661,11 +670,10 @@ message ModuleConfig {
   }
 
   /*
-    Ambient Lighting Module - Settings for control of onboard LEDs to allow users to adjust the brightness levels and respective color levels.
-    Initially created for the RAK14001 RGB LED module.
+     Ambient Lighting Module - Settings for control of onboard LEDs to allow users to adjust the brightness levels and respective color levels.
+     Initially created for the RAK14001 RGB LED module.
   */
   message AmbientLightingConfig {
-
     /*
      * Sets LED to on or off.
      */

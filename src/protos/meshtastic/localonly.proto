@@ -114,7 +114,7 @@ message LocalModuleConfig {
   /*
    * The part of the config that is specific to the Ambient Lighting module
    */
-   ModuleConfig.AmbientLightingConfig ambient_lighting = 12;
+  ModuleConfig.AmbientLightingConfig ambient_lighting = 12;
 
   /*
    * The part of the config that is specific to the Detection Sensor module

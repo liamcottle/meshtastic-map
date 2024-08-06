@@ -40,8 +40,10 @@
 
 *Routing.variant anonymous_oneof:true
 
-*LogRecord.message max_size:64
-*LogRecord.source max_size:8
+*LogRecord.message max_size:384
+*LogRecord.source max_size:32
+
+*FileInfo.file_name max_size:228
 
 # MyMessage.name         max_size:40 
 # or fixed_length or fixed_count, or max_count
@@ -59,3 +61,7 @@
 *MqttClientProxyMessage.topic max_size:60
 *MqttClientProxyMessage.data max_size:435
 *MqttClientProxyMessage.text max_size:435
+
+*ChunkedPayload.chunk_count int_size:16
+*ChunkedPayload.chunk_index int_size:16
+*ChunkedPayload.payload_chunk max_size:228

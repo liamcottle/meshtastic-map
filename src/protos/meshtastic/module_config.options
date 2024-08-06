@@ -3,7 +3,7 @@
 *MQTTConfig.address max_size:64
 *MQTTConfig.username max_size:64
 *MQTTConfig.password max_size:64
-*MQTTConfig.root max_size:16
+*MQTTConfig.root max_size:32
 
 *AudioConfig.ptt_pin int_size:8
 *AudioConfig.i2s_ws int_size:8
