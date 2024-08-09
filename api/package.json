@@ -1,0 +1,32 @@
+{
+  "name": "meshtastic-map-api",
+  "version": "1.0.0",
+  "description": "API for a map of all Meshtastic nodes heard via MQTT.",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liamcottle/meshtastic-map.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/liamcottle/meshtastic-map/issues"
+  },
+  "homepage": "https://github.com/liamcottle/meshtastic-map#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.1.0",
+    "nodemon": "^3.1.4",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.18.0",
+    "express": "^4.19.2",
+    "mqtt": "^5.9.1"
+  }
+}

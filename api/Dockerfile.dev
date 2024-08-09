@@ -1,0 +1,13 @@
+FROM node:lts-alpine
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+
+COPY ./prisma /app/prisma
+
+RUN npm install --frozen-lockfile
+
+EXPOSE 8080
+
+CMD ["npm", "run", "dev"]
