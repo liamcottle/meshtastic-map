@@ -6,6 +6,7 @@ import { mqttClient } from "./mqtt.js";
 import { handleStatMessage } from "./messages/stat.js";
 import { handleServiceEnvelope } from "./messages/service_envelope.js";
 import { handleTextMessage } from "./messages/text_message.js";
+import { handlePosition } from "./messages/position.js";
 
 mqttClient.on("message", async (topic, message) => {
   try {
@@ -25,6 +26,10 @@ mqttClient.on("message", async (topic, message) => {
     switch (portnum) {
       case 1:
         await handleTextMessage(envelope, packet, payload);
+        break;
+      case 3:
+        await handlePosition(envelope, packet, payload);
+        break;
     }
   } catch (err) {
     console.error(err);

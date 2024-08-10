@@ -12,6 +12,8 @@ export const COLLECT_SERVICE_ENVELOPES: boolean =
   !!process.env.COLLECT_SERVICE_ENVELOPES || false;
 export const COLLECT_TEXT_MESSAGES: boolean =
   !!process.env.COLLECT_TEXT_MESSAGES || false;
+export const COLLECT_POSITION: boolean =
+  !!process.env.COLLECT_POSITION || false;
 
 export const LOG_KNOWN_PACKET_TYPES: boolean =
   !!process.env.LOG_KNOWN_PACKET_TYPES || true;
