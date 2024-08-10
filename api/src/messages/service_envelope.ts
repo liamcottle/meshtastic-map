@@ -15,7 +15,12 @@ export async function handleServiceEnvelope(
   topic: string,
   message: Buffer
 ): Promise<
-  { packet: MeshPacket; decodedPayload: Data | undefined } | undefined
+  | {
+      envelope: ServiceEnvelope;
+      packet: MeshPacket;
+      payload: Data | undefined;
+    }
+  | undefined
 > {
   try {
     const envelope: ServiceEnvelope = fromBinary(
@@ -54,7 +59,11 @@ export async function handleServiceEnvelope(
     if (packet.payloadVariant.case === "encrypted")
       decodedPayload = await decrypt(packet);
 
-    return { packet: packet, decodedPayload: decodedPayload };
+    return {
+      envelope: envelope,
+      packet: packet,
+      payload: decodedPayload,
+    };
   } catch (err) {
     console.error(err);
   }

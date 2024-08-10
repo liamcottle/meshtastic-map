@@ -10,6 +10,11 @@ export const MQTT_TOPIC: string = process.env.MQTT_TOPIC || "msh/HAM/S5/#";
 
 export const COLLECT_SERVICE_ENVELOPES: boolean =
   !!process.env.COLLECT_SERVICE_ENVELOPES || false;
+export const COLLECT_TEXT_MESSAGES: boolean =
+  !!process.env.COLLECT_TEXT_MESSAGES || false;
+
+export const LOG_KNOWN_PACKET_TYPES: boolean =
+  !!process.env.LOG_KNOWN_PACKET_TYPES || true;
 
 export const DECRYPTION_KEYS: string[] = process.env.DECRYPTION_KEYS?.split(
   ","
