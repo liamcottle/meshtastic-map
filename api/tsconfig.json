@@ -1,22 +1,17 @@
 {
   "compilerOptions": {
-    "module": "esnext",
+    "module": "ES2022",
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "target": "es2017",
-    "moduleResolution": "node",
+    "target": "ES2023",
+    "moduleResolution": "Node",
     "sourceMap": true,
     "outDir": "./dist",
     "strict": true
   },
-  "exclude": [
-    "./dist",
-    "./node_modules"
-  ],
-  "include": [
-    "./src"
-  ],
+  "exclude": ["./dist", "./node_modules"],
+  "include": ["./src"],
   "ts-node": {
     "esm": true
-  },
+  }
 }
