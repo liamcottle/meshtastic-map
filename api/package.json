@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "nodemon"
+    "dev": "npx prisma migrate deploy && nodemon"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,8 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@buf/meshtastic_protobufs.bufbuild_es": "^2.0.0-20240808155351-4b932fafad19.1",
+    "@bufbuild/protobuf": "^2.0.0",
     "@prisma/client": "^5.18.0",
     "express": "^4.19.2",
     "mqtt": "^5.9.1"
