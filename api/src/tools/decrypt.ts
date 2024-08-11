@@ -1,10 +1,12 @@
 import { fromBinary } from "@bufbuild/protobuf";
 import {
   type MeshPacket,
+  type Data,
   DataSchema,
 } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb.js";
 import crypto from "node:crypto";
 import { DECRYPTION_KEYS } from "../settings.js";
+import type { ServiceEnvelope } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mqtt_pb.js";
 
 export function createNonce(packetId: number, fromNode: number) {
   // Expand packetId to 64 bits
@@ -65,4 +67,43 @@ export async function decrypt(packet: MeshPacket) {
 
   // couldn't decrypt
   return undefined;
+}
+
+export function extractMetaData(
+  envelope: ServiceEnvelope,
+  packet: MeshPacket,
+  payload: Data
+) {
+  const envelopeMeta = {
+    channelId: envelope.channelId,
+    gatewayId: envelope.gatewayId,
+  };
+
+  const packetMeta = {
+    from: packet.from,
+    to: packet.to,
+    channel: packet.channel,
+    id: packet.id,
+    rxTime: packet.rxTime,
+    rxSnr: packet.rxSnr,
+    rxRssi: packet.rxRssi,
+    hopLimit: packet.hopLimit,
+    wantAck: packet.wantAck,
+    priority: packet.priority,
+    viaMqtt: packet.viaMqtt,
+    hopStart: packet.hopStart,
+    delayed: packet.delayed,
+  };
+
+  const payloadMeta = {
+    portnum: payload.portnum,
+    dest: payload.dest,
+    emoji: payload.emoji,
+    replyId: payload.replyId,
+    requestId: payload.requestId,
+    source: payload.source,
+    wantResponse: payload.wantResponse,
+  };
+
+  return { envelopeMeta, packetMeta, payloadMeta };
 }
