@@ -36,18 +36,12 @@ export async function handleServiceEnvelope(
         data: {
           mqtt_topic: topic,
           channel_id: envelope.channelId,
-          gateway_id: envelope.gatewayId,
-          from: packet.from,
+          gateway_id: envelope.gatewayId
+            ? BigInt(`0x${envelope.gatewayId.replaceAll("!", "")}`)
+            : null, // convert hex id "!f96a92f0" to bigint
           to: packet.to,
-          packet_id: packet.id,
-          rx_time: packet.rxTime,
-          rx_snr: packet.rxSnr,
-          hop_limit: packet.hopLimit,
-          want_ack: packet.wantAck,
-          priority: packet.priority,
-          rx_rssi: packet.rxRssi,
-          via_mqtt: packet.viaMqtt,
-          hop_start: packet.hopStart,
+          from: packet.from,
+          protobuf: message,
         },
       });
     }
