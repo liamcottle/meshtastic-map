@@ -1,6 +1,6 @@
-import {
-  type MeshPacket,
-  type Data,
+import type {
+  MeshPacket,
+  Data,
 } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb";
 import {
   MapReportSchema,

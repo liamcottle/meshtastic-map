@@ -15,7 +15,7 @@ import { handleTraceroute } from "./messages/traceroute.js";
 import { handleMapReport } from "./messages/map_report.js";
 import { LOG_UNKNOWN_PACKET_TYPES } from "./settings.js";
 
-mqttClient.on("message", async (topic, message) => {
+mqttClient.on("message", async (topic: string, message: Buffer) => {
   try {
     if (topic.includes("/stat/!"))
       return await handleStatMessage(topic, message);

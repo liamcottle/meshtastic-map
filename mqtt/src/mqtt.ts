@@ -1,5 +1,10 @@
-import mqtt from 'mqtt';
-import { MQTT_URL, MQTT_USERNAME, MQTT_PASSWORD, MQTT_TOPIC } from './settings.js';
+import mqtt from "mqtt";
+import {
+  MQTT_URL,
+  MQTT_USERNAME,
+  MQTT_PASSWORD,
+  MQTT_TOPIC,
+} from "./settings.js";
 
 export const mqttClient = mqtt.connect(MQTT_URL, {
   username: MQTT_USERNAME,
@@ -12,9 +17,9 @@ mqttClient.on("connect", () => {
     .- - - - - - - - - - - - - - - - - - - -
     |   MQTT client listening on topic ${MQTT_TOPIC}
     '- - - - - - - - - - - - - - - - - - - -
-    `)
+    `);
 });
 
-mqttClient.on("error", (error) => {
+mqttClient.on("error", (error: Error) => {
   console.error(error);
 });

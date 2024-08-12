@@ -1,8 +1,7 @@
 services:
-
   # listens to mqtt packets and saves to database
-  meshtastic-map-api:
-    container_name: meshtastic-map-api
+  meshtastic-map-mqtt:
+    container_name: meshtastic-map-mqtt
     build:
-      context: api
+      context: mqtt
       dockerfile: Dockerfile.dev

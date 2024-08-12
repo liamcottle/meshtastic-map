@@ -8,9 +8,9 @@ import { prisma } from "../db";
 import { LOG_KNOWN_PACKET_TYPES } from "../settings";
 import { extractMetaData } from "../tools/decrypt";
 import {
-  DeviceMetrics,
-  EnvironmentMetrics,
-  PowerMetrics,
+  type DeviceMetrics,
+  type EnvironmentMetrics,
+  type PowerMetrics,
   type Telemetry,
   TelemetrySchema,
 } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/telemetry_pb";
@@ -38,8 +38,8 @@ export async function handleTelemetry(
       });
     }
 
-    let data;
-    let isDuplicate;
+    let data: DeviceMetrics | EnvironmentMetrics | PowerMetrics | undefined;
+    let isDuplicate: boolean;
 
     switch (telemetry.variant.case) {
       case "deviceMetrics":

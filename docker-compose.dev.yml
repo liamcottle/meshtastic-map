@@ -1,10 +1,9 @@
 services:
-
   # listens to mqtt packets and saves to database
-  meshtastic-map-api:
-    container_name: meshtastic-map-api
+  meshtastic-map-mqtt:
+    container_name: meshtastic-map-mqtt
     build:
-      context: api
+      context: mqtt
       dockerfile: Dockerfile.dev
     depends_on:
       database:
@@ -12,7 +11,7 @@ services:
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
     volumes:
-      - ./api:/app
+      - ./mqtt:/app
       - /app/node_modules
 
   # runs the database to store everything from mqtt
@@ -27,7 +26,7 @@ services:
     volumes:
       - database_data:/bitnami/mariadb
     healthcheck:
-      test: ['CMD', '/opt/bitnami/scripts/mariadb/healthcheck.sh']
+      test: ["CMD", "/opt/bitnami/scripts/mariadb/healthcheck.sh"]
       interval: 15s
       timeout: 5s
       retries: 6
