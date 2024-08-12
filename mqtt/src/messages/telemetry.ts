@@ -38,19 +38,26 @@ export async function handleTelemetry(
       });
     }
 
-    let data: DeviceMetrics | EnvironmentMetrics | PowerMetrics | undefined;
-    let isDuplicate: boolean;
+    let data: object = {};
+    let isDuplicate: object;
 
     switch (telemetry.variant.case) {
-      case "deviceMetrics":
-        data = telemetry.variant.value as DeviceMetrics;
+      case "deviceMetrics": {
+        const tValue = telemetry.variant.value as DeviceMetrics;
+        data = {
+          battery_level: tValue.batteryLevel,
+          voltage: tValue.voltage,
+          channel_utilization: tValue.channelUtilization,
+          air_util_tx: tValue.airUtilTx,
+          uptime_seconds: tValue.uptimeSeconds,
+        };
         isDuplicate = await prisma.deviceMetric.findFirst({
           where: {
             node_id: packet.from,
-            battery_level: data.batteryLevel,
-            voltage: data.voltage,
-            channel_utilization: data.channelUtilization,
-            air_util_tx: data.airUtilTx,
+            battery_level: tValue.batteryLevel,
+            voltage: tValue.voltage,
+            channel_utilization: tValue.channelUtilization,
+            air_util_tx: tValue.airUtilTx,
             created_at: {
               gte: new Date(Date.now() - 15000), // created in the last 15 seconds
             },
@@ -61,16 +68,26 @@ export async function handleTelemetry(
         await prisma.deviceMetric.create({
           data: {
             node_id: packet.from,
-            battery_level: data.batteryLevel,
-            voltage: data.voltage,
-            channel_utilization: data.channelUtilization,
-            air_util_tx: data.airUtilTx,
+            battery_level: tValue.batteryLevel,
+            voltage: tValue.voltage,
+            channel_utilization: tValue.channelUtilization,
+            air_util_tx: tValue.airUtilTx,
           },
         });
         break;
+      }
 
-      case "environmentMetrics":
-        data = telemetry.variant.value as EnvironmentMetrics;
+      case "environmentMetrics": {
+        const tValue = telemetry.variant.value as EnvironmentMetrics;
+        data = {
+          temperature: tValue.temperature,
+          relative_humidity: tValue.relativeHumidity,
+          barometric_pressure: tValue.barometricPressure,
+          gas_resistance: tValue.gasResistance,
+          voltage: tValue.voltage,
+          current: tValue.current,
+          iaq: tValue.iaq,
+        };
 
         // find an existing metric with duplicate information created in the last 15 seconds
         isDuplicate = await prisma.environmentMetric.findFirst({
@@ -89,19 +106,28 @@ export async function handleTelemetry(
           data: {
             node_id: packet.from,
             packet_id: packet.id,
-            temperature: data.temperature,
-            relative_humidity: data.relativeHumidity,
-            barometric_pressure: data.barometricPressure,
-            gas_resistance: data.gasResistance,
-            voltage: data.voltage,
-            current: data.current,
-            iaq: data.iaq,
+            temperature: tValue.temperature,
+            relative_humidity: tValue.relativeHumidity,
+            barometric_pressure: tValue.barometricPressure,
+            gas_resistance: tValue.gasResistance,
+            voltage: tValue.voltage,
+            current: tValue.current,
+            iaq: tValue.iaq,
           },
         });
         break;
+      }
 
-      case "powerMetrics":
-        data = telemetry.variant.value as PowerMetrics;
+      case "powerMetrics": {
+        const tValue = telemetry.variant.value as PowerMetrics;
+        data = {
+          ch1_voltage: tValue.ch1Voltage,
+          ch1_current: tValue.ch1Current,
+          ch2_voltage: tValue.ch2Voltage,
+          ch2_current: tValue.ch2Current,
+          ch3_voltage: tValue.ch3Voltage,
+          ch3_current: tValue.ch3Current,
+        };
 
         // find an existing metric with duplicate information created in the last 15 seconds
         isDuplicate = await prisma.powerMetric.findFirst({
@@ -119,15 +145,16 @@ export async function handleTelemetry(
           data: {
             node_id: packet.from,
             packet_id: packet.id,
-            ch1_voltage: data.ch1Voltage,
-            ch1_current: data.ch1Current,
-            ch2_voltage: data.ch2Voltage,
-            ch2_current: data.ch2Current,
-            ch3_voltage: data.ch3Voltage,
-            ch3_current: data.ch3Current,
+            ch1_voltage: tValue.ch1Voltage,
+            ch1_current: tValue.ch1Current,
+            ch2_voltage: tValue.ch2Voltage,
+            ch2_current: tValue.ch2Current,
+            ch3_voltage: tValue.ch3Voltage,
+            ch3_current: tValue.ch3Current,
           },
         });
         break;
+      }
 
       case "airQualityMetrics":
         break;
