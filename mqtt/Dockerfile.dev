@@ -4,11 +4,7 @@ WORKDIR /app
 
 COPY package.json package-lock.json ./
 
-COPY ./prisma /app/prisma
-
 RUN npm install --frozen-lockfile
-
-RUN npx prisma generate
 
 EXPOSE 8080
 
