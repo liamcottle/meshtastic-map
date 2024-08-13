@@ -36,8 +36,6 @@ export const COLLECT_TEXT_MESSAGES: boolean =
   !!process.env.COLLECT_TEXT_MESSAGES || false;
 export const COLLECT_POSITION: boolean =
   !!process.env.COLLECT_POSITION || false;
-export const COLLECT_NODEINFO: boolean =
-  !!process.env.COLLECT_NODEINFO || false;
 export const COLLECT_WAYPOINT: boolean =
   !!process.env.COLLECT_WAYPOINT || false;
 export const COLLECT_NEIGHBOURINFO: boolean =
