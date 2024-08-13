@@ -3,12 +3,12 @@ import {
   type Data,
   type Position,
   PositionSchema,
-} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb";
-import type { ServiceEnvelope } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mqtt_pb";
-import { COLLECT_POSITION, LOG_KNOWN_PACKET_TYPES } from "../settings";
+} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb.js";
+import type { ServiceEnvelope } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mqtt_pb.js";
+import { COLLECT_POSITION, LOG_KNOWN_PACKET_TYPES } from "../settings.js";
 import { fromBinary } from "@bufbuild/protobuf";
-import { prisma } from "../db";
-import { extractMetaData } from "../tools/decrypt";
+import { prisma } from "../db.js";
+import { extractMetaData } from "../tools/decrypt.js";
 
 export async function handlePosition(
   envelope: ServiceEnvelope,

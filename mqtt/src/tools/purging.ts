@@ -1,4 +1,4 @@
-import { prisma } from "../db";
+import { prisma } from "../db.js";
 import {
   PURGE_DEVICE_METRICS_FOR_SECONDS,
   PURGE_ENVIROMENT_METRICS_FOR_SECONDS,
@@ -6,7 +6,7 @@ import {
   PURGE_POWER_METRICS_FOR_SECONDS,
   PURGE_TEXT_MESSAGES_FOR_SECONDS,
   PURGE_UNHEARD_NODES_FOR_SECONDS,
-} from "../settings";
+} from "../settings.js";
 
 /**
  * Purges all nodes from the database that haven't been heard from within the configured timeframe.

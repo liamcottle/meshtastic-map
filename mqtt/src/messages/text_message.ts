@@ -1,11 +1,11 @@
 import type {
   Data,
   MeshPacket,
-} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb";
-import { COLLECT_TEXT_MESSAGES, LOG_KNOWN_PACKET_TYPES } from "../settings";
-import { prisma } from "../db";
-import type { ServiceEnvelope } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mqtt_pb";
-import { extractMetaData } from "../tools/decrypt";
+} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb.js";
+import { COLLECT_TEXT_MESSAGES, LOG_KNOWN_PACKET_TYPES } from "../settings.js";
+import { prisma } from "../db.js";
+import type { ServiceEnvelope } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mqtt_pb.js";
+import { extractMetaData } from "../tools/decrypt.js";
 
 export async function handleTextMessage(
   envelope: ServiceEnvelope,

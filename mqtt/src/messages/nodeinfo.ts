@@ -3,12 +3,12 @@ import {
   type Data,
   type NodeInfo,
   NodeInfoSchema,
-} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb";
-import type { ServiceEnvelope } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mqtt_pb";
+} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb.js";
+import type { ServiceEnvelope } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mqtt_pb.js";
 import { fromBinary } from "@bufbuild/protobuf";
-import { prisma } from "../db";
-import { COLLECT_NODEINFO, LOG_KNOWN_PACKET_TYPES } from "../settings";
-import { extractMetaData } from "../tools/decrypt";
+import { prisma } from "../db.js";
+import { COLLECT_NODEINFO, LOG_KNOWN_PACKET_TYPES } from "../settings.js";
+import { extractMetaData } from "../tools/decrypt.js";
 
 export async function handleNodeInfo(
   envelope: ServiceEnvelope,
@@ -45,11 +45,11 @@ export async function handleNodeInfo(
         },
         create: {
           node_id: packet.from,
-          long_name: user?.longName,
-          short_name: user?.shortName,
-          hardware_model: user?.hwModel,
+          long_name: user?.longName || "",
+          short_name: user?.shortName || "",
+          hardware_model: user?.hwModel || 0,
           is_licensed: user?.isLicensed === true,
-          role: user?.role,
+          role: user?.role || 0,
         },
         update: {
           long_name: user?.longName,

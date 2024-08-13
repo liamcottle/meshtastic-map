@@ -1,16 +1,16 @@
 import type {
   MeshPacket,
   Data,
-} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb";
+} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb.js";
 import {
   MapReportSchema,
   type MapReport,
   type ServiceEnvelope,
-} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mqtt_pb";
-import { COLLECT_MAP_REPOR, LOG_KNOWN_PACKET_TYPES } from "../settings";
+} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mqtt_pb.js";
+import { COLLECT_MAP_REPOR, LOG_KNOWN_PACKET_TYPES } from "../settings.js";
 import { fromBinary } from "@bufbuild/protobuf";
-import { prisma } from "../db";
-import { extractMetaData } from "../tools/decrypt";
+import { prisma } from "../db.js";
+import { extractMetaData } from "../tools/decrypt.js";
 
 export async function handleMapReport(
   envelope: ServiceEnvelope,

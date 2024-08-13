@@ -9,7 +9,7 @@
     "outDir": "./dist",
     "strict": true
   },
-  "exclude": ["./dist", "./node_modules"],
+  "exclude": ["./dist"],
   "include": ["./src"],
   "ts-node": {
     "esm": true

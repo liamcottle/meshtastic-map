@@ -1,19 +1,19 @@
 import type {
   MeshPacket,
   Data,
-} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb";
-import type { ServiceEnvelope } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mqtt_pb";
+} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb.js";
+import type { ServiceEnvelope } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mqtt_pb.js";
 import { fromBinary } from "@bufbuild/protobuf";
-import { prisma } from "../db";
-import { LOG_KNOWN_PACKET_TYPES } from "../settings";
-import { extractMetaData } from "../tools/decrypt";
+import { prisma } from "../db.js";
+import { LOG_KNOWN_PACKET_TYPES } from "../settings.js";
+import { extractMetaData } from "../tools/decrypt.js";
 import {
   type DeviceMetrics,
   type EnvironmentMetrics,
   type PowerMetrics,
   type Telemetry,
   TelemetrySchema,
-} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/telemetry_pb";
+} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/telemetry_pb.js";
 
 export async function handleTelemetry(
   envelope: ServiceEnvelope,
@@ -39,7 +39,7 @@ export async function handleTelemetry(
     }
 
     let data: object = {};
-    let isDuplicate: object;
+    let isDuplicate: any;
 
     switch (telemetry.variant.case) {
       case "deviceMetrics": {

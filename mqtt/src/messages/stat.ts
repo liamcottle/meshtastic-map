@@ -1,4 +1,4 @@
-import { prisma } from "../db";
+import { prisma } from "../db.js";
 
 export async function handleStatMessage(topic: string, message: Buffer) {
   try {

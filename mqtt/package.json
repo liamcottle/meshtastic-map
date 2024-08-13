@@ -5,6 +5,8 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
+    "start": "npx prisma migrate deploy && node dist/index.js",
+    "build": "npx tsc",
     "dev": "npx prisma generate && npx prisma migrate deploy && nodemon"
   },
   "repository": {
@@ -19,13 +21,13 @@
   "homepage": "https://github.com/liamcottle/meshtastic-map#readme",
   "devDependencies": {
     "@types/express": "^4.17.21",
-    "@types/node": "^22.1.0",
+    "@types/node": "^22.2.0",
     "nodemon": "^3.1.4",
     "tsx": "^4.17.0",
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@buf/meshtastic_protobufs.bufbuild_es": "^2.0.0-20240808155351-4b932fafad19.1",
+    "@buf/meshtastic_protobufs.bufbuild_es": "^2.0.0-20240812161137-bf80cd78054c.2",
     "@bufbuild/protobuf": "^2.0.0",
     "@prisma/client": "^5.18.0",
     "express": "^4.19.2",

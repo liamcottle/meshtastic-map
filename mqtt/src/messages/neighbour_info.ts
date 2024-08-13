@@ -3,12 +3,12 @@ import {
   type Data,
   NeighborInfoSchema,
   type NeighborInfo,
-} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb";
-import type { ServiceEnvelope } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mqtt_pb";
+} from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb.js";
+import type { ServiceEnvelope } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mqtt_pb.js";
 import { fromBinary } from "@bufbuild/protobuf";
-import { prisma } from "../db";
-import { COLLECT_NEIGHBOURINFO, LOG_KNOWN_PACKET_TYPES } from "../settings";
-import { extractMetaData } from "../tools/decrypt";
+import { prisma } from "../db.js";
+import { COLLECT_NEIGHBOURINFO, LOG_KNOWN_PACKET_TYPES } from "../settings.js";
+import { extractMetaData } from "../tools/decrypt.js";
 
 export async function handleNeighbourInfo(
   envelope: ServiceEnvelope,
