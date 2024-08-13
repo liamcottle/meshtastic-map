@@ -8,6 +8,28 @@ export const MQTT_USERNAME: string = process.env.MQTT_USERNAME || "meshdev";
 export const MQTT_PASSWORD: string = process.env.MQTT_PASSWORD || "large4cats";
 export const MQTT_TOPIC: string = process.env.MQTT_TOPIC || "msh/HAM/S5/#";
 
+export const PURGE_INTERVAL_SECONDS: number = Number.parseInt(
+  process.env.PURGE_INTERVAL_SECONDS || "0"
+);
+export const PURGE_UNHEARD_NODES_FOR_SECONDS: number = Number.parseInt(
+  process.env.PURGE_UNHEARD_NODES_FOR_SECONDS || "0"
+);
+export const PURGE_DEVICE_METRICS_FOR_SECONDS: number = Number.parseInt(
+  process.env.PURGE_DEVICE_METRICS_FOR_SECONDS || "0"
+);
+export const PURGE_ENVIROMENT_METRICS_FOR_SECONDS: number = Number.parseInt(
+  process.env.PURGE_ENVIROMENT_METRICS_FOR_SECONDS || "0"
+);
+export const PURGE_POWER_METRICS_FOR_SECONDS: number = Number.parseInt(
+  process.env.PURGE_POWER_METRICS_FOR_SECONDS || "0"
+);
+export const PURGE_POSITIONS_FOR_SECONDS: number = Number.parseInt(
+  process.env.PURGE_POSITIONS_FOR_SECONDS || "0"
+);
+export const PURGE_TEXT_MESSAGES_FOR_SECONDS: number = Number.parseInt(
+  process.env.PURGE_TEXT_MESSAGES_FOR_SECONDS || "0"
+);
+
 export const COLLECT_SERVICE_ENVELOPES: boolean =
   !!process.env.COLLECT_SERVICE_ENVELOPES || false;
 export const COLLECT_TEXT_MESSAGES: boolean =

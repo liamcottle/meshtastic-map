@@ -3,6 +3,15 @@ import "./http.js";
 import "./express.js";
 import { mqttClient } from "./mqtt.js";
 
+import {
+  purgeOldDeviceMetrics,
+  purgeOldEnvironmentMetrics,
+  purgeOldPositions,
+  purgeOldPowerMetrics,
+  purgeOldTextMessages,
+  purgeUnheardNodes,
+} from "./tools/purging.js";
+
 import { handleStatMessage } from "./messages/stat.js";
 import { handleServiceEnvelope } from "./messages/service_envelope.js";
 import { handleTextMessage } from "./messages/text_message.js";
@@ -13,19 +22,38 @@ import { handleNeighbourInfo } from "./messages/neighbour_info.js";
 import { handleTelemetry } from "./messages/telemetry.js";
 import { handleTraceroute } from "./messages/traceroute.js";
 import { handleMapReport } from "./messages/map_report.js";
-import { LOG_UNKNOWN_PACKET_TYPES } from "./settings.js";
 
+import {
+  LOG_UNKNOWN_PACKET_TYPES,
+  PURGE_INTERVAL_SECONDS,
+} from "./settings.js";
+
+// run automatic purge if configured
+setInterval(async () => {
+  await purgeUnheardNodes();
+  await purgeOldDeviceMetrics();
+  await purgeOldEnvironmentMetrics();
+  await purgeOldPowerMetrics();
+  await purgeOldPositions();
+  await purgeOldTextMessages();
+}, PURGE_INTERVAL_SECONDS * 1000);
+
+// handle message received
 mqttClient.on("message", async (topic: string, message: Buffer) => {
   try {
-    if (topic.includes("/stat/!"))
+    if (topic.includes("/stat/!")) {
+      // no need to continue with this mqtt message
       return await handleStatMessage(topic, message);
+    }
 
     const data = await handleServiceEnvelope(topic, message);
 
+    // ignore if packet is empty
     if (!data) return;
 
     const { envelope, packet, payload } = data;
 
+    // ignore if we can't decrypt the message
     if (!payload) return;
 
     const portnum = payload?.portnum;
@@ -43,14 +71,14 @@ mqttClient.on("message", async (topic: string, message: Buffer) => {
       case 8:
         await handleWaypoint(envelope, packet, payload);
         break;
-      case 71:
-        await handleNeighbourInfo(envelope, packet, payload);
-        break;
       case 67:
         await handleTelemetry(envelope, packet, payload);
         break;
       case 70:
         await handleTraceroute(envelope, packet, payload);
+        break;
+      case 71:
+        await handleNeighbourInfo(envelope, packet, payload);
         break;
       case 73:
         await handleMapReport(envelope, packet, payload);
