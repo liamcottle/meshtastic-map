@@ -30,7 +30,7 @@ export async function handleTelemetry(
     );
 
     if (LOG_KNOWN_PACKET_TYPES) {
-      console.log("NEIGHBORINFO_APP", {
+      console.log("TELEMETRY_APP", {
         envelopeMeta: envelopeMeta,
         packetMeta: packetMeta,
         payloadMeta: payloadMeta,
@@ -83,10 +83,6 @@ export async function handleTelemetry(
           temperature: tValue.temperature,
           relative_humidity: tValue.relativeHumidity,
           barometric_pressure: tValue.barometricPressure,
-          gas_resistance: tValue.gasResistance,
-          voltage: tValue.voltage,
-          current: tValue.current,
-          iaq: tValue.iaq,
         };
 
         // find an existing metric with duplicate information created in the last 15 seconds
@@ -120,14 +116,6 @@ export async function handleTelemetry(
 
       case "powerMetrics": {
         const tValue = telemetry.variant.value as PowerMetrics;
-        data = {
-          ch1_voltage: tValue.ch1Voltage,
-          ch1_current: tValue.ch1Current,
-          ch2_voltage: tValue.ch2Voltage,
-          ch2_current: tValue.ch2Current,
-          ch3_voltage: tValue.ch3Voltage,
-          ch3_current: tValue.ch3Current,
-        };
 
         // find an existing metric with duplicate information created in the last 15 seconds
         isDuplicate = await prisma.powerMetric.findFirst({

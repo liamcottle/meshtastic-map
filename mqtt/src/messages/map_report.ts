@@ -27,7 +27,7 @@ export async function handleMapReport(
     );
 
     if (LOG_KNOWN_PACKET_TYPES) {
-      console.log("POSITION_APP", {
+      console.log("MAP_REPORT_APP", {
         envelopeMeta: envelopeMeta,
         packetMeta: packetMeta,
         payloadMeta: payloadMeta,
