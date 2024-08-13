@@ -1,4 +1,18 @@
 services:
+  # runs the frontend
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: ./app/Dockerfile
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - 8080:8080
+    environment:
+      DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
+
   # listens to mqtt packets and saves to database
   mqtt:
     container_name: mqtt
