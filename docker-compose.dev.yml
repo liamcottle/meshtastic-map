@@ -1,4 +1,20 @@
 services:
+  # runs the frontend
+  app:
+    container_name: app
+    build:
+      context: app
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - mqtt
+    ports:
+      - 8080:8080
+    environment:
+      DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
+    volumes:
+      - ./app:/app
+      - ./prisma:/app/prisma
+
   # listens to mqtt packets and saves to database
   mqtt:
     container_name: mqtt
@@ -11,9 +27,8 @@ services:
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
     volumes:
-      - ./prisma:/app/prisma
       - ./mqtt:/app
-      - /app/node_modules
+      - ./prisma:/app/prisma
 
   # runs the database to store everything from mqtt
   database:
