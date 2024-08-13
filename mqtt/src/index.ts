@@ -1,4 +1,5 @@
 import "./settings.js";
+import "./db.js";
 import { mqttClient } from "./mqtt.js";
 
 import {
@@ -27,14 +28,16 @@ import {
 } from "./settings.js";
 
 // run automatic purge if configured
-setInterval(async () => {
-  await purgeUnheardNodes();
-  await purgeOldDeviceMetrics();
-  await purgeOldEnvironmentMetrics();
-  await purgeOldPowerMetrics();
-  await purgeOldPositions();
-  await purgeOldTextMessages();
-}, PURGE_INTERVAL_SECONDS * 1000);
+if (PURGE_INTERVAL_SECONDS !== 0) {
+  setInterval(async () => {
+    await purgeUnheardNodes();
+    await purgeOldDeviceMetrics();
+    await purgeOldEnvironmentMetrics();
+    await purgeOldPowerMetrics();
+    await purgeOldPositions();
+    await purgeOldTextMessages();
+  }, PURGE_INTERVAL_SECONDS * 1000);
+}
 
 // handle message received
 mqttClient.on("message", async (topic: string, message: Buffer) => {
