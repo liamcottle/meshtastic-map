@@ -27,6 +27,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@buf/meshtastic_protobufs.bufbuild_es": "^2.0.0-20240813231743-2730236cd9ec.2",
     "@prisma/client": "^5.18.0",
     "express": "^4.19.2"
   }
