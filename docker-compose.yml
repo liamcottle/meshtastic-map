@@ -8,8 +8,15 @@ services:
     depends_on:
       database:
         condition: service_healthy
-    ports:
-      - 8080:8080
+
+  api:
+    container_name: api
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
+    depends_on:
+      database:
+        condition: service_healthy
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
 
@@ -29,8 +36,6 @@ services:
   database:
     container_name: database
     image: bitnami/mariadb
-    ports:
-      - 3306:3306/tcp
     environment:
       MARIADB_DATABASE: "meshtastic-map"
       MARIADB_ROOT_PASSWORD: "password"
@@ -42,6 +47,17 @@ services:
       timeout: 5s
       retries: 6
       start_interval: 5s
+
+  proxy:
+    container_name: proxy
+    image: nginx:alpine
+    depends_on:
+      - app
+      - api
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
 
 volumes:
   database_data:

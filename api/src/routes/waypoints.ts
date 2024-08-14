@@ -12,7 +12,7 @@ express.get("/api/v1/waypoints", async (req, res) => {
 
     // ensure we only have the latest unique waypoints
     // since ordered by newest first, older entries will be ignored
-    const uniqueWaypoints = [];
+    const uniqueWaypoints: typeof waypoints = [];
     for (const waypoint of waypoints) {
       // skip if we already have a newer entry for this waypoint
       if (
@@ -31,7 +31,7 @@ express.get("/api/v1/waypoints", async (req, res) => {
     // we only want waypoints that haven't expired yet
     const nonExpiredWayPoints = uniqueWaypoints.filter((waypoint) => {
       const nowInSeconds = Math.floor(Date.now() / 1000);
-      return waypoint.expire >= nowInSeconds;
+      if (waypoint.expire) return waypoint.expire >= nowInSeconds;
     });
 
     res.json({

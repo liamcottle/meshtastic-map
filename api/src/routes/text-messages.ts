@@ -1,17 +1,22 @@
+import type { Prisma } from "@prisma/client";
 import { prisma } from "../db";
 import express from "../express";
 
 express.get("/api/v1/text-messages", async (req, res) => {
   try {
+    const directMessageIds = req.query.direct_message_node_ids as string;
+    const lastI = req.query.last_id as string;
+    const coun = req.query.count as string;
+
     // get query params
     const to = req.query.to ?? undefined;
     const from = req.query.from ?? undefined;
-    const channelId = req.query.channel_id ?? undefined;
-    const gatewayId = req.query.gateway_id ?? undefined;
-    const directMessageNodeIds =
-      req.query.direct_message_node_ids?.split(",") ?? undefined;
-    const lastId = req.query.last_id ? Number.parseInt(req.query.last_id) : undefined;
-    const count = req.query.count ? Number.parseInt(req.query.count) : 50;
+    const channelId = (req.query.channel_id as string) ?? undefined;
+    const gatewayId =
+      Number.parseInt(req.query.gateway_id as string) ?? undefined;
+    const directMessageNodeIds = directMessageIds.split(",") ?? undefined;
+    const lastId = lastI ? Number.parseInt(lastI) : undefined;
+    const count = req.query.count ? Number.parseInt(coun) : 50;
     const order = req.query.order ?? "asc";
 
     // if direct message node ids are provided, there should be exactly two node ids
@@ -27,7 +32,7 @@ express.get("/api/v1/text-messages", async (req, res) => {
     }
 
     // default where clauses that should always be used for filtering
-    var where = {
+    let where: Prisma.TextMessageWhereInput = {
       channel_id: channelId,
       gateway_id: gatewayId,
       // when ordered oldest to newest (asc), only get records after last id
@@ -53,12 +58,12 @@ express.get("/api/v1/text-messages", async (req, res) => {
         AND: where,
         OR: [
           {
-            to: firstNodeId,
-            from: secondNodeId,
+            to: Number.parseInt(firstNodeId),
+            from: Number.parseInt(secondNodeId),
           },
           {
-            to: secondNodeId,
-            from: firstNodeId,
+            to: Number.parseInt(secondNodeId),
+            from: Number.parseInt(firstNodeId),
           },
         ],
       };
@@ -66,8 +71,8 @@ express.get("/api/v1/text-messages", async (req, res) => {
       // filter by to and from
       where = {
         ...where,
-        to: to,
-        from: from,
+        to: Number.parseInt(to as string),
+        from: Number.parseInt(from as string),
       };
     }
 
@@ -75,7 +80,7 @@ express.get("/api/v1/text-messages", async (req, res) => {
     const textMessages = await prisma.textMessage.findMany({
       where: where,
       orderBy: {
-        id: order,
+        id: order as Prisma.SortOrder,
       },
       take: count,
     });

@@ -4,7 +4,9 @@ import express from "../express";
 express.get("/api/v1/nodes/:nodeId/traceroutes", async (req, res) => {
   try {
     const nodeId = Number.parseInt(req.params.nodeId);
-    const count = req.query.count ? Number.parseInt(req.query.count) : 10; // can't set to null because of $queryRaw
+    const count = req.query.count
+      ? Number.parseInt(req.query.count as string)
+      : 10; // can't set to null because of $queryRaw
 
     // find node
     const node = await prisma.node.findFirst({

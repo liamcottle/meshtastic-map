@@ -6,7 +6,7 @@ import {
 } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/config_pb.js";
 
 // appends extra info for node objects returned from api
-export function formatNodeInfo(node) {
+export function formatNodeInfo(node: any) {
   return {
     ...node,
     node_id_hex: `!${node.node_id.toString(16)}`,

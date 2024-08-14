@@ -25,7 +25,7 @@ express.get("/api/v1/nodes", async (req, res) => {
 
 express.get("/api/v1/nodes/:nodeId", async (req, res) => {
   try {
-    const nodeId = parseInt(req.params.nodeId);
+    const nodeId = Number.parseInt(req.params.nodeId);
 
     // find node
     const node = await prisma.node.findFirst({

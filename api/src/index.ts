@@ -12,7 +12,8 @@ import "./routes/text-messages.js";
 import "./routes/traceroutes.js";
 import "./routes/waypoints.js";
 
-// return big ints as string when using JSON.stringify
-BigInt.prototype.toJSON = function () {
-  return this.toString();
-};
+Object.assign(BigInt.prototype, {
+  toJSON: function () {
+    return this.toString();
+  },
+});
