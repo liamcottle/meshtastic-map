@@ -3,12 +3,17 @@ import "./db.js";
 import { mqttClient } from "./mqtt.js";
 
 import {
+  purgeUnheardNodes,
   purgeOldDeviceMetrics,
   purgeOldEnvironmentMetrics,
-  purgeOldPositions,
+  purgeOldMapReports,
+  purgeOldNeighbourInfos,
   purgeOldPowerMetrics,
+  purgeOldPositions,
+  purgeOldServiceEnvelopes,
   purgeOldTextMessages,
-  purgeUnheardNodes,
+  purgeOldTraceroutes,
+  purgeOldWaypoints,
 } from "./tools/purging.js";
 
 import { handleStatMessage } from "./messages/stat.js";
@@ -33,9 +38,14 @@ if (PURGE_INTERVAL_SECONDS !== 0) {
     await purgeUnheardNodes();
     await purgeOldDeviceMetrics();
     await purgeOldEnvironmentMetrics();
+    await purgeOldMapReports();
+    await purgeOldNeighbourInfos();
     await purgeOldPowerMetrics();
     await purgeOldPositions();
+    await purgeOldServiceEnvelopes();
     await purgeOldTextMessages();
+    await purgeOldTraceroutes();
+    await purgeOldWaypoints();
   }, PURGE_INTERVAL_SECONDS * 1000);
 }
 
