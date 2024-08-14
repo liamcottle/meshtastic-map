@@ -10,10 +10,25 @@ services:
         condition: service_healthy
     ports:
       - 8080:8080
+    volumes:
+      - ./app:/app
+      - ./prisma:/app/prisma
+
+  # runs the api
+  api:
+    container_name: api
+    build:
+      context: api
+      dockerfile: Dockerfile.dev
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - 8081:8081
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
     volumes:
-      - ./app:/app
+      - ./api:/app
       - ./prisma:/app/prisma
 
   # listens to mqtt packets and saves to database

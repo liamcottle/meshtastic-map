@@ -1,0 +1,7 @@
+{
+  "verbose": true,
+  "ignore": ["./dist/*"],
+  "execMap": {
+    "ts": "npx tsx"
+  }
+}
