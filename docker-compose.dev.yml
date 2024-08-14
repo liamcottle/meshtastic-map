@@ -12,7 +12,6 @@ services:
       - 8080:8080
     volumes:
       - ./app:/app
-      - ./prisma:/app/prisma
 
   # runs the api
   api:
@@ -63,6 +62,17 @@ services:
       timeout: 5s
       retries: 6
       start_interval: 5s
+
+  proxy:
+    container_name: proxy
+    image: nginx:alpine
+    depends_on:
+      - app
+      - api
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
 
 volumes:
   database_data:

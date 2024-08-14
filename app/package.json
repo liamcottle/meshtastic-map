@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx prisma migrate deploy && node index.js ${MAP_OPTS}",
-    "dev": "npx prisma generate && npx prisma migrate deploy && nodemon index.js ${MAP_OPTS}"
+    "start": "node index.js ${MAP_OPTS}",
+    "dev": "nodemon index.js ${MAP_OPTS}"
   },
   "author": "",
   "license": "ISC",
