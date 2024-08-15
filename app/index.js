@@ -43,7 +43,7 @@ if(options.help){
 }
 
 // get options and fallback to default values
-const port = options["port"] ?? 8080;
+const port = options["port"] ?? 80;
 
 const app = express();
 

@@ -1,7 +1,3 @@
-export const HTTP_PORT: number = Number.parseInt(
-  process.env.HTTP_PORT || "8080"
-);
-
 export const MQTT_URL: string =
   process.env.MQTT_URL || "mqtt://mqtt.meshtastic.org";
 export const MQTT_USERNAME: string = process.env.MQTT_USERNAME || "meshdev";

@@ -9,7 +9,7 @@ services:
       database:
         condition: service_healthy
     ports:
-      - 8080:8080
+      - 8080:80
     volumes:
       - ./app:/app
 
@@ -23,7 +23,7 @@ services:
       database:
         condition: service_healthy
     ports:
-      - 8081:8081
+      - 8081:80
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
     volumes:

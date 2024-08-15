@@ -1,3 +1,1 @@
-export const HTTP_PORT: number = Number.parseInt(
-  process.env.HTTP_PORT || "8081"
-);
+export const HTTP_PORT: number = Number.parseInt(process.env.HTTP_PORT || "80");
