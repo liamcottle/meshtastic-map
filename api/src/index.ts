@@ -3,6 +3,7 @@ import "./db.js";
 import "./express.js";
 import "./http.js";
 
+import "./routes/healthz.js";
 import "./routes/api.js";
 import "./routes/nodes.js";
 import "./routes/metrics.js";
