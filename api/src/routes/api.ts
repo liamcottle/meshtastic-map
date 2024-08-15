@@ -1,4 +1,4 @@
-import express from "../express";
+import express from "../express.js";
 
 express.get("/api", async (req, res) => {
   const links = [
@@ -28,3 +28,4 @@ express.get("/api", async (req, res) => {
 
   res.send(html);
 });
+console.log("API:EXPRESS registered route GET:/api");

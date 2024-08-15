@@ -1,10 +1,12 @@
-import { prisma } from "../db";
-import express from "../express";
+import { prisma } from "../db.js";
+import express from "../express.js";
 
 express.get("/api/v1/nodes/:nodeId/device-metrics", async (req, res) => {
   try {
     const nodeId = Number.parseInt(req.params.nodeId);
-    const count = req.query.count ? Number.parseInt(req.query.count.toString()) : undefined;
+    const count = req.query.count
+      ? Number.parseInt(req.query.count.toString())
+      : undefined;
 
     // find node
     const node = await prisma.node.findFirst({
@@ -42,11 +44,16 @@ express.get("/api/v1/nodes/:nodeId/device-metrics", async (req, res) => {
     });
   }
 });
+console.log(
+  "API:EXPRESS registered route GET:/api/v1/nodes/:nodeId/device-metrics"
+);
 
 express.get("/api/v1/nodes/:nodeId/environment-metrics", async (req, res) => {
   try {
     const nodeId = Number.parseInt(req.params.nodeId);
-    const count = req.query.count ? Number.parseInt(req.query.count.toString()) : undefined;
+    const count = req.query.count
+      ? Number.parseInt(req.query.count.toString())
+      : undefined;
 
     // find node
     const node = await prisma.node.findFirst({
@@ -84,11 +91,16 @@ express.get("/api/v1/nodes/:nodeId/environment-metrics", async (req, res) => {
     });
   }
 });
+console.log(
+  "API:EXPRESS registered route GET:/api/v1/nodes/:nodeId/environment-metrics"
+);
 
 express.get("/api/v1/nodes/:nodeId/power-metrics", async (req, res) => {
   try {
     const nodeId = Number.parseInt(req.params.nodeId);
-    const count = req.query.count ? Number.parseInt(req.query.count.toString()) : undefined;
+    const count = req.query.count
+      ? Number.parseInt(req.query.count.toString())
+      : undefined;
 
     // find node
     const node = await prisma.node.findFirst({
@@ -126,6 +138,9 @@ express.get("/api/v1/nodes/:nodeId/power-metrics", async (req, res) => {
     });
   }
 });
+console.log(
+  "API:EXPRESS registered route GET:/api/v1/nodes/:nodeId/power-metrics"
+);
 
 express.get("/api/v1/nodes/:nodeId/mqtt-metrics", async (req, res) => {
   try {
@@ -160,3 +175,6 @@ express.get("/api/v1/nodes/:nodeId/mqtt-metrics", async (req, res) => {
     });
   }
 });
+console.log(
+  "API:EXPRESS registered route GET:/api/v1/nodes/:nodeId/mqtt-metrics"
+);

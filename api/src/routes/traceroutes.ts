@@ -1,5 +1,5 @@
-import { prisma } from "../db";
-import express from "../express";
+import { prisma } from "../db.js";
+import express from "../express.js";
 
 express.get("/api/v1/nodes/:nodeId/traceroutes", async (req, res) => {
   try {
@@ -39,3 +39,6 @@ express.get("/api/v1/nodes/:nodeId/traceroutes", async (req, res) => {
     });
   }
 });
+console.log(
+  "API:EXPRESS registered route GET:/api/v1/nodes/:nodeId/traceroutes"
+);

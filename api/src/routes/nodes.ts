@@ -1,6 +1,6 @@
-import { prisma } from "../db";
-import express from "../express";
-import { formatNodeInfo } from "../tools/format";
+import { prisma } from "../db.js";
+import express from "../express.js";
+import { formatNodeInfo } from "../tools/format.js";
 
 express.get("/api/v1/nodes", async (req, res) => {
   try {
@@ -22,6 +22,7 @@ express.get("/api/v1/nodes", async (req, res) => {
     });
   }
 });
+console.log("API:EXPRESS registered route GET:/api/v1/nodes");
 
 express.get("/api/v1/nodes/:nodeId", async (req, res) => {
   try {
@@ -52,3 +53,4 @@ express.get("/api/v1/nodes/:nodeId", async (req, res) => {
     });
   }
 });
+console.log("API:EXPRESS registered route GET:/api/v1/nodes/:nodeId");
