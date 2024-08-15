@@ -1,0 +1,26 @@
+name: build
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build MQTT
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./mqtt/Dockerfile
+
+      - name: Build API
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./api/Dockerfile
