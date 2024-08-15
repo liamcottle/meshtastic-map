@@ -6,8 +6,10 @@ services:
       context: app
       dockerfile: Dockerfile.dev
     depends_on:
-      database:
+      api:
         condition: service_healthy
+      mqtt:
+        condition: service_started
     ports:
       - 8080:80
     volumes:
@@ -49,16 +51,16 @@ services:
   database:
     container_name: database
     image: bitnami/mariadb
-    ports:
-      - 3306:3306/tcp
     environment:
       MARIADB_DATABASE: "meshtastic-map"
       MARIADB_ROOT_PASSWORD: "password"
+    ports:
+      - 3306:3306/tcp
     volumes:
       - database_data:/bitnami/mariadb
     healthcheck:
       test: ["CMD", "/opt/bitnami/scripts/mariadb/healthcheck.sh"]
-      interval: 15s
+      interval: 10s
       timeout: 5s
       retries: 6
       start_interval: 5s
@@ -67,12 +69,21 @@ services:
     container_name: proxy
     image: nginx:alpine
     depends_on:
-      - app
-      - api
+      app:
+        condition: service_healthy
+      api:
+        condition: service_healthy
     ports:
       - 80:80
     volumes:
       - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    healthcheck:
+      test:
+        ["CMD-SHELL", "wget -O- http://localhost/nginx/healthcheck || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_interval: 5s
 
 volumes:
   database_data:

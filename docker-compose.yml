@@ -6,8 +6,10 @@ services:
       context: .
       dockerfile: ./app/Dockerfile
     depends_on:
-      database:
+      api:
         condition: service_healthy
+      mqtt:
+        condition: service_started
 
   api:
     container_name: api
@@ -19,6 +21,8 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
+    ports:
+      - 3000:80
 
   # listens to mqtt packets and saves to database
   mqtt:
@@ -43,7 +47,7 @@ services:
       - database_data:/bitnami/mariadb
     healthcheck:
       test: ["CMD", "/opt/bitnami/scripts/mariadb/healthcheck.sh"]
-      interval: 15s
+      interval: 10s
       timeout: 5s
       retries: 6
       start_interval: 5s
@@ -52,12 +56,21 @@ services:
     container_name: proxy
     image: nginx:alpine
     depends_on:
-      - app
-      - api
+      app:
+        condition: service_healthy
+      api:
+        condition: service_healthy
     ports:
       - 80:80
     volumes:
       - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    healthcheck:
+      test:
+        ["CMD-SHELL", "wget -O- http://localhost/nginx/healthcheck || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_interval: 5s
 
 volumes:
   database_data:
