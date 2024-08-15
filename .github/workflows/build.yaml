@@ -16,11 +16,11 @@ jobs:
       - name: Build MQTT
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: "{{defaultContext}}"
           file: ./mqtt/Dockerfile
 
       - name: Build API
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: "{{defaultContext}}"
           file: ./api/Dockerfile
