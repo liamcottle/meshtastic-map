@@ -21,8 +21,6 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
-    ports:
-      - 3000:80
 
   # listens to mqtt packets and saves to database
   mqtt:
