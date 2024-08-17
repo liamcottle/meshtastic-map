@@ -1,5 +1,6 @@
-export const MQTT_URL: string =
-  process.env.MQTT_URL || "mqtt://mqtt.meshtastic.org";
+import { extractBoolean } from "./tools/decrypt";
+
+export const MQTT_URL: string = process.env.MQTT_URL || "mqtt://mqtt.meshtastic.org";
 export const MQTT_USERNAME: string = process.env.MQTT_USERNAME || "meshdev";
 export const MQTT_PASSWORD: string = process.env.MQTT_PASSWORD || "large4cats";
 export const MQTT_TOPIC: string = process.env.MQTT_TOPIC || "msh/HAM/S5/#";
@@ -23,7 +24,7 @@ export const PURGE_NEIGHBOUR_INFOS_AFTER_SECONDS: number = Number.parseInt(
   process.env.PURGE_NEIGHBOUR_INFOS_AFTER_SECONDS || "0"
 );
 export const PURGE_UNHEARD_NODES_FOR_SECONDS: number = Number.parseInt(
-  process.env.PURGE_UNHEARD_NODES_FOR_SECONDS || "0"
+	process.env.PURGE_UNHEARD_NODES_FOR_SECONDS || "0"
 );
 export const PURGE_POSITIONS_AFTER_SECONDS: number = Number.parseInt(
   process.env.PURGE_POSITIONS_AFTER_SECONDS || "0"
@@ -56,11 +57,9 @@ export const COLLECT_TRACEROUTES: boolean =
 export const COLLECT_MAP_REPORS: boolean =
   !!process.env.COLLECT_MAP_REPORS || true;
 
-export const LOG_KNOWN_PACKET_TYPES: boolean =
-  !!process.env.LOG_KNOWN_PACKET_TYPES || true;
-export const LOG_UNKNOWN_PACKET_TYPES: boolean =
-  !!process.env.LOG_UNKNOWN_PACKET_TYPES || false;
+export const LOG_KNOWN_PACKET_TYPES: boolean = extractBoolean(process.env.LOG_KNOWN_PACKET_TYPES, true);
+export const LOG_UNKNOWN_PACKET_TYPES: boolean = extractBoolean(process.env.LOG_UNKNOWN_PACKET_TYPES, false);
 
-export const DECRYPTION_KEYS: string[] = process.env.DECRYPTION_KEYS?.split(
-  ","
-) || ["1PG7OiApB1nwvP+rz05pAQ=="];
+export const DECRYPTION_KEYS: string[] = process.env.DECRYPTION_KEYS?.split(",") || [
+	"1PG7OiApB1nwvP+rz05pAQ==",
+];
