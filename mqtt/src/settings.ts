@@ -1,4 +1,4 @@
-import { extractBoolean } from "./tools/decrypt";
+import { extractBoolean } from "./tools/decrypt.js";
 
 export const MQTT_URL: string = process.env.MQTT_URL || "mqtt://mqtt.meshtastic.org";
 export const MQTT_USERNAME: string = process.env.MQTT_USERNAME || "meshdev";
