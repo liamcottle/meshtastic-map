@@ -417,7 +417,12 @@ app.get('/api/v1/nodes/:nodeId/traceroutes', async (req, res) => {
         const traceroutes = await prisma.$queryRaw`SELECT * FROM traceroutes WHERE want_response = false and \`to\` = ${node.node_id} and gateway_id is not null order by id desc limit ${count}`;
 
         res.json({
-            traceroutes: traceroutes,
+            traceroutes: traceroutes.map((trace) => {
+                if (typeof(trace.route) === "string") {
+                    trace.route = JSON.parse(trace.route);
+                }
+                return trace;
+            }),
         });
 
     } catch(err) {
