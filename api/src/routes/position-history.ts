@@ -3,6 +3,16 @@ import express from "../express.js";
 
 express.get("/api/v1/nodes/:nodeId/position-history", async (req, res) => {
 	try {
+		// defaults
+		const nowInMilliseconds = new Date().getTime();
+		const oneHourAgoInMilliseconds = new Date().getTime() - 3600 * 1000;
+
+		// get request params
+		const nodeId = parseInt(req.params.nodeId);
+		const timeFrom = req.query.time_from ? parseInt(req.query.time_from) : oneHourAgoInMilliseconds;
+		const timeTo = req.query.time_to ? parseInt(req.query.time_to) : nowInMilliseconds;
+
+		// find node
 		const nodeId = Number.parseInt(req.params.nodeId);
 		const timeFrom = req.query.time_from
 			? Number.parseInt(req.query.time_from)
@@ -51,8 +61,7 @@ express.get("/api/v1/nodes/:nodeId/position-history", async (req, res) => {
 				latitude: position.latitude,
 				longitude: position.longitude,
 				altitude: position.altitude,
-				accuracy: position.accuracy,
-				time: position.created_at,
+				created_at: position.created_at,
 			});
 		});
 
@@ -62,12 +71,12 @@ express.get("/api/v1/nodes/:nodeId/position-history", async (req, res) => {
 				latitude: mapReport.latitude,
 				longitude: mapReport.longitude,
 				altitude: mapReport.altitude,
-				accuracy: mapReport.accuracy,
-				time: mapReport.created_at,
+				created_at: mapReport.created_at,
 			});
 		});
 
-		positionHistory.sort((a, b) => a.time - b.time);
+		// sort oldest to newest
+		positionHistory.sort((a, b) => a.created_at - b.created_at);
 
 		res.json({
 			position_history: positionHistory,
