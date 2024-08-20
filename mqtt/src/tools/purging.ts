@@ -79,12 +79,12 @@ export async function purgeOldEnvironmentMetrics() {
 }
 
 /**
- * Purges all power metrics from the database that are older than the configured timeframe.
+ * Purges all map reports from the database that are older than the configured timeframe.
  */
 export async function purgeOldMapReports() {
   if (PURGE_MAP_REPORTS_AFTER_SECONDS === 0) return;
 
-  // delete all environment metrics that are older than the configured purge time
+  // delete all map reports that are older than the configured purge time
   try {
     await prisma.mapReport.deleteMany({
       where: {
@@ -107,7 +107,7 @@ export async function purgeOldMapReports() {
 export async function purgeOldNeighbourInfos() {
   if (PURGE_NEIGHBOUR_INFOS_AFTER_SECONDS === 0) return;
 
-  // delete all environment metrics that are older than the configured purge time
+  // delete all neighbour infos that are older than the configured purge time
   try {
     await prisma.neighbourInfo.deleteMany({
       where: {
