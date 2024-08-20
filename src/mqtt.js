@@ -94,6 +94,11 @@ const optionsList = [
         description: "Power Metrics older than this many seconds will be purged from the database.",
     },
     {
+        name: "purge-map-reports-after-seconds",
+        type: Number,
+        description: "Map reports older than this many seconds will be purged from the database.",
+    },
+    {
         name: "purge-nodes-unheard-for-seconds",
         type: Number,
         description: "Nodes that haven't been heard from in this many seconds will be purged from the database.",
@@ -147,6 +152,7 @@ const purgeIntervalSeconds = options["purge-interval-seconds"] ?? 10;
 const purgeNodesUnheardForSeconds = options["purge-nodes-unheard-for-seconds"] ?? null;
 const purgeDeviceMetricsAfterSeconds = options["purge-device-metrics-after-seconds"] ?? null;
 const purgeEnvironmentMetricsAfterSeconds = options["purge-environment-metrics-after-seconds"] ?? null;
+const purgeMapReportsAfterSeconds = options["purge-map-reports-after-seconds"] ?? null;
 const purgePowerMetricsAfterSeconds = options["purge-power-metrics-after-seconds"] ?? null;
 const purgePositionsAfterSeconds = options["purge-positions-after-seconds"] ?? null;
 const purgeTextMessagesAfterSeconds = options["purge-text-messages-after-seconds"] ?? null;
@@ -177,6 +183,7 @@ if(purgeIntervalSeconds){
         await purgeUnheardNodes();
         await purgeOldDeviceMetrics();
         await purgeOldEnvironmentMetrics();
+        await purgeOldMapReports();
         await purgeOldPowerMetrics();
         await purgeOldPositions();
         await purgeOldTextMessages();
@@ -252,6 +259,32 @@ async function purgeOldEnvironmentMetrics() {
                 created_at: {
                     // last updated before x seconds ago
                     lt: new Date(Date.now() - purgeEnvironmentMetricsAfterSeconds * 1000),
+                },
+            }
+        });
+    } catch(e) {
+        // do nothing
+    }
+
+}
+
+/**
+ * Purges all power metrics from the database that are older than the configured timeframe.
+ */
+async function purgeOldMapReports() {
+
+    // make sure seconds provided
+    if(!purgeMapReportsAfterSeconds){
+        return;
+    }
+
+    // delete all map reports that are older than the configured purge time
+    try {
+        await prisma.mapReport.deleteMany({
+            where: {
+                created_at: {
+                    // created before x seconds ago
+                    lt: new Date(Date.now() - purgeMapReportsAfterSeconds * 1000),
                 },
             }
         });
