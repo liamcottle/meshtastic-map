@@ -105,23 +105,22 @@ export async function purgeOldMapReports() {
  * Purges all neighbour infos from the database that are older than the configured timeframe.
  */
 export async function purgeOldNeighbourInfos() {
-  if (PURGE_NEIGHBOUR_INFOS_AFTER_SECONDS === 0) return;
+	// make sure seconds provided
+	if (PURGE_NEIGHBOUR_INFOS_AFTER_SECONDS === 0) return;
 
-  // delete all neighbour infos that are older than the configured purge time
-  try {
-    await prisma.neighbourInfo.deleteMany({
-      where: {
-        created_at: {
-          // last updated before x seconds ago
-          lt: new Date(
-            Date.now() - PURGE_NEIGHBOUR_INFOS_AFTER_SECONDS * 1000
-          ),
-        },
-      },
-    });
-  } catch (e) {
-    // do nothing
-  }
+	// delete all neighbour infos that are older than the configured purge time
+	try {
+		await prisma.neighbourInfo.deleteMany({
+			where: {
+				created_at: {
+					// created before x seconds ago
+					lt: new Date(Date.now() - PURGE_NEIGHBOUR_INFOS_AFTER_SECONDS * 1000),
+				},
+			},
+		});
+	} catch (e) {
+		// do nothing
+	}
 }
 
 /**
@@ -227,28 +226,6 @@ export async function purgeOldTraceroutes() {
   } catch (e) {
     // do nothing
   }
-}
-
-/**
- * Purges all traceroutes from the database that are older than the configured timeframe.
- */
-export async function purgeOldTraceroutes() {
-	// make sure seconds provided
-	if (PURGE_TRACEROUTES_FOR_SECONDS === 0) return;
-
-	/// delete all traceroutes that are older than the configured purge time
-	try {
-		await prisma.traceRoute.deleteMany({
-			where: {
-				created_at: {
-					// created before x seconds ago
-					lt: new Date(Date.now() - PURGE_TRACEROUTES_FOR_SECONDS * 1000),
-				},
-			},
-		});
-	} catch (e) {
-		// do nothing
-	}
 }
 
 /**
