@@ -114,6 +114,11 @@ const optionsList = [
         description: "Positions older than this many seconds will be purged from the database.",
     },
     {
+        name: "purge-service-envelopes-after-seconds",
+        type: Number,
+        description: "Service envelopes older than this many seconds will be purged from the database.",
+    },
+    {
         name: "purge-text-messages-after-seconds",
         type: Number,
         description: "Text Messages older than this many seconds will be purged from the database.",
@@ -171,6 +176,7 @@ const purgeMapReportsAfterSeconds = options["purge-map-reports-after-seconds"] ?
 const purgeNeighbourInfosAfterSeconds = options["purge-neighbour-infos-after-seconds"] ?? null;
 const purgePowerMetricsAfterSeconds = options["purge-power-metrics-after-seconds"] ?? null;
 const purgePositionsAfterSeconds = options["purge-positions-after-seconds"] ?? null;
+const purgeServiceEnvelopesAfterSeconds = options["purge-service-envelopes-after-seconds"] ?? null;
 const purgeTextMessagesAfterSeconds = options["purge-text-messages-after-seconds"] ?? null;
 const purgeTraceroutesAfterSeconds = options["purge-traceroutes-after-seconds"] ?? null;
 const purgeWaypointsAfterSeconds = options["purge-waypoints-after-seconds"] ?? null;
@@ -205,6 +211,7 @@ if(purgeIntervalSeconds){
         await purgeOldNeighbourInfos();
         await purgeOldPowerMetrics();
         await purgeOldPositions();
+        await purgeOldServiceEnvelopes();
         await purgeOldTextMessages();
         await purgeOldTraceroutes();
         await purgeOldWaypoints();
@@ -384,6 +391,32 @@ async function purgeOldPositions() {
                 created_at: {
                     // created before x seconds ago
                     lt: new Date(Date.now() - purgePositionsAfterSeconds * 1000),
+                },
+            }
+        });
+    } catch(e) {
+        // do nothing
+    }
+
+}
+
+/**
+ * Purges all service envelopes from the database that are older than the configured timeframe.
+ */
+async function purgeOldServiceEnvelopes() {
+
+    // make sure seconds provided
+    if(!purgeServiceEnvelopesAfterSeconds){
+        return;
+    }
+
+    // delete all service envelopes that are older than the configured purge time
+    try {
+        await prisma.serviceEnvelope.deleteMany({
+            where: {
+                created_at: {
+                    // created before x seconds ago
+                    lt: new Date(Date.now() - purgeServiceEnvelopesAfterSeconds * 1000),
                 },
             }
         });
