@@ -41,14 +41,17 @@ export const PURGE_TRACEROUTES_AFTER_SECONDS: number = Number.parseInt(
 export const PURGE_WAYPOINTS_AFTER_SECONDS: number = Number.parseInt(
   process.env.PURGE_WAYPOINTS_AFTER_SECONDS || "0"
 );
-export const PURGE_SERVICE_ENVELOPES_FOR_SECONDS: number = Number.parseInt(
-	process.env.PURGE_SERVICE_ENVELOPES_FOR_SECONDS || "0"
+export const PURGE_TEXT_MESSAGES_AFTER_SECONDS: number = Number.parseInt(
+	process.env.PURGE_TEXT_MESSAGES_AFTER_SECONDS || "0"
 );
-export const PURGE_TRACEROUTES_FOR_SECONDS: number = Number.parseInt(
-	process.env.PURGE_TRACEROUTES_FOR_SECONDS || "0"
+export const PURGE_SERVICE_ENVELOPES_AFTER_SECONDS: number = Number.parseInt(
+	process.env.PURGE_SERVICE_ENVELOPES_AFTER_SECONDS || "0"
 );
-export const PURGE_WAYPOINTS_FOR_SECONDS: number = Number.parseInt(
-	process.env.PURGE_WAYPOINTS_FOR_SECONDS || "0"
+export const PURGE_TRACEROUTES_AFTER_SECONDS: number = Number.parseInt(
+	process.env.PURGE_TRACEROUTES_AFTER_SECONDS || "0"
+);
+export const PURGE_WAYPOINTS_AFTER_SECONDS: number = Number.parseInt(
+	process.env.PURGE_WAYPOINTS_AFTER_SECONDS || "0"
 );
 
 export const COLLECT_SERVICE_ENVELOPES: boolean =

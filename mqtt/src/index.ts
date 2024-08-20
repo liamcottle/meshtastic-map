@@ -17,15 +17,15 @@ import {
 } from "./tools/purging.js";
 
 import { handleStatMessage } from "./messages/stat.js";
+import { handleNodeInfo } from "./messages/nodeinfo.js";
+import { handleTelemetry } from "./messages/telemetry.js";
+import { handleMapReport } from "./messages/map_report.js";
+import { handleNeighbourInfo } from "./messages/neighbour_info.js";
+import { handlePosition } from "./messages/position.js";
 import { handleServiceEnvelope } from "./messages/service_envelope.js";
 import { handleTextMessage } from "./messages/text_message.js";
-import { handlePosition } from "./messages/position.js";
-import { handleNodeInfo } from "./messages/nodeinfo.js";
-import { handleWaypoint } from "./messages/waypoint.js";
-import { handleNeighbourInfo } from "./messages/neighbour_info.js";
-import { handleTelemetry } from "./messages/telemetry.js";
 import { handleTraceroute } from "./messages/traceroute.js";
-import { handleMapReport } from "./messages/map_report.js";
+import { handleWaypoint } from "./messages/waypoint.js";
 
 import { LOG_UNKNOWN_PACKET_TYPES, PURGE_INTERVAL_SECONDS } from "./settings.js";
 

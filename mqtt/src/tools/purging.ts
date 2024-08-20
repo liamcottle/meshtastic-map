@@ -187,28 +187,6 @@ export async function purgeOldServiceEnvelopes() {
 }
 
 /**
- * Purges all service envelopes from the database that are older than the configured timeframe.
- */
-export async function purgeOldServiceEnvelopes() {
-	// make sure seconds provided
-	if (PURGE_SERVICE_ENVELOPES_FOR_SECONDS === 0) return;
-
-	// delete all service envelopes that are older than the configured purge time
-	try {
-		await prisma.serviceEnvelope.deleteMany({
-			where: {
-				created_at: {
-					// created before x seconds ago
-					lt: new Date(Date.now() - PURGE_SERVICE_ENVELOPES_FOR_SECONDS * 1000),
-				},
-			},
-		});
-	} catch (e) {
-		// do nothing
-	}
-}
-
-/**
  * Purges all text messages from the database that are older than the configured timeframe.
  */
 export async function purgeOldTextMessages() {
