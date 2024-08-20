@@ -113,6 +113,11 @@ const optionsList = [
         type: Number,
         description: "Text Messages older than this many seconds will be purged from the database.",
     },
+    {
+        name: "purge-waypoints-after-seconds",
+        type: Number,
+        description: "Waypoints older than this many seconds will be purged from the database.",
+    },
 ];
 
 // parse command line args
@@ -156,6 +161,7 @@ const purgeMapReportsAfterSeconds = options["purge-map-reports-after-seconds"] ?
 const purgePowerMetricsAfterSeconds = options["purge-power-metrics-after-seconds"] ?? null;
 const purgePositionsAfterSeconds = options["purge-positions-after-seconds"] ?? null;
 const purgeTextMessagesAfterSeconds = options["purge-text-messages-after-seconds"] ?? null;
+const purgeWaypointsAfterSeconds = options["purge-waypoints-after-seconds"] ?? null;
 
 // create mqtt client
 const client = mqtt.connect(mqttBrokerUrl, {
@@ -187,6 +193,7 @@ if(purgeIntervalSeconds){
         await purgeOldPowerMetrics();
         await purgeOldPositions();
         await purgeOldTextMessages();
+        await purgeOldWaypoints();
     }, purgeIntervalSeconds * 1000);
 }
 
@@ -231,7 +238,7 @@ async function purgeOldDeviceMetrics() {
         await prisma.deviceMetric.deleteMany({
             where: {
                 created_at: {
-                    // last updated before x seconds ago
+                    // created before x seconds ago
                     lt: new Date(Date.now() - purgeDeviceMetricsAfterSeconds * 1000),
                 },
             }
@@ -257,7 +264,7 @@ async function purgeOldEnvironmentMetrics() {
         await prisma.environmentMetric.deleteMany({
             where: {
                 created_at: {
-                    // last updated before x seconds ago
+                    // created before x seconds ago
                     lt: new Date(Date.now() - purgeEnvironmentMetricsAfterSeconds * 1000),
                 },
             }
@@ -309,7 +316,7 @@ async function purgeOldPowerMetrics() {
         await prisma.powerMetric.deleteMany({
             where: {
                 created_at: {
-                    // last updated before x seconds ago
+                    // created before x seconds ago
                     lt: new Date(Date.now() - purgePowerMetricsAfterSeconds * 1000),
                 },
             }
@@ -335,7 +342,7 @@ async function purgeOldPositions() {
         await prisma.position.deleteMany({
             where: {
                 created_at: {
-                    // last updated before x seconds ago
+                    // created before x seconds ago
                     lt: new Date(Date.now() - purgePositionsAfterSeconds * 1000),
                 },
             }
@@ -361,8 +368,34 @@ async function purgeOldTextMessages() {
         await prisma.textMessage.deleteMany({
             where: {
                 created_at: {
-                    // last updated before x seconds ago
+                    // created before x seconds ago
                     lt: new Date(Date.now() - purgeTextMessagesAfterSeconds * 1000),
+                },
+            }
+        });
+    } catch(e) {
+        // do nothing
+    }
+
+}
+
+/**
+ * Purges all waypoints from the database that are older than the configured timeframe.
+ */
+async function purgeOldWaypoints() {
+
+    // make sure seconds provided
+    if(!purgeWaypointsAfterSeconds){
+        return;
+    }
+
+    // delete all waypoints that are older than the configured purge time
+    try {
+        await prisma.waypoint.deleteMany({
+            where: {
+                created_at: {
+                    // created before x seconds ago
+                    lt: new Date(Date.now() - purgeWaypointsAfterSeconds * 1000),
                 },
             }
         });
