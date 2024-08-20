@@ -99,6 +99,11 @@ const optionsList = [
         description: "Map reports older than this many seconds will be purged from the database.",
     },
     {
+        name: "purge-neighbour-infos-after-seconds",
+        type: Number,
+        description: "Neighbour infos older than this many seconds will be purged from the database.",
+    },
+    {
         name: "purge-nodes-unheard-for-seconds",
         type: Number,
         description: "Nodes that haven't been heard from in this many seconds will be purged from the database.",
@@ -163,6 +168,7 @@ const purgeNodesUnheardForSeconds = options["purge-nodes-unheard-for-seconds"] ?
 const purgeDeviceMetricsAfterSeconds = options["purge-device-metrics-after-seconds"] ?? null;
 const purgeEnvironmentMetricsAfterSeconds = options["purge-environment-metrics-after-seconds"] ?? null;
 const purgeMapReportsAfterSeconds = options["purge-map-reports-after-seconds"] ?? null;
+const purgeNeighbourInfosAfterSeconds = options["purge-neighbour-infos-after-seconds"] ?? null;
 const purgePowerMetricsAfterSeconds = options["purge-power-metrics-after-seconds"] ?? null;
 const purgePositionsAfterSeconds = options["purge-positions-after-seconds"] ?? null;
 const purgeTextMessagesAfterSeconds = options["purge-text-messages-after-seconds"] ?? null;
@@ -196,6 +202,7 @@ if(purgeIntervalSeconds){
         await purgeOldDeviceMetrics();
         await purgeOldEnvironmentMetrics();
         await purgeOldMapReports();
+        await purgeOldNeighbourInfos();
         await purgeOldPowerMetrics();
         await purgeOldPositions();
         await purgeOldTextMessages();
@@ -299,6 +306,32 @@ async function purgeOldMapReports() {
                 created_at: {
                     // created before x seconds ago
                     lt: new Date(Date.now() - purgeMapReportsAfterSeconds * 1000),
+                },
+            }
+        });
+    } catch(e) {
+        // do nothing
+    }
+
+}
+
+/**
+ * Purges all neighbour infos from the database that are older than the configured timeframe.
+ */
+async function purgeOldNeighbourInfos() {
+
+    // make sure seconds provided
+    if(!purgeNeighbourInfosAfterSeconds){
+        return;
+    }
+
+    // delete all neighbour infos that are older than the configured purge time
+    try {
+        await prisma.neighbourInfo.deleteMany({
+            where: {
+                created_at: {
+                    // created before x seconds ago
+                    lt: new Date(Date.now() - purgeNeighbourInfosAfterSeconds * 1000),
                 },
             }
         });
