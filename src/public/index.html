@@ -3788,11 +3788,11 @@
         var mqttStatus = "";
         var mqttStatusLastUpdated = node.mqtt_connection_state_updated_at ? `(${moment(new Date(node.mqtt_connection_state_updated_at)).fromNow()})` : "";
         if(node.mqtt_connection_state === "online"){
-            mqttStatus = `<span class="text-green-700">Online</span> ${mqttStatusLastUpdated}`;
+            mqttStatus = `<span class="text-green-700">Connected</span> ${mqttStatusLastUpdated}`;
         } else if(node.mqtt_connection_state === "offline"){
-            mqttStatus = `<span class="text-blue-700">Offline</span> ${mqttStatusLastUpdated}`;
+            mqttStatus = `<span class="text-blue-700">Disconnected</span> ${mqttStatusLastUpdated}`;
         } else {
-            mqttStatus = `<span class="text-blue-700">Offline</span>`;
+            mqttStatus = `<span class="text-blue-700">Disconnected</span>`;
         }
 
         var loraFrequencyRange = getRegionFrequencyRange(node.region_name);
@@ -3800,7 +3800,7 @@
         var tooltip = `<img class="mb-4 w-40 mx-auto" src="/images/devices/${node.hardware_model_name}.png" onerror="this.classList.add('hidden')"/>` +
             `<b>${escapeString(node.long_name)}</b>` +
             `<br/>Short Name: ${escapeString(node.short_name)}` +
-            `<br/>MQTT Status: ${mqttStatus}` +
+            `<br/>MQTT: ${mqttStatus}` +
             (node.num_online_local_nodes != null ? `<br/>Local Nodes Online: ${node.num_online_local_nodes}` : '') +
             `<br/><br/>Role: ${node.role_name}` +
             `<br/>Hardware: ${node.hardware_model_name}` +
