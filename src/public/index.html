@@ -66,6 +66,12 @@
             border: 1px solid white;
         }
 
+        .icon-position-history {
+            background-color: #a855f7;
+            border-radius: 25px;
+            border: 1px solid white;
+        }
+
         .waypoint-label {
             font-size: 26px;
             background-color: transparent;
@@ -748,7 +754,14 @@
 
                             <!-- position -->
                             <div>
-                                <div class="bg-gray-200 p-2 font-semibold">Position</div>
+                                <div @click.stop class="flex bg-gray-200 p-2 font-semibold">
+                                    <div class="my-auto">Position</div>
+                                    <div class="ml-auto">
+                                        <button @click="showNodePositionHistory(selectedNode.node_id)" type="button" class="rounded bg-white px-2 py-1 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                            Show History
+                                        </button>
+                                    </div>
+                                </div>
                                 <ul role="list" class="flex-1 divide-y divide-gray-200">
 
                                     <li>
@@ -1589,6 +1602,58 @@
 
     </div>
 
+    <!-- node position history modal -->
+    <div class="relative z-sidebar" role="dialog" aria-modal="true">
+
+        <!-- sidebar -->
+        <transition
+                enter-active-class="transition duration-300 ease-in-out transform"
+                enter-from-class="translate-y-full"
+                enter-to-class="translate-y-0"
+                leave-active-class="transition duration-300 ease-in-out transform"
+                leave-from-class="translate-y-0"
+                leave-to-class="translate-y-full">
+            <div v-show="selectedNodeToShowPositionHistory != null" class="fixed left-0 right-0 bottom-0">
+                <div v-if="selectedNodeToShowPositionHistory != null" class="mx-auto w-screen max-w-md p-4">
+                    <div class="flex h-full flex-col bg-white shadow-xl rounded-xl border">
+                        <div>
+                            <div class="flex p-2 border-b">
+                                <div class="my-auto mr-auto font-bold">{{ selectedNodeToShowPositionHistory.short_name }} Position History</div>
+                                <div class="my-auto ml-3">
+                                    <a href="javascript:void(0)" class="rounded-full" @click="dismissShowingNodePositionHistory">
+                                        <div class="bg-gray-100 hover:bg-gray-200 p-1 rounded-full">
+                                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M18 6l-12 12"></path>
+                                                <path d="M6 6l12 12"></path>
+                                            </svg>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="p-2 space-y-1">
+
+                                <!-- from -->
+                                <div class="flex items-center">
+                                    <label class="text-sm pr-1 min-w-12 text-right">From:</label>
+                                    <input v-model="positionHistoryDateTimeFrom" @change="loadNodePositionHistory(selectedNodeToShowPositionHistory.node_id)" type="datetime-local" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1">
+                                </div>
+
+                                <!-- to -->
+                                <div class="flex items-center">
+                                    <label class="text-sm pr-1 min-w-12 text-right">To:</label>
+                                    <input v-model="positionHistoryDateTimeTo" @change="loadNodePositionHistory(selectedNodeToShowPositionHistory.node_id)" type="datetime-local" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1">
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+    </div>
+
 </div>
 
 <script>
@@ -1652,7 +1717,7 @@
         } catch(e) {}
 
         // overlays enabled by default
-        return ["Legend"];
+        return ["Legend", "Position History"];
 
     }
 
@@ -1755,6 +1820,14 @@
                 selectedNodeMqttMetrics: [],
                 selectedNodeTraceroutes: [],
 
+                // YYYY-MM-DDTHH:mm is the format expected by the datetime-local input type
+                positionHistoryDateTimeFrom: moment().subtract(1, "hours").format('YYYY-MM-DDTHH:mm'),
+                positionHistoryDateTimeTo: moment().format('YYYY-MM-DDTHH:mm'),
+                selectedNodePositionHistory: [],
+                selectedNodeToShowPositionHistory: null,
+                selectedNodePositionHistoryMarkers: [],
+                selectedNodePositionHistoryPolyLines: [],
+
                 selectedTraceRoute: null,
 
                 selectedNodeToShowNeighbours: null,
@@ -1783,6 +1856,7 @@
                 this.loadNodePowerMetrics(node.node_id);
                 this.loadNodeMqttMetrics(node.node_id);
                 this.loadNodeTraceroutes(node.node_id);
+                //this.loadNodePositionHistory(node.node_id);
             };
 
             // handle node callback from outside of vue
@@ -1873,6 +1947,25 @@
                     },
                 }).then((response) => {
                     this.selectedNodeTraceroutes = response.data.traceroutes;
+                }).catch(() => {
+                    // do nothing
+                });
+            },
+            loadNodePositionHistory: function(nodeId) {
+                this.selectedNodePositionHistory = [];
+                window.axios.get(`/api/v1/nodes/${nodeId}/position-history`, {
+                    params: {
+                        // parse from datetime-local format, and send as unix timestamp in milliseconds
+                        time_from: moment(this.positionHistoryDateTimeFrom, "YYYY-MM-DDTHH:mm").format("x"),
+                        time_to: moment(this.positionHistoryDateTimeTo, "YYYY-MM-DDTHH:mm").format("x"),
+                    },
+                }).then((response) => {
+                    this.selectedNodePositionHistory = response.data.position_history;
+                    if(this.selectedNodeToShowPositionHistory != null){
+                        clearAllPositionHistory();
+                        onPositionHistoryUpdated(response.data.position_history);
+                    }
+
                 }).catch(() => {
                     // do nothing
                 });
@@ -2489,6 +2582,22 @@
             getRegionFrequencyRange: function(regionName) {
                 return window.getRegionFrequencyRange(regionName);
             },
+            showNodePositionHistory: function(nodeId) {
+
+                // find node
+                const node = findNodeById(nodeId);
+                if(!node){
+                    return;
+                }
+
+                // update ui
+                this.selectedNode = null;
+                this.selectedNodeToShowPositionHistory = node;
+
+                // load position history
+                this.loadNodePositionHistory(nodeId);
+
+            },
             getShareLinkForNode: function(nodeId) {
                 return window.location.origin + `/?node_id=${nodeId}`;
             },
@@ -2511,6 +2620,13 @@
             dismissShowingNodeNeighbours: function() {
                 window._onHideNodeNeighboursClick();
                 this.selectedNodeToShowNeighbours = null;
+            },
+            dismissShowingNodePositionHistory: function() {
+                this.selectedNodePositionHistory = [];
+                this.selectedNodeToShowPositionHistory = null;
+                this.selectedNodePositionHistoryMarkers = [];
+                this.selectedNodePositionHistoryPolyLines = [];
+                cleanUpPositionHistory();
             },
             formatUptimeSeconds: function(secondsToFormat) {
                 secondsToFormat = Number(secondsToFormat);
@@ -2615,6 +2731,7 @@
     var nodeMarkers = {};
     var selectedNodeOutlineCircle = null;
     var waypoints = [];
+    var positionHistories = [];
 
     // set map bounds to be a little more than full size to prevent panning off screen
     var bounds = [
@@ -2680,6 +2797,7 @@
         disableClusteringAtZoom: 10, // zoom level where node clustering is disabled
     });
     var waypointsLayerGroup = new L.LayerGroup();
+    var nodePositionHistoryLayerGroup = new L.LayerGroup();
 
     // create icons
     var iconMqttConnected = L.divIcon({
@@ -2694,6 +2812,11 @@
 
     var iconOffline = L.divIcon({
         className: 'icon-offline',
+        iconSize: [16, 16], // increase from 12px to 16px to make hover easier
+    });
+
+    var iconPositionHistory = L.divIcon({
+        className: 'icon-position-history',
         iconSize: [16, 16], // increase from 12px to 16px to make hover easier
     });
 
@@ -2739,6 +2862,7 @@
             "Legend": legendLayerGroup,
             "Neighbours": neighboursLayerGroup,
             "Waypoints": waypointsLayerGroup,
+            "Position History": nodePositionHistoryLayerGroup,
         },
     }, {
         // make the "Nodes" group exclusive (use radio inputs instead of checkbox)
@@ -2758,6 +2882,9 @@
     }
     if(enabledOverlayLayers.includes("Waypoints")){
         waypointsLayerGroup.addTo(map);
+    }
+    if(enabledOverlayLayers.includes("Position History")){
+        nodePositionHistoryLayerGroup.addTo(map);
     }
 
     // update config when map overlay is added
@@ -2915,6 +3042,10 @@
                 layer.removeFrom(map);
             }
         });
+    }
+
+    function clearAllPositionHistory() {
+        nodePositionHistoryLayerGroup.clearLayers();
     }
 
     function clearNodeOutline() {
@@ -3504,6 +3635,70 @@
 
     }
 
+    function onPositionHistoryUpdated(updatedPositionHistories) {
+
+        let positionHistoryLinesCords = [];
+
+        // add nodes
+        for(var positionHistory of updatedPositionHistories) {
+
+            // skip position history without position
+            if(!positionHistory.latitude || !positionHistory.longitude){
+                continue;
+            }
+
+            // fix lat long
+            positionHistory.latitude = positionHistory.latitude / 10000000;
+            positionHistory.longitude = positionHistory.longitude / 10000000;
+
+            var hasLocation = isValidLatLng(positionHistory.latitude, positionHistory.longitude);
+            if(hasLocation){
+
+                // wrap longitude for shortest path, everything to left of australia should be shown on the right
+                var longitude = parseFloat(positionHistory.longitude);
+                if(longitude <= 100){
+                    longitude += 360;
+                }
+
+                positionHistoryLinesCords.push([positionHistory.latitude, longitude]);
+
+                let tooltip = "";
+                tooltip += `<b>${moment(new Date(positionHistory.created_at)).format("DD/MM/YYYY hh:mm A")}</b></br>`;
+                tooltip += `Position: ${positionHistory.latitude}, ${positionHistory.longitude}</br>`;
+
+                // create position history marker
+                const marker = L.marker([positionHistory.latitude, longitude],{
+                    icon: iconPositionHistory,
+                }).bindPopup(tooltip).on('click', function(event) {
+                    // close tooltip on click to prevent tooltip and popup showing at same time
+                    event.target.closeTooltip();
+                });
+
+                // add marker to position history layer group
+                marker.addTo(nodePositionHistoryLayerGroup);
+
+            }
+
+        }
+
+        // show lines between position history markers
+        L.polyline(positionHistoryLinesCords).addTo(nodePositionHistoryLayerGroup);
+
+    }
+
+    function cleanUpPositionHistory() {
+
+        // close tooltips and popups
+        closeAllPopups();
+        closeAllTooltips();
+
+        // setup node neighbours layer
+        nodePositionHistoryLayerGroup.clearLayers();
+        nodePositionHistoryLayerGroup.removeFrom(map);
+        nodePositionHistoryLayerGroup.addTo(map);
+
+    }
+    
     function setLoading(loading){
         var reloadButton = document.getElementById("reload-button");
         if(loading){
