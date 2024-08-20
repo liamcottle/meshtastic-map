@@ -39,50 +39,20 @@ My version of the map is available at https://meshtastic.liamcottle.net
 - [x] Device list. To see which hardware models are most popular.
 - [x] Mobile optimised layout.
 - [x] Settings available to hide nodes from the map if they haven't been updated in a while.
+- [x] Real-Time message UI to view `TEXT_MESSAGE_APP` packets as they come in.
+- [x] View position history of a node between a selectable time range.
 - [x] "Neighbours" map layer. Shows blue connection lines between nodes that heard the other node.
   - This information is taken from the `NEIGHBORINFO_APP`.
   - Some neighbour lines are clearly wrong.
   - Meshtastic firmware older than [v2.3.2](https://github.com/meshtastic/firmware/releases/tag/v2.3.2.63df972) reports MQTT nodes as Neighbours.
   - This was fixed in [meshtastic/firmware/#3457](https://github.com/meshtastic/firmware/pull/3457), but adoption will likely be slow...
 
-## Planned Features
-
-- Login/Register to manually add nodes to the map, and manage their details.
-- Collect all `ServiceEnvelope` packets and provide a UI to filter and view them.
-- Real-Time message UI to view `TEXT_MESSAGE_APP` packets as they come in.
-- Map Filters
-  - Filter out "Neighbours" based on max distance setting. Eg no greater than 200km.
-  - Filter by Hardware Model
-  - Filter by Frequency (we don't have this information yet)
-  - Filter by Last Updated (ie, only show nodes heard in the last 1hr, 24hr, etc)
-
-## Ideas
-
-- Maybe a way to "claim" nodes, by sending a custom message from the node.
-  - Set other information, such as frequency, antenna info.
-  - Could allow you to upload your own photos of the node to show on the map.
-
 ## TODO
 
-- use proper vuejs build process
-- don't use hosted javascript deps so we can run fully offline
+- use vuejs build process to make managing code easier
+- don't use cdn hosted javascript deps so we can run fully offline
+  - offline map tiles?
 - dedupe packets to prevent spamming database
-- track gateway id and channel for packets
-
-- show frequency
-- welcome modal
-- not affiliated with meshtastic info
-- donate link
-- login/register to add nodes to the map manually
-
-  - need to prevent spam
-  - captcha for reg
-  - limit how many nodes can be added from an account
-
-- ui to view realtime events from specific nodes
-- ui to view text messages log
-- store x days worth of historical logs
-- be able to go back in time and see how the mesh evolved
 
 ## Install
 
