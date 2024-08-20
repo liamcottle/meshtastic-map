@@ -114,6 +114,11 @@ const optionsList = [
         description: "Text Messages older than this many seconds will be purged from the database.",
     },
     {
+        name: "purge-traceroutes-after-seconds",
+        type: Number,
+        description: "Traceroutes older than this many seconds will be purged from the database.",
+    },
+    {
         name: "purge-waypoints-after-seconds",
         type: Number,
         description: "Waypoints older than this many seconds will be purged from the database.",
@@ -161,6 +166,7 @@ const purgeMapReportsAfterSeconds = options["purge-map-reports-after-seconds"] ?
 const purgePowerMetricsAfterSeconds = options["purge-power-metrics-after-seconds"] ?? null;
 const purgePositionsAfterSeconds = options["purge-positions-after-seconds"] ?? null;
 const purgeTextMessagesAfterSeconds = options["purge-text-messages-after-seconds"] ?? null;
+const purgeTraceroutesAfterSeconds = options["purge-traceroutes-after-seconds"] ?? null;
 const purgeWaypointsAfterSeconds = options["purge-waypoints-after-seconds"] ?? null;
 
 // create mqtt client
@@ -193,6 +199,7 @@ if(purgeIntervalSeconds){
         await purgeOldPowerMetrics();
         await purgeOldPositions();
         await purgeOldTextMessages();
+        await purgeOldTraceroutes();
         await purgeOldWaypoints();
     }, purgeIntervalSeconds * 1000);
 }
@@ -370,6 +377,32 @@ async function purgeOldTextMessages() {
                 created_at: {
                     // created before x seconds ago
                     lt: new Date(Date.now() - purgeTextMessagesAfterSeconds * 1000),
+                },
+            }
+        });
+    } catch(e) {
+        // do nothing
+    }
+
+}
+
+/**
+ * Purges all traceroutes from the database that are older than the configured timeframe.
+ */
+async function purgeOldTraceroutes() {
+
+    // make sure seconds provided
+    if(!purgeTraceroutesAfterSeconds){
+        return;
+    }
+
+    // delete all traceroutes that are older than the configured purge time
+    try {
+        await prisma.traceRoute.deleteMany({
+            where: {
+                created_at: {
+                    // created before x seconds ago
+                    lt: new Date(Date.now() - purgeTraceroutesAfterSeconds * 1000),
                 },
             }
         });
