@@ -2605,6 +2605,9 @@
                 this.selectedNode = null;
                 this.selectedNodeToShowPositionHistory = node;
 
+                // close node info tooltip as position history shows under it
+                window.closeAllTooltips();
+
                 // reset default time range when opening position history ui
                 // YYYY-MM-DDTHH:mm is the format expected by the datetime-local input type
                 this.positionHistoryDateTimeFrom = moment().subtract(1, "hours").format('YYYY-MM-DDTHH:mm');
