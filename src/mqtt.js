@@ -34,6 +34,8 @@ const optionsList = [
     {
         name: "mqtt-topic",
         type: String,
+        multiple: true,
+        typeLabel: '<topic> ...',
         description: "MQTT Topic to subscribe to (e.g: msh/#)",
     },
     {
@@ -158,7 +160,7 @@ if(options.help){
 const mqttBrokerUrl = options["mqtt-broker-url"] ?? "mqtt://mqtt.meshtastic.org";
 const mqttUsername = options["mqtt-username"] ?? "meshdev";
 const mqttPassword = options["mqtt-password"] ?? "large4cats";
-const mqttTopic = options["mqtt-topic"] ?? "msh/#";
+const mqttTopics = options["mqtt-topic"] ?? ["msh/#"];
 const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
 const collectPositions = options["collect-positions"] ?? true;
 const collectTextMessages = options["collect-text-messages"] ?? false;
@@ -572,7 +574,9 @@ function decrypt(packet) {
 
 // subscribe to everything when connected
 client.on("connect", () => {
-    client.subscribe(mqttTopic);
+    for(const mqttTopic of mqttTopics){
+        client.subscribe(mqttTopic);
+    }
 });
 
 // handle message received
