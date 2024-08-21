@@ -1631,18 +1631,30 @@
                                     </a>
                                 </div>
                             </div>
-                            <div class="p-2 space-y-1">
+                            <div class="divide-y">
 
-                                <!-- from -->
-                                <div class="flex items-center">
-                                    <label class="text-sm pr-1 min-w-12 text-right">From:</label>
-                                    <input v-model="positionHistoryDateTimeFrom" @change="loadNodePositionHistory(selectedNodeToShowPositionHistory.node_id)" type="datetime-local" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1">
+                                <!-- quick range -->
+                                <div class="flex p-2 space-x-2">
+                                    <button @click="onPositionHistoryQuickRangeClick('1h')" type="button" class="w-full bg-gray-100 rounded border shadow px-2 py-1 text-sm hover:bg-gray-200 text-center">1 Hour</button>
+                                    <button @click="onPositionHistoryQuickRangeClick('24h')" type="button" class="w-full bg-gray-100 rounded border shadow px-2 py-1 text-sm hover:bg-gray-200 text-center">24 Hours</button>
+                                    <button @click="onPositionHistoryQuickRangeClick('7d')" type="button" class="w-full bg-gray-100 rounded border shadow px-2 py-1 text-sm hover:bg-gray-200 text-center">7 Days</button>
                                 </div>
 
-                                <!-- to -->
-                                <div class="flex items-center">
-                                    <label class="text-sm pr-1 min-w-12 text-right">To:</label>
-                                    <input v-model="positionHistoryDateTimeTo" @change="loadNodePositionHistory(selectedNodeToShowPositionHistory.node_id)" type="datetime-local" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1">
+                                <!-- manual range -->
+                                <div class="p-2 space-y-1">
+
+                                    <!-- from -->
+                                    <div class="flex items-center">
+                                        <label class="text-sm pr-1 min-w-12 text-right">From:</label>
+                                        <input v-model="positionHistoryDateTimeFrom" @change="loadNodePositionHistory(selectedNodeToShowPositionHistory.node_id)" type="datetime-local" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1">
+                                    </div>
+
+                                    <!-- to -->
+                                    <div class="flex items-center">
+                                        <label class="text-sm pr-1 min-w-12 text-right">To:</label>
+                                        <input v-model="positionHistoryDateTimeTo" @change="loadNodePositionHistory(selectedNodeToShowPositionHistory.node_id)" type="datetime-local" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1">
+                                    </div>
+
                                 </div>
 
                             </div>
@@ -2600,6 +2612,34 @@
 
                 // load position history
                 this.loadNodePositionHistory(nodeId);
+
+            },
+            onPositionHistoryQuickRangeClick: function(range) {
+
+                // update position history time range
+                switch(range){
+                    case "1h": {
+                        this.positionHistoryDateTimeFrom = moment().subtract(1, "hours").format('YYYY-MM-DDTHH:mm');
+                        this.positionHistoryDateTimeTo = moment().format('YYYY-MM-DDTHH:mm');
+                        break;
+                    }
+                    case "24h": {
+                        this.positionHistoryDateTimeFrom = moment().subtract(24, "hours").format('YYYY-MM-DDTHH:mm');
+                        this.positionHistoryDateTimeTo = moment().format('YYYY-MM-DDTHH:mm');
+                        break;
+                    }
+                    case "7d": {
+                        this.positionHistoryDateTimeFrom = moment().subtract(7, "days").format('YYYY-MM-DDTHH:mm');
+                        this.positionHistoryDateTimeTo = moment().format('YYYY-MM-DDTHH:mm');
+                        break;
+                    }
+                }
+
+                // reload position history
+                const node = this.selectedNodeToShowPositionHistory;
+                if(node){
+                    this.loadNodePositionHistory(node.node_id);
+                }
 
             },
             getShareLinkForNode: function(nodeId) {
