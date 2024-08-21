@@ -1820,9 +1820,8 @@
                 selectedNodeMqttMetrics: [],
                 selectedNodeTraceroutes: [],
 
-                // YYYY-MM-DDTHH:mm is the format expected by the datetime-local input type
-                positionHistoryDateTimeFrom: moment().subtract(1, "hours").format('YYYY-MM-DDTHH:mm'),
-                positionHistoryDateTimeTo: moment().format('YYYY-MM-DDTHH:mm'),
+                positionHistoryDateTimeFrom: null,
+                positionHistoryDateTimeTo: null,
                 selectedNodePositionHistory: [],
                 selectedNodeToShowPositionHistory: null,
                 selectedNodePositionHistoryMarkers: [],
@@ -2593,6 +2592,11 @@
                 // update ui
                 this.selectedNode = null;
                 this.selectedNodeToShowPositionHistory = node;
+
+                // reset default time range when opening position history ui
+                // YYYY-MM-DDTHH:mm is the format expected by the datetime-local input type
+                this.positionHistoryDateTimeFrom = moment().subtract(1, "hours").format('YYYY-MM-DDTHH:mm');
+                this.positionHistoryDateTimeTo = moment().format('YYYY-MM-DDTHH:mm');
 
                 // load position history
                 this.loadNodePositionHistory(nodeId);
