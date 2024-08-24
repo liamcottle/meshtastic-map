@@ -10,7 +10,7 @@
 
 A map of all Meshtastic nodes heard via MQTT.
 
-My version of the map is available at https://meshtastic.liamcottle.net
+My version of the map is available at https://meshmap.app
 
 <img src="./screenshot.png">
 
