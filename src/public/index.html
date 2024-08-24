@@ -1699,7 +1699,9 @@
     }
 
     function getConfigAutoUpdatePositionInUrl() {
-        return localStorage.getItem("config_auto_update_position_in_url") === "true";
+        // use user preference, or enable by default
+        const value = localStorage.getItem("config_auto_update_position_in_url");
+        return value === "true" || value == null;
     }
 
     function setConfigAutoUpdatePositionInUrl(value) {
