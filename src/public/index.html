@@ -144,6 +144,30 @@
     <div class="flex flex-col h-full w-full overflow-hidden">
         <div class="flex flex-col h-full">
 
+            <!-- announcement -->
+            <div v-if="isShowingAnnouncement" class="flex bg-yellow-300 p-2 border-gray-300 border-b">
+
+                <!-- info -->
+                <div class="my-auto leading-tight">
+                    <div class="font-bold">Service Announcement</div>
+                    <div class="text-sm">
+                        <span>Changes were made to mqtt.meshtastic.org. Uplink your nodes to <button @click="isShowingInfoModal = true" type="button" class="link">our MQTT server</button> to continue showing on this map.</span>
+                    </div>
+                </div>
+
+                <!-- action buttons -->
+                <div class="flex my-auto ml-auto mr-0 sm:mr-2">
+                    <a @click="dismissAnnouncement" href="javascript:void(0)" class="rounded-full">
+                        <div class="bg-white hover:bg-gray-100 p-2 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+
             <!-- header -->
             <div class="flex bg-white p-2 border-gray-300 border-b h-16">
 
@@ -1828,6 +1852,8 @@
         data() {
             return {
 
+                isShowingAnnouncement: this.shouldShowAnnouncement(),
+
                 configNodesMaxAgeInSeconds: window.getConfigNodesMaxAgeInSeconds(),
                 configNodesOfflineAgeInSeconds: window.getConfigNodesOfflineAgeInSeconds(),
                 configWaypointsMaxAgeInSeconds: window.getConfigWaypointsMaxAgeInSeconds(),
@@ -1911,6 +1937,18 @@
 
         },
         methods: {
+            getAnnouncementId: function() {
+                // change this when making a new announcement
+                return "1";
+            },
+            shouldShowAnnouncement: function() {
+                const lastSeenAnnouncementId = window.localStorage.getItem("last-seen-announcement-id");
+                return lastSeenAnnouncementId?.toString() !== this.getAnnouncementId();
+            },
+            dismissAnnouncement: function() {
+                window.localStorage.setItem("last-seen-announcement-id", this.getAnnouncementId());
+                this.isShowingAnnouncement = false;
+            },
             shouldShowInfoModal: function() {
                 return !window.getConfigHasSeenInfoModal()
                     && !window.isMobile();
