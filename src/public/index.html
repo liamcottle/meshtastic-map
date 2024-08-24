@@ -394,8 +394,22 @@
                                     <div class="space-y-2">
                                         <div class="bg-gray-100 rounded p-2 border border-gray-200">
                                             <div class="font-semibold">How do I add my node to the map?</div>
-                                            <div>Your node, or a node that hears your node must uplink to MQTT.</div>
+                                            <div>Your node, or a node that hears your node must uplink to our MQTT server.</div>
                                             <div>Your position packet must be unencrypted, or encrypted with the default key.</div>
+                                            <div>Use the MQTT server details below to uplink to this map.</div>
+                                        </div>
+                                        <div class="bg-gray-100 rounded p-2 border border-gray-200">
+                                            <div class="font-semibold">What are the MeshMap MQTT server details?</div>
+                                            <ul class="list-disc list-inside">
+                                                <li>Address: mqtt.meshmap.app</li>
+                                                <li>Username: uplink</li>
+                                                <li>Password: uplink</li>
+                                                <li>Encryption Enabled: Yes</li>
+                                                <li>JSON Output: No</li>
+                                                <li>TLS Enabled: No</li>
+                                            </ul>
+                                            <div>Please note, nodes can only uplink to this server. Downlink is disabled.</div>
+                                            <div>We suggest running dedicated nodes for uplinking to the map.</div>
                                         </div>
                                         <div class="bg-gray-100 rounded p-2 border border-gray-200">
                                             <div class="font-semibold">How do I remove my node from the map?</div>
