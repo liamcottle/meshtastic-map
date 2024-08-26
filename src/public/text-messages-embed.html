@@ -46,22 +46,38 @@
         <div v-show="messages.length > 0" id="messages" class="h-full flex flex-col-reverse p-3 overflow-y-auto">
 
             <!-- messages -->
-            <div :key="message.id" v-for="message of reversedMessages" class="flex flex-col max-w-xl items-start my-1.5">
+            <div :key="message.id" v-for="message of reversedMessages" class="max-w-xl items-start my-1.5">
 
-                <!-- sender -->
-                <div class="text-xs text-gray-500">
-                    <a target="_blank" :href="`/?node_id=${message.from}`" class="hover:text-blue-500">
-                        <span>{{ getNodeName(message.from) }}</span>
-                    </a>
-                    <span v-if="message.to.toString() !== '4294967295'">
-                        <span> → </span>
-                        <a target="_blank" :href="`/?node_id=${message.to}`" class="hover:text-blue-500">{{ getNodeName(message.to) }}</a>
-                    </span>
-                </div>
+                <div class="flex">
 
-                <!-- message -->
-                <div class="border border-gray-300 rounded-xl shadow overflow-hidden bg-[#efefef]">
-                    <div class="w-full space-y-0.5 px-2.5 py-1" v-html="escapeMessageText(message.text)"></div>
+                    <div class="mr-2 mt-2">
+                        <div class="flex rounded-full h-12 w-12 text-white" :class="[ `bg-[${getNodeColour(message.from)}]` ]">
+                            <div class="mx-auto my-auto">{{ getNodeShortName(message.from) }}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col">
+
+                        <!-- sender -->
+                        <div class="text-xs text-gray-500">
+                            <a target="_blank" :href="`/?node_id=${message.from}`" class="hover:text-blue-500">
+                                <span>{{ getNodeLongName(message.from) }}</span>
+                            </a>
+                            <span v-if="message.to.toString() !== '4294967295'">
+                                <span> → </span>
+                                <a target="_blank" :href="`/?node_id=${message.to}`" class="hover:text-blue-500">{{ getNodeName(message.to) }}</a>
+                            </span>
+                        </div>
+
+                        <!-- message -->
+                        <div class="flex">
+                            <div class="border border-gray-300 rounded-xl shadow overflow-hidden bg-[#efefef]">
+                                <div class="w-full space-y-0.5 px-2.5 py-1" v-html="escapeMessageText(message.text)" style="white-space:pre-wrap;word-break:break-word;"></div>
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div>
 
             </div>
@@ -292,6 +308,16 @@
 
                 return `[${node.short_name}] ${node.long_name}`;
 
+            },
+            getNodeShortName(nodeId) {
+                return this.nodesById[nodeId]?.short_name?.substring(0, 4) ?? "?";
+            },
+            getNodeLongName(nodeId) {
+                return this.nodesById[nodeId]?.long_name ?? "???";
+            },
+            getNodeColour(nodeId) {
+                // convert node id to a hex colour
+                return "#" + (nodeId & 0x00FFFFFF).toString(16).padStart(6, '0');
             },
             escapeMessageText(text) {
                 return text.replaceAll('<', '&lt;')
