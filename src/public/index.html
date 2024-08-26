@@ -3169,15 +3169,23 @@
         clearNodeOutline();
 
         // find node marker by id
-        var nodeMarker = nodeMarkers[id];
+        const nodeMarker = nodeMarkers[id];
         if(!nodeMarker){
             return;
         }
 
-        // add circle around node
-        selectedNodeOutlineCircle = L.circle(nodeMarker.getLatLng(), {
-            radius: 1200, // 1.2km
-        }).addTo(map);
+        // find node by id
+        const node = findNodeById(id);
+        if(!node){
+            return;
+        }
+
+        // add position precision circle around node
+        if(node.position_precision != null && node.position_precision > 0 && node.position_precision < 32){
+            selectedNodeOutlineCircle = L.circle(nodeMarker.getLatLng(), {
+                radius: getPositionPrecisionInMeters(node.position_precision),
+            }).addTo(map);
+        }
 
     }
 
@@ -3552,7 +3560,7 @@
                     });
                 }
 
-                // show node info sidebar when clicking node marker
+                // show node info tooltip when clicking node marker
                 marker.on("click", function(event) {
 
                     // close all other popups and tooltips
@@ -3564,6 +3572,9 @@
                     if(!node){
                         return;
                     }
+
+                    // show position precision outline
+                    showNodeOutline(node.node_id);
 
                     // open tooltip for node
                     map.openTooltip(getTooltipContentForNode(node), event.target.getLatLng(), {
