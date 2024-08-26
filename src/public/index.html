@@ -3890,6 +3890,55 @@
 
     }
 
+    function getPositionPrecisionInMeters(positionPrecision) {
+        switch(positionPrecision){
+            case 2: return 5976446;
+            case 3: return 2988223;
+            case 4: return 1494111;
+            case 5: return 747055;
+            case 6: return 373527;
+            case 7: return 186763;
+            case 8: return 93381;
+            case 9: return 46690;
+            case 10: return 23345;
+            case 11: return 11672; // Android LOW_PRECISION
+            case 12: return 5836;
+            case 13: return 2918;
+            case 14: return 1459;
+            case 15: return 729;
+            case 16: return 364; // Android MED_PRECISION
+            case 17: return 182;
+            case 18: return 91;
+            case 19: return 45;
+            case 20: return 22;
+            case 21: return 11;
+            case 22: return 5;
+            case 23: return 2;
+            case 24: return 1;
+            case 32: return 0; // Android HIGH_PRECISION
+        }
+        return null;
+    }
+
+    function formatPositionPrecision(positionPrecision) {
+
+        // get position precision in meters
+        const positionPrecisionInMeters = getPositionPrecisionInMeters(positionPrecision);
+        if(positionPrecision == null){
+            return "?";
+        }
+
+        // format kilometers
+        if(positionPrecisionInMeters > 1000){
+            const positionPrecisionInKilometers = Math.ceil(positionPrecisionInMeters / 1000);
+            return `±${positionPrecisionInKilometers}km`;
+        }
+
+        // format meters
+        return `±${positionPrecisionInMeters}m`;
+
+    }
+
     function getTooltipContentForNode(node) {
 
         // human friendly connection state
@@ -3910,6 +3959,7 @@
             `<br/>Short Name: ${escapeString(node.short_name)}` +
             `<br/>MQTT: ${mqttStatus}` +
             (node.num_online_local_nodes != null ? `<br/>Local Nodes Online: ${node.num_online_local_nodes}` : '') +
+            (node.position_precision != null && node.position_precision !== 32 ? `<br/>Position Precision: ${formatPositionPrecision(node.position_precision)}` : '') +
             `<br/><br/>Role: ${node.role_name}` +
             `<br/>Hardware: ${node.hardware_model_name}` +
             (node.firmware_version != null ? `<br/>Firmware: ${node.firmware_version}` : '') +
