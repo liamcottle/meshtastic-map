@@ -70,9 +70,12 @@
                         </div>
 
                         <!-- message -->
-                        <div class="flex">
-                            <div class="border border-gray-300 rounded-xl shadow overflow-hidden bg-[#efefef]">
+                        <div @click="message.is_details_expanded = !message.is_details_expanded" class="flex">
+                            <div class="border border-gray-300 rounded-xl shadow overflow-hidden bg-[#efefef] divide-y">
                                 <div class="w-full space-y-0.5 px-2.5 py-1" v-html="escapeMessageText(message.text)" style="white-space:pre-wrap;word-break:break-word;"></div>
+                                <div v-if="message.is_details_expanded" class="text-xs text-gray-500 px-2 py-1">
+                                    <span :title="message.created_at">{{ moment(new Date(message.created_at)).fromNow() }}</span>
+                                </div>
                             </div>
                         </div>
 
