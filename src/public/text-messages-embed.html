@@ -52,7 +52,7 @@
 
                     <div class="mr-2 mt-2">
                         <a target="_blank" :href="`/?node_id=${message.from}`">
-                            <div class="flex rounded-full h-12 w-12 text-white" :class="[ `bg-[${getNodeColour(message.from)}]` ]">
+                            <div class="flex rounded-full h-12 w-12 text-white shadow" :class="[ `bg-[${getNodeColour(message.from)}]` ]">
                                 <div class="mx-auto my-auto">{{ getNodeShortName(message.from) }}</div>
                             </div>
                         </a>
