@@ -54,6 +54,11 @@ const optionsList = [
         description: "This option will save all received text messages to the database.",
     },
     {
+        name: "ignore-direct-messages",
+        type: Boolean,
+        description: "This option will prevent saving direct messages to the database.",
+    },
+    {
         name: "collect-waypoints",
         type: Boolean,
         description: "This option will save all received waypoints to the database.",
@@ -164,6 +169,7 @@ const mqttTopics = options["mqtt-topic"] ?? ["msh/#"];
 const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
 const collectPositions = options["collect-positions"] ?? true;
 const collectTextMessages = options["collect-text-messages"] ?? false;
+const ignoreDirectMessages = options["ignore-direct-messages"] ?? false;
 const collectWaypoints = options["collect-waypoints"] ?? true;
 const collectNeighbourInfo = options["collect-neighbour-info"] ?? false;
 const collectMapReports = options["collect-map-reports"] ?? true;
@@ -655,6 +661,11 @@ client.on("message", async (topic, message) => {
         if(portnum === 1) {
 
             if(!collectTextMessages){
+                return;
+            }
+
+            // check if we want to ignore direct messages
+            if(ignoreDirectMessages && envelope.packet.to !== 0xFFFFFFFF){
                 return;
             }
 
