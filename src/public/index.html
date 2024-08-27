@@ -749,23 +749,7 @@
                                                     <div class="truncate">
                                                         <p class="truncate text-sm font-medium text-gray-900">Region</p>
                                                         <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.region_name">{{ selectedNode.region_name }}</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="truncate">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Frequency</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.region_name">{{ getRegionFrequencyRange(selectedNode.region_name) }}</span>
+                                                            <span v-if="selectedNode.region_name">{{ selectedNode.region_name }} ({{ getRegionFrequencyRange(selectedNode.region_name) }})</span>
                                                             <span v-else class="text-gray-500">???</span>
                                                         </p>
                                                     </div>
@@ -3973,8 +3957,7 @@
             `<br/><br/>Role: ${node.role_name}` +
             `<br/>Hardware: ${node.hardware_model_name}` +
             (node.firmware_version != null ? `<br/>Firmware: ${node.firmware_version}` : '') +
-            (node.region_name != null ? `<br/>LoRa Region: ${node.region_name}` : '') +
-            (loraFrequencyRange != null ? `<br/>LoRa Frequency: ${loraFrequencyRange}` : '') +
+            (node.region_name != null ? `<br/>LoRa Region: ${node.region_name} (${loraFrequencyRange})` : '') +
             (node.modem_preset_name != null ? `<br/>Modem Preset: ${node.modem_preset_name}` : '') +
             (node.has_default_channel != null ? `<br/>Has Default Channel: ${node.has_default_channel ? "Yes" : "No"}` : '');
 
