@@ -581,12 +581,17 @@
 
                         <!-- slideover header -->
                         <div class="p-2 border-b border-gray-200 shadow">
-                            <div class="flex items-start justify-between">
-                                <div>
+                            <div class="flex">
+                                <div class="mr-2">
+                                    <div class="flex rounded-full h-12 w-12 text-white shadow" :class="[ `bg-[${getNodeColour(selectedNode.node_id)}]` ]">
+                                        <div class="mx-auto my-auto">{{ selectedNode.short_name }}</div>
+                                    </div>
+                                </div>
+                                <div class="mr-auto">
                                     <h2 class="font-bold">Node Info</h2>
                                     <h3 class="text-sm">{{ selectedNode.long_name }}</h3>
                                 </div>
-                                <div class="my-auto ml-3 flex h-7 items-center">
+                                <div class="my-auto ml-2 flex h-7 items-center">
                                     <a href="javascript:void(0)" class="rounded-full" @click="selectedNode = null">
                                         <div class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full">
                                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -2774,6 +2779,10 @@
             },
             celsiusToFahrenheit: function(celsius) {
                 return (celsius * 9/5) + 32;
+            },
+            getNodeColour(nodeId) {
+                // convert node id to a hex colour
+                return "#" + (nodeId & 0x00FFFFFF).toString(16).padStart(6, '0');
             },
         },
         computed: {
