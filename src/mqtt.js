@@ -585,6 +585,15 @@ function decrypt(packet) {
 
 }
 
+/**
+ * converts hex id to numeric id, for example: !FFFFFFFF to 4294967295
+ * @param hexId a node id in hex format with a prepended "!"
+ * @returns {bigint} the node id in numeric form
+ */
+function convertHexIdToNumericId(hexId) {
+    return BigInt('0x' + hexId.replaceAll("!", ""));
+}
+
 // subscribe to everything when connected
 client.on("connect", () => {
     for(const mqttTopic of mqttTopics){
@@ -605,7 +614,7 @@ client.on("message", async (topic, message) => {
                 const mqttConnectionState = message.toString();
 
                 // convert node id hex to int value
-                const nodeId = BigInt('0x' + nodeIdHex.replaceAll("!", ""));
+                const nodeId = convertHexIdToNumericId(nodeIdHex);
 
                 // update mqtt connection state for node
                 await prisma.node.updateMany({
@@ -639,7 +648,7 @@ client.on("message", async (topic, message) => {
                     data: {
                         mqtt_topic: topic,
                         channel_id: envelope.channelId,
-                        gateway_id: envelope.gatewayId ? BigInt('0x' + envelope.gatewayId.replaceAll("!", "")) : null, // convert hex id "!f96a92f0" to bigint
+                        gateway_id: envelope.gatewayId ? convertHexIdToNumericId(envelope.gatewayId) : null,
                         to: envelope.packet.to,
                         from: envelope.packet.from,
                         protobuf: message,
@@ -692,7 +701,7 @@ client.on("message", async (topic, message) => {
                         channel: envelope.packet.channel,
                         packet_id: envelope.packet.id,
                         channel_id: envelope.channelId,
-                        gateway_id: envelope.gatewayId ? BigInt('0x' + envelope.gatewayId.replaceAll("!", "")) : null, // convert hex id "!f96a92f0" to bigint
+                        gateway_id: envelope.gatewayId ? convertHexIdToNumericId(envelope.gatewayId) : null,
                         text: envelope.packet.decoded.payload.toString(),
                         rx_time: envelope.packet.rxTime,
                         rx_snr: envelope.packet.rxSnr,
@@ -763,7 +772,7 @@ client.on("message", async (topic, message) => {
                             channel: envelope.packet.channel,
                             packet_id: envelope.packet.id,
                             channel_id: envelope.channelId,
-                            gateway_id: envelope.gatewayId ? BigInt('0x' + envelope.gatewayId.replaceAll("!", "")) : null, // convert hex id "!f96a92f0" to bigint
+                            gateway_id: envelope.gatewayId ? convertHexIdToNumericId(envelope.gatewayId) : null,
                             latitude: position.latitudeI,
                             longitude: position.longitudeI,
                             altitude: position.altitude,
@@ -848,7 +857,7 @@ client.on("message", async (topic, message) => {
                         channel: envelope.packet.channel,
                         packet_id: envelope.packet.id,
                         channel_id: envelope.channelId,
-                        gateway_id: envelope.gatewayId ? BigInt('0x' + envelope.gatewayId.replaceAll("!", "")) : null, // convert hex id "!f96a92f0" to bigint
+                        gateway_id: envelope.gatewayId ? convertHexIdToNumericId(envelope.gatewayId) : null,
                     },
                 });
             } catch (e) {
@@ -1113,7 +1122,7 @@ client.on("message", async (topic, message) => {
                         channel: envelope.packet.channel,
                         packet_id: envelope.packet.id,
                         channel_id: envelope.channelId,
-                        gateway_id: envelope.gatewayId ? BigInt('0x' + envelope.gatewayId.replaceAll("!", "")) : null, // convert hex id "!f96a92f0" to bigint
+                        gateway_id: envelope.gatewayId ? convertHexIdToNumericId(envelope.gatewayId) : null,
                     },
                 });
             } catch (e) {
