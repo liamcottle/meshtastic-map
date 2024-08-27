@@ -326,6 +326,38 @@ app.get('/api/v1/nodes/:nodeId/mqtt-metrics', async (req, res) => {
             mqtt_metrics: queryResult,
         });
 
+        // Check if the node has uploaded packets and mark node MQTT status
+        if(queryResult.length > 0) {
+            const lastMessageTime = new Date(queryResult[0].last_packet_at);
+            const currentTime = new Date();
+
+            // Check if the last message was within the last 15 minutes
+            const fifteenMinutesAgo = new Date(currentTime.getTime() - 15 * 60 * 1000);
+
+            if(lastMessageTime >= fifteenMinutesAgo) {
+                await prisma.node.updateMany({
+                    where: {
+                        node_id: nodeId,
+                    },
+                    data: {
+                        mqtt_connection_state: "online",
+                        mqtt_connection_state_updated_at: lastMessageTime,
+                    },
+                });
+            }
+            else {
+                await prisma.node.updateMany({
+                    where: {
+                        node_id: nodeId,
+                    },
+                    data: {
+                        mqtt_connection_state: "offline",
+                        mqtt_connection_state_updated_at: lastMessageTime,
+                    },
+                });
+            }
+        }
+
     } catch(err) {
         console.error(err);
         res.status(500).json({

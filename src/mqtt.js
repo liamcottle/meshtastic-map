@@ -604,37 +604,6 @@ client.on("connect", () => {
 // handle message received
 client.on("message", async (topic, message) => {
     try {
-
-        // handle node status
-        if(topic.includes("/stat/!")){
-            try {
-
-                // get node id and status
-                const nodeIdHex = topic.split("/").pop();
-                const mqttConnectionState = message.toString();
-
-                // convert node id hex to int value
-                const nodeId = convertHexIdToNumericId(nodeIdHex);
-
-                // update mqtt connection state for node
-                await prisma.node.updateMany({
-                    where: {
-                        node_id: nodeId,
-                    },
-                    data: {
-                        mqtt_connection_state: mqttConnectionState,
-                        mqtt_connection_state_updated_at: new Date(),
-                    },
-                });
-
-                // no need to continue with this mqtt message
-                return;
-
-            } catch(e) {
-                console.error(e);
-            }
-        }
-
         // decode service envelope
         const envelope = ServiceEnvelope.decode(message);
         if(!envelope.packet){
