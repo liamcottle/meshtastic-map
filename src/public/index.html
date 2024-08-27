@@ -826,25 +826,9 @@
                                             <div class="block flex-1 px-4 py-2">
                                                 <div class="relative flex min-w-0 flex-1 items-center">
                                                     <div class="truncate">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Latitude</p>
+                                                        <p class="truncate text-sm font-medium text-gray-900">Latitude, Longitude</p>
                                                         <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.latitude">{{ selectedNode.latitude }}</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="truncate">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Longitude</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.longitude">{{ selectedNode.longitude }}</span>
+                                                            <span v-if="selectedNode.latitude && selectedNode.longitude">{{ selectedNode.latitude }}, {{ selectedNode.longitude }}</span>
                                                             <span v-else class="text-gray-500">???</span>
                                                         </p>
                                                     </div>
