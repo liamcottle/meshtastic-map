@@ -32,6 +32,11 @@ const optionsList = [
         description: "MQTT Password (e.g: large4cats)",
     },
     {
+        name: "mqtt-client-id",
+        type: String,
+        description: "MQTT Client ID (e.g: map.example.com)",
+    },
+    {
         name: "mqtt-topic",
         type: String,
         multiple: true,
@@ -165,6 +170,7 @@ if(options.help){
 const mqttBrokerUrl = options["mqtt-broker-url"] ?? "mqtt://mqtt.meshtastic.org";
 const mqttUsername = options["mqtt-username"] ?? "meshdev";
 const mqttPassword = options["mqtt-password"] ?? "large4cats";
+const mqttClientId = options["mqtt-client-id"] ?? null;
 const mqttTopics = options["mqtt-topic"] ?? ["msh/#"];
 const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
 const collectPositions = options["collect-positions"] ?? true;
@@ -193,6 +199,7 @@ const purgeWaypointsAfterSeconds = options["purge-waypoints-after-seconds"] ?? n
 const client = mqtt.connect(mqttBrokerUrl, {
     username: mqttUsername,
     password: mqttPassword,
+    clientId: mqttClientId,
 });
 
 // load protobufs
