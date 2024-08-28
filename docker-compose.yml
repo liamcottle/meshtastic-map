@@ -23,7 +23,7 @@ services:
     command: /app/docker/mqtt.sh
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
-      MQTT_OPTS: "--mqtt-broker-url mqtt://mosquitto --mqtt-username username --mqtt-password password" # add any custom mqtt.js options here
+      MQTT_OPTS: "--mqtt-broker-url mqtt://mosquitto --mqtt-username user --mqtt-password password" # add any custom mqtt.js options here
 
   # runs the web map ui
   meshtastic-map:
