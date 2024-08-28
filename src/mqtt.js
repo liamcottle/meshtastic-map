@@ -631,7 +631,7 @@ client.on("message", async (topic, message) => {
         }
 
         // Update Node MQTT status based on Last Packet Received time
-        const ret = await prisma.node.updateMany({
+        await prisma.node.updateMany({
             where: {
                 node_id: convertHexIdToNumericId(envelope.gatewayId),
             },
