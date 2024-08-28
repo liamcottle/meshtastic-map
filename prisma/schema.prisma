@@ -48,7 +48,6 @@ model Node {
   neighbours                        Json?
   neighbours_updated_at             DateTime?
 
-  mqtt_connection_state            String?
   mqtt_connection_state_updated_at DateTime?
 
   created_at DateTime @default(now())
