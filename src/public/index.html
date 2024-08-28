@@ -3801,6 +3801,12 @@
                 continue;
             }
 
+            // find node this position is for
+            const node = findNodeById(positionHistory.node_id);
+            if(!node){
+                continue;
+            }
+
             // fix lat long
             positionHistory.latitude = positionHistory.latitude / 10000000;
             positionHistory.longitude = positionHistory.longitude / 10000000;
@@ -3817,15 +3823,20 @@
                 positionHistoryLinesCords.push([positionHistory.latitude, longitude]);
 
                 let tooltip = "";
-                tooltip += `<b>${moment(new Date(positionHistory.created_at)).format("DD/MM/YYYY hh:mm A")}</b></br>`;
-                tooltip += `Position: ${positionHistory.latitude}, ${positionHistory.longitude}</br>`
+                if(positionHistory.type === "position"){
+                    tooltip += `<b>Position</b>`;
+                } else if(positionHistory.type === "map_report"){
+                    tooltip += `<b>Map Report</b>`;
+                }
+                tooltip += `<br/>[${escapeString(node.short_name)}] ${escapeString(node.long_name)}`;
+                tooltip += `<br/>${positionHistory.latitude}, ${positionHistory.longitude}`;
+                tooltip += `<br/>Heard on: ${moment(new Date(positionHistory.created_at)).format("DD/MM/YYYY hh:mm A")}`;
 
                 // add gateway info if available
                 if(positionHistory.gateway_id){
                     const gatewayNode = findNodeById(positionHistory.gateway_id);
-                    if(gatewayNode){
-                        tooltip += `Heard by: <a href="javascript:void(0);" onclick="goToNode(${gatewayNode.node_id})">[${gatewayNode.short_name}] ${gatewayNode.long_name}</a>`;
-                    }
+                    const gatewayNodeInfo = gatewayNode ? `[${gatewayNode.short_name}] ${gatewayNode.long_name}` : "???";
+                    tooltip += `<br/>Heard by: <a href="javascript:void(0);" onclick="goToNode(${positionHistory.gateway_id})">${gatewayNodeInfo}</a>`;
                 }
 
                 // create position history marker

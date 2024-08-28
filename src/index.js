@@ -484,7 +484,9 @@ app.get('/api/v1/nodes/:nodeId/position-history', async (req, res) => {
 
         positions.forEach((position) => {
             positionHistory.push({
+                id: position.id,
                 node_id: position.node_id,
+                type: "position",
                 latitude: position.latitude,
                 longitude: position.longitude,
                 altitude: position.altitude,
@@ -497,6 +499,7 @@ app.get('/api/v1/nodes/:nodeId/position-history', async (req, res) => {
         mapReports.forEach((mapReport) => {
             positionHistory.push({
                 node_id: mapReport.node_id,
+                type: "map_report",
                 latitude: mapReport.latitude,
                 longitude: mapReport.longitude,
                 altitude: mapReport.altitude,
