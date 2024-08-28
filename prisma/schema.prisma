@@ -48,6 +48,7 @@ model Node {
   neighbours                        Json?
   neighbours_updated_at             DateTime?
 
+  // this column tracks when an mqtt gateway node uplinked a packet
   mqtt_connection_state_updated_at DateTime?
 
   created_at DateTime @default(now())
