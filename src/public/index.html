@@ -1485,6 +1485,29 @@
                                 </select>
                             </div>
 
+                            <!-- configNodesDisconnectedAgeInSeconds -->
+                            <div class="p-2">
+                                <label class="block text-sm font-medium text-gray-900">Nodes Disconnected Age</label>
+                                <div class="text-xs text-gray-600 mb-2">Nodes that have not uplinked to MQTT in this time will show as blue icons. Reload to update map.</div>
+                                <select v-model="configNodesDisconnectedAgeInSeconds" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                    <option value="900">15 minutes</option>
+                                    <option value="1800">30 minutes</option>
+                                    <option value="2700">45 minutes</option>
+                                    <option value="3600">1 hour</option>
+                                    <option value="7200">2 hours</option>
+                                    <option value="10800">3 hours</option>
+                                    <option value="21600">6 hours</option>
+                                    <option value="43200">12 hours</option>
+                                    <option value="86400">24 hours</option>
+                                    <option value="172800">2 days</option>
+                                    <option value="259200">3 days</option>
+                                    <option value="345600">4 days</option>
+                                    <option value="432000">5 days</option>
+                                    <option value="518400">6 days</option>
+                                    <option value="604800">7 days</option>
+                                </select>
+                            </div>
+
                             <!-- configNodesOfflineAgeInSeconds -->
                             <div class="p-2">
                                 <label class="block text-sm font-medium text-gray-900">Nodes Offline Age</label>
@@ -1777,6 +1800,20 @@
         }
     }
 
+    function getConfigNodesDisconnectedAgeInSeconds() {
+        // default to showing nodes as recently uplinked if heard in the last 30 minutes
+        const value = localStorage.getItem("config_nodes_disconnected_age_in_seconds");
+        return value != null ? parseInt(value) : 1800;
+    }
+
+    function setConfigNodesDisconnectedAgeInSeconds(value) {
+        if(value != null){
+            return localStorage.setItem("config_nodes_disconnected_age_in_seconds", value);
+        } else {
+            return localStorage.removeItem("config_nodes_disconnected_age_in_seconds");
+        }
+    }
+
     function getConfigNodesOfflineAgeInSeconds() {
         const value = localStorage.getItem("config_nodes_offline_age_in_seconds");
         return value != null ? parseInt(value) : null;
@@ -1836,6 +1873,7 @@
                 isShowingAnnouncement: this.shouldShowAnnouncement(),
 
                 configNodesMaxAgeInSeconds: window.getConfigNodesMaxAgeInSeconds(),
+                configNodesDisconnectedAgeInSeconds: window.getConfigNodesDisconnectedAgeInSeconds(),
                 configNodesOfflineAgeInSeconds: window.getConfigNodesOfflineAgeInSeconds(),
                 configWaypointsMaxAgeInSeconds: window.getConfigWaypointsMaxAgeInSeconds(),
                 configNeighboursMaxDistanceInMeters: window.getConfigNeighboursMaxDistanceInMeters(),
@@ -2791,6 +2829,9 @@
             configNodesMaxAgeInSeconds() {
                 window.setConfigNodesMaxAgeInSeconds(this.configNodesMaxAgeInSeconds);
             },
+            configNodesDisconnectedAgeInSeconds() {
+                window.setConfigNodesDisconnectedAgeInSeconds(this.configNodesDisconnectedAgeInSeconds);
+            },
             configNodesOfflineAgeInSeconds() {
                 window.setConfigNodesOfflineAgeInSeconds(this.configNodesOfflineAgeInSeconds);
             },
@@ -3455,6 +3496,14 @@
         return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
+    // determine if node was recently heard uplinking packets to mqtt
+    function hasNodeUplinkedToMqttRecently(node) {
+        const now = moment();
+        const configNodesDisconnectedAgeInSeconds = getConfigNodesDisconnectedAgeInSeconds();
+        const millisecondsSinceNodeLastUplinkedToMqtt = now.diff(moment(node.mqtt_connection_state_updated_at));
+        return millisecondsSinceNodeLastUplinkedToMqtt < configNodesDisconnectedAgeInSeconds * 1000;
+    }
+
     function onNodesUpdated(updatedNodes) {
 
         // clear nodes cache
@@ -3500,9 +3549,6 @@
 
                 // icon based on mqtt connection state
                 var icon = iconMqttDisconnected;
-                if(node.mqtt_connection_state === "online"){
-                    icon = iconMqttConnected;
-                }
 
                 // use offline icon for nodes older than configured node offline age
                 const now = moment();
@@ -3514,12 +3560,18 @@
                     }
                 }
 
+                // determine if node was recently heard uplinking packets to mqtt
+                const nodeHasUplinkedToMqttRecently = hasNodeUplinkedToMqttRecently(node);
+                if(nodeHasUplinkedToMqttRecently){
+                    icon = iconMqttConnected;
+                }
+
                 // create node marker
                 var marker = L.marker([node.latitude, longitude], {
                     icon: icon,
                     tagName: node.node_id,
                     // we want to show online nodes above offline, but without needing to use separate layer groups
-                    zIndexOffset: node.mqtt_connection_state === "online" ? 1000 : -1000,
+                    zIndexOffset: nodeHasUplinkedToMqttRecently ? 1000 : -1000,
                 }).on('click', function(event) {
                     // close tooltip on click to prevent tooltip and popup showing at same time
                     event.target.closeTooltip();
@@ -3935,15 +3987,16 @@
 
     function getTooltipContentForNode(node) {
 
-        // human friendly connection state
-        var mqttStatus = "";
-        var mqttStatusLastUpdated = node.mqtt_connection_state_updated_at ? `(${moment(new Date(node.mqtt_connection_state_updated_at)).fromNow()})` : "";
-        if(node.mqtt_connection_state === "online"){
-            mqttStatus = `<span class="text-green-700">Connected</span> ${mqttStatusLastUpdated}`;
-        } else if(node.mqtt_connection_state === "offline"){
-            mqttStatus = `<span class="text-blue-700">Disconnected</span> ${mqttStatusLastUpdated}`;
-        } else {
-            mqttStatus = `<span class="text-blue-700">Disconnected</span>`;
+        // determine if node was recently heard uplinking packets to mqtt
+        const nodeHasUplinkedToMqttRecently = hasNodeUplinkedToMqttRecently(node);
+        var mqttStatus = `<span class="text-blue-700">Disconnected</span>`;
+        if(node.mqtt_connection_state_updated_at){
+            var mqttStatusUpdatedAt = moment(new Date(node.mqtt_connection_state_updated_at)).fromNow();
+            if(nodeHasUplinkedToMqttRecently){
+                mqttStatus = `<span><span class="text-green-700">Connected</span> (${mqttStatusUpdatedAt})</span>`;
+            } else {
+                mqttStatus = `<span><span class="text-blue-700">Disconnected</span> (${mqttStatusUpdatedAt})</span>`;
+            }
         }
 
         var loraFrequencyRange = getRegionFrequencyRange(node.region_name);
