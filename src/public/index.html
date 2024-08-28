@@ -3818,7 +3818,15 @@
 
                 let tooltip = "";
                 tooltip += `<b>${moment(new Date(positionHistory.created_at)).format("DD/MM/YYYY hh:mm A")}</b></br>`;
-                tooltip += `Position: ${positionHistory.latitude}, ${positionHistory.longitude}</br>`;
+                tooltip += `Position: ${positionHistory.latitude}, ${positionHistory.longitude}</br>`
+
+                // add gateway info if available
+                if(positionHistory.gateway_id){
+                    const gatewayNode = findNodeById(positionHistory.gateway_id);
+                    if(gatewayNode){
+                        tooltip += `Heard by: <a href="javascript:void(0);" onclick="goToNode(${gatewayNode.node_id})">[${gatewayNode.short_name}] ${gatewayNode.long_name}</a>`;
+                    }
+                }
 
                 // create position history marker
                 const marker = L.marker([positionHistory.latitude, longitude],{
