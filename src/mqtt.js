@@ -604,6 +604,7 @@ client.on("connect", () => {
 // handle message received
 client.on("message", async (topic, message) => {
     try {
+
         // decode service envelope
         const envelope = ServiceEnvelope.decode(message);
         if(!envelope.packet){
@@ -630,15 +631,19 @@ client.on("message", async (topic, message) => {
             }
         }
 
-        // Update Node MQTT status based on Last Packet Received time
-        await prisma.node.updateMany({
-            where: {
-                node_id: convertHexIdToNumericId(envelope.gatewayId),
-            },
-            data: {
-                mqtt_connection_state_updated_at: new Date(),
-            },
-        });
+        // track when a node last gated a packet to mqtt
+        try {
+            await prisma.node.updateMany({
+                where: {
+                    node_id: convertHexIdToNumericId(envelope.gatewayId),
+                },
+                data: {
+                    mqtt_connection_state_updated_at: new Date(),
+                },
+            });
+        } catch(e) {
+            // don't care if updating mqtt timestamp fails
+        }
 
         // attempt to decrypt encrypted packets
         const isEncrypted = envelope.packet.encrypted?.length > 0;
