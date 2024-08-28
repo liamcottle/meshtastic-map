@@ -1488,9 +1488,8 @@
                             <!-- configNodesDisconnectedAgeInSeconds -->
                             <div class="p-2">
                                 <label class="block text-sm font-medium text-gray-900">Nodes Disconnected Age</label>
-                                <div class="text-xs text-gray-600 mb-2">Nodes that have not uploaded to MQTT in this time will show as blue icons. Reload to update map.</div>
+                                <div class="text-xs text-gray-600 mb-2">Nodes that have not uplinked to MQTT in this time will show as blue icons. Reload to update map.</div>
                                 <select v-model="configNodesDisconnectedAgeInSeconds" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                    <option :value="null">Don't show as offline</option>
                                     <option value="900">15 minutes</option>
                                     <option value="1800">30 minutes</option>
                                     <option value="2700">45 minutes</option>
@@ -1802,8 +1801,9 @@
     }
 
     function getConfigNodesDisconnectedAgeInSeconds() {
+        // default to showing nodes as recently uplinked if heard in the last 30 minutes
         const value = localStorage.getItem("config_nodes_disconnected_age_in_seconds");
-        return value != null ? parseInt(value) : null;
+        return value != null ? parseInt(value) : 1800;
     }
 
     function setConfigNodesDisconnectedAgeInSeconds(value) {
@@ -3496,6 +3496,14 @@
         return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
+    // determine if node was recently heard uplinking packets to mqtt
+    function hasNodeUplinkedToMqttRecently(node) {
+        const now = moment();
+        const configNodesDisconnectedAgeInSeconds = getConfigNodesDisconnectedAgeInSeconds();
+        const millisecondsSinceNodeLastUplinkedToMqtt = now.diff(moment(node.mqtt_connection_state_updated_at));
+        return millisecondsSinceNodeLastUplinkedToMqtt < configNodesDisconnectedAgeInSeconds * 1000;
+    }
+
     function onNodesUpdated(updatedNodes) {
 
         // clear nodes cache
@@ -3541,15 +3549,9 @@
 
                 // icon based on mqtt connection state
                 var icon = iconMqttDisconnected;
-                const now = moment();
-                const configNodesDisconnectedAgeInSeconds = getConfigNodesDisconnectedAgeInSeconds();
-                if(configNodesDisconnectedAgeInSeconds){
-                    if(now.diff(moment(node.mqtt_connection_state_updated_at)) > configNodesDisconnectedAgeInSeconds * 1000){
-                        icon = iconMqttConnected;
-                    }
-                }
 
                 // use offline icon for nodes older than configured node offline age
+                const now = moment();
                 const configNodesOfflineAgeInSeconds = getConfigNodesOfflineAgeInSeconds();
                 if(configNodesOfflineAgeInSeconds){
                     const lastUpdatedAgeInMillis = now.diff(moment(node.updated_at));
@@ -3558,12 +3560,18 @@
                     }
                 }
 
+                // determine if node was recently heard uplinking packets to mqtt
+                const nodeHasUplinkedToMqttRecently = hasNodeUplinkedToMqttRecently(node);
+                if(nodeHasUplinkedToMqttRecently){
+                    icon = iconMqttConnected;
+                }
+
                 // create node marker
                 var marker = L.marker([node.latitude, longitude], {
                     icon: icon,
                     tagName: node.node_id,
                     // we want to show online nodes above offline, but without needing to use separate layer groups
-                    zIndexOffset: now.diff(moment(node.mqtt_connection_state_updated_at)) > configNodesDisconnectedAgeInSeconds * 1000 ? 1000 : -1000,
+                    zIndexOffset: nodeHasUplinkedToMqttRecently ? 1000 : -1000,
                 }).on('click', function(event) {
                     // close tooltip on click to prevent tooltip and popup showing at same time
                     event.target.closeTooltip();
@@ -3979,15 +3987,16 @@
 
     function getTooltipContentForNode(node) {
 
-        // human friendly connection state
-        var mqttStatus = "";
-        var mqttStatusLastUpdated = node.mqtt_connection_state_updated_at ? `${moment(new Date(node.mqtt_connection_state_updated_at)).fromNow()}` : "";
-        if(moment().diff(moment(node.mqtt_connection_state_updated_at)) > getConfigNodesDisconnectedAgeInSeconds() * 1000){
-            mqttStatus = `<span class="text-green-700">Heard</span> ${mqttStatusLastUpdated}`;
-        } else if(moment().diff(moment(node.mqtt_connection_state_updated_at)) < getConfigNodesDisconnectedAgeInSeconds() * 1000){
-            mqttStatus = `<span class="text-blue-700">Last Heard</span> ${mqttStatusLastUpdated}`;
-        } else {
-            mqttStatus = `<span class="text-blue-700">Not heard</span>`;
+        // determine if node was recently heard uplinking packets to mqtt
+        const nodeHasUplinkedToMqttRecently = hasNodeUplinkedToMqttRecently(node);
+        var mqttStatus = `<span class="text-blue-700">Disconnected</span>`;
+        if(node.mqtt_connection_state_updated_at){
+            var mqttStatusUpdatedAt = moment(new Date(node.mqtt_connection_state_updated_at)).fromNow();
+            if(nodeHasUplinkedToMqttRecently){
+                mqttStatus = `<span><span class="text-green-700">Connected</span> (${mqttStatusUpdatedAt})</span>`;
+            } else {
+                mqttStatus = `<span><span class="text-blue-700">Disconnected</span> (${mqttStatusUpdatedAt})</span>`;
+            }
         }
 
         var loraFrequencyRange = getRegionFrequencyRange(node.region_name);
