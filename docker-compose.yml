@@ -10,6 +10,8 @@ services:
     volumes:
       - ./mosquitto:/etc/mosquitto
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - proxynet
 
   # listens to mqtt packets and saves to database
   meshtastic-mqtt:
@@ -24,6 +26,8 @@ services:
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
       MQTT_OPTS: "--mqtt-broker-url mqtt://mosquitto --mqtt-username user --mqtt-password password" # add any custom mqtt.js options here
+    networks:
+      - proxynet
 
   # runs the web map ui
   meshtastic-map:
@@ -35,11 +39,15 @@ services:
       context: .
       dockerfile: ./Dockerfile
     command: /app/docker/map.sh
-    ports:
-      - 8080:8080/tcp
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
       MAP_OPTS: "" # add any custom index.js options here
+      VIRTUAL_HOST: "127.0.0.1"
+      VIRTUAL_PORT: "8080"
+    expose:
+      - "8080"
+    networks:
+      - proxynet
 
   # runs the database to store everything from mqtt
   database:
@@ -58,6 +66,29 @@ services:
       timeout: 5s
       retries: 6
       start_interval: 5s
+    networks:
+      - proxynet
+
+  # nginx proxy for password protection
+  nginx-proxy:
+    container_name: nginx-proxy
+    restart: always
+    image: jwilder/nginx-proxy
+    networks:
+      - proxynet
+    ports:
+      - "8080:80"
+    volumes:
+      - /srv/docker/nginx/htpasswd:/etc/nginx/htpasswd
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    environment:
+      DEFAULT_HOST: "127.0.0.1"
+
+networks:
+  proxynet:
+    external: true
 
 volumes:
   database_data:
