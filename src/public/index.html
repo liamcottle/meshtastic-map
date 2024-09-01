@@ -1137,87 +1137,45 @@
                                 <div class="bg-gray-200 p-2 font-semibold">Other</div>
                                 <ul role="list" class="flex-1 divide-y divide-gray-200">
 
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="truncate">
-                                                        <p class="truncate text-sm font-medium text-gray-900">ID</p>
-                                                        <p class="truncate text-sm text-gray-700">{{ selectedNode.node_id }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <!-- id -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">ID</div>
+                                        <div class="ml-auto text-sm text-gray-700">{{ selectedNode.node_id }}</div>
+                                    </li>
+
+                                    <!-- hex id -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Hex ID</div>
+                                        <div class="ml-auto text-sm text-gray-700">{{ selectedNode.node_id_hex }}</div>
+                                    </li>
+
+                                    <!-- first seen -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">First Seen</div>
+                                        <div class="ml-auto text-sm text-gray-700">{{ moment(new Date(selectedNode.created_at)).fromNow() }}</div>
+                                    </li>
+
+                                    <!-- last seen -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Last Seen</div>
+                                        <div class="ml-auto text-sm text-gray-700">{{ moment(new Date(selectedNode.updated_at)).fromNow() }}</div>
+                                    </li>
+
+                                    <!-- neighbours updated -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Neighbours Updated</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.neighbours_updated_at">{{ moment(new Date(selectedNode.neighbours_updated_at)).fromNow() }}</span>
+                                            <span v-else>???</span>
                                         </div>
                                     </li>
 
-                                    <li>
-                                        <div class="group relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="truncate">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Hex ID</p>
-                                                        <p class="truncate text-sm text-gray-700">{{ selectedNode.node_id_hex }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="truncate">
-                                                        <p class="truncate text-sm font-medium text-gray-900">First Seen</p>
-                                                        <p class="truncate text-sm text-gray-700">{{ moment(new Date(selectedNode.created_at)).fromNow() }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="truncate">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Last Seen</p>
-                                                        <p class="truncate text-sm text-gray-700">{{ moment(new Date(selectedNode.updated_at)).fromNow() }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="truncate">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Neighbours Updated</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.neighbours_updated_at">{{ moment(new Date(selectedNode.neighbours_updated_at)).fromNow() }}</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="truncate">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Position Updated</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.position_updated_at">{{ moment(new Date(selectedNode.position_updated_at)).fromNow() }}</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <!-- position updated -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Position Updated</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.position_updated_at">{{ moment(new Date(selectedNode.position_updated_at)).fromNow() }}</span>
+                                            <span v-else>???</span>
                                         </div>
                                     </li>
 
