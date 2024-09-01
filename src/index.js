@@ -172,6 +172,8 @@ app.get('/api/v1/nodes/:nodeId/device-metrics', async (req, res) => {
 
         const nodeId = parseInt(req.params.nodeId);
         const count = req.query.count ? parseInt(req.query.count) : undefined;
+        const timeFrom = req.query.time_from ? parseInt(req.query.time_from) : undefined;
+        const timeTo = req.query.time_to ? parseInt(req.query.time_to) : undefined;
 
         // find node
         const node = await prisma.node.findFirst({
@@ -192,6 +194,10 @@ app.get('/api/v1/nodes/:nodeId/device-metrics', async (req, res) => {
         const deviceMetrics = await prisma.deviceMetric.findMany({
             where: {
                 node_id: node.node_id,
+                created_at: {
+                    gte: timeFrom ? new Date(timeFrom) : undefined,
+                    lte: timeTo ? new Date(timeTo) : undefined,
+                },
             },
             orderBy: {
                 id: 'desc',

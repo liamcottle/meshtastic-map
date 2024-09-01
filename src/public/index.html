@@ -46,6 +46,7 @@
 
     <!-- chart js -->
     <script src="assets/js/chart.js@4.4.2/dist/chart.umd.js"></script>
+    <script src="assets/js/chartjs-adapter-moment/chartjs-adapter-moment.js"></script>
 
     <style>
 
@@ -845,98 +846,76 @@
                                 <div class="bg-gray-200 p-2 font-semibold">Device Metrics</div>
                                 <ul role="list" class="flex-1 divide-y divide-gray-200">
 
+                                    <!-- device metrics chart -->
                                     <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="w-full">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Battery Level</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                        <span v-if="selectedNode.battery_level">
-                                                            <span v-if="selectedNode.battery_level > 100">Plugged In</span>
-                                                            <span v-else>{{ selectedNode.battery_level }}%</span>
-                                                        </span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <canvas id="batteryLevelChart" style="width:150px;height:50px;"></canvas>
+                                        <div class="px-4 py-2">
+                                            <div class="w-full">
+                                                <canvas id="deviceMetricsChart" style="height:150px;"></canvas>
+                                                <div class="flex">
+                                                    <div class="mx-auto flex space-x-2">
+                                                        <div class="flex mx-auto">
+                                                            <div class="my-auto w-2 h-2 bg-blue-500 rounded-full"></div>
+                                                            <div class="my-auto ml-1 text-sm text-gray-500">Battery Level</div>
+                                                        </div>
+                                                        <div class="flex mx-auto">
+                                                            <div class="my-auto w-2 h-2 bg-green-500 rounded-full"></div>
+                                                            <div class="my-auto ml-1 text-sm text-gray-500">Channel Utilization</div>
+                                                        </div>
+                                                        <div class="flex mx-auto">
+                                                            <div class="my-auto w-2 h-2 bg-orange-500 rounded-full"></div>
+                                                            <div class="my-auto ml-1 text-sm text-gray-500">Air Util TX</div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </li>
 
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="w-full">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Voltage</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.voltage">{{ Number(selectedNode.voltage).toFixed(2) }}V</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <canvas id="voltageChart" style="width:150px;height:50px;"></canvas>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <!-- battery level -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Battery Level</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.battery_level">
+                                                <span v-if="selectedNode.battery_level > 100">Plugged In</span>
+                                                <span v-else>{{ selectedNode.battery_level }}%</span>
+                                            </span>
+                                            <span v-else>???</span>
                                         </div>
                                     </li>
 
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="w-full">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Channel Utilization</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.channel_utilization">{{ Number(selectedNode.channel_utilization).toFixed(2) }}%</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <canvas id="channelUtilizationChart" style="width:150px;height:50px;"></canvas>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <!-- voltage -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Voltage</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.voltage">{{ Number(selectedNode.voltage).toFixed(2) }}V</span>
+                                            <span v-else>???</span>
                                         </div>
                                     </li>
 
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="w-full">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Air Util Tx</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.air_util_tx">{{ Number(selectedNode.air_util_tx).toFixed(2) }}%</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <canvas id="airUtilTxChart" style="width:150px;height:50px;"></canvas>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <!-- channel utilization -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Channel Utilization</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.channel_utilization">{{ Number(selectedNode.channel_utilization).toFixed(2) }}%</span>
+                                            <span v-else>???</span>
                                         </div>
                                     </li>
 
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="w-full">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Uptime</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.uptime_seconds">{{ formatUptimeSeconds(selectedNode.uptime_seconds) }}</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <!-- air util tx -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Air Util Tx</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.air_util_tx">{{ Number(selectedNode.air_util_tx).toFixed(2) }}%</span>
+                                            <span v-else>???</span>
+                                        </div>
+                                    </li>
+
+                                    <!-- air util tx -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Uptime</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.uptime_seconds">{{ formatUptimeSeconds(selectedNode.uptime_seconds) }}</span>
+                                            <span v-else>???</span>
                                         </div>
                                     </li>
 
@@ -1980,9 +1959,11 @@
                 });
             },
             loadNodeDeviceMetrics: function(nodeId) {
+                // load the last 3 days worth of device metrics
+                const threeDaysAgoInMilliseconds = new Date().getTime() - (259200 * 1000);
                 window.axios.get(`/api/v1/nodes/${nodeId}/device-metrics`, {
                     params: {
-                        count: 100,
+                        time_from: threeDaysAgoInMilliseconds,
                     },
                 }).then((response) => {
                     // reverse response, as it's newest to oldest, but we want oldest to newest
@@ -2061,257 +2042,98 @@
                 });
             },
             renderDeviceMetricCharts: function() {
-                this.updateBatteryLevelChart();
-                this.updateVoltageChart();
-                this.updateChannelUtilizationChart();
-                this.updateAirUtilTxChart();
+                try {
+                    this.updateDeviceMetricsChart();
+                } catch(e) {
+                    console.log(e);
+                }
             },
-            updateBatteryLevelChart: function() {
+            updateDeviceMetricsChart: function() {
 
                 // get chart context
-                const ctx = window.document.getElementById('batteryLevelChart')?.getContext('2d');
+                const ctx = window.document.getElementById('deviceMetricsChart')?.getContext('2d');
                 if(!ctx){
                     return;
                 }
 
-                // get battery metrics
-                const deviceMetrics = this.selectedNodeDeviceMetrics.filter((deviceMetric) => {
-                    return deviceMetric.battery_level != null;
-                });
+                const labels = [];
+                const batteryMetrics = [];
+                const channelUtilizationMetrics = [];
+                const airUtilTxMetrics = [];
+                for(const deviceMetric of this.selectedNodeDeviceMetrics){
+                    labels.push(moment(deviceMetric.created_at));
+                    batteryMetrics.push(deviceMetric.battery_level);
+                    channelUtilizationMetrics.push(deviceMetric.channel_utilization);
+                    airUtilTxMetrics.push(deviceMetric.air_util_tx);
+                }
 
                 new window.Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: deviceMetrics.map((deviceMetric) => {
-                            return new Date(deviceMetric.created_at).toLocaleTimeString();
-                        }),
-                        datasets: [{
-                            label: 'Battery Level',
-                            data: deviceMetrics.map((deviceMetric) => {
-                                return deviceMetric.battery_level;
-                            }),
-                            borderColor: '#22c55e',
-                            backgroundColor: '#e5e7eb',
-                            fill: true,
-                        }]
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Battery Level',
+                                borderColor: '#3b82f6',
+                                backgroundColor: '#3b82f6',
+                                pointStyle: false, // no points
+                                fill: false,
+                                data: batteryMetrics,
+                            },
+                            {
+                                label: 'Channel Util',
+                                borderColor: '#22c55e',
+                                backgroundColor: '#22c55e',
+                                showLine: false, // no lines between points
+                                fill: false,
+                                data: channelUtilizationMetrics,
+                            },
+                            {
+                                label: 'Air Util TX',
+                                borderColor: '#f97316',
+                                backgroundColor: '#f97316',
+                                showLine: false, // no lines between points
+                                fill: false,
+                                data: airUtilTxMetrics,
+
+                            },
+                        ],
                     },
                     options: {
                         responsive: true,
+                        borderWidth: 2,
+                        elements: {
+                            point: {
+                                radius: 2,
+                            },
+                        },
                         scales: {
                             x: {
-                                display: false, // Hide x-axis labels
+                                type: 'time',
+                                time: {
+                                    unit: 'day',
+                                    displayFormats: {
+                                        day: 'MMM DD', // Jan 01
+                                    },
+                                },
                             },
                             y: {
-                                display: false, // Hide y-axis labels
                                 min: 0,
                                 max: 101, // 101 is "Plugged In", need to include for tooltip to work
                             },
                         },
                         plugins: {
                             legend: {
-                                display: false, // Hide the legend
+                                display: false,
                             },
                             tooltip: {
-                                yAlign: 'top',
+                                mode: "nearest",
                                 intersect: false,
-                                displayColors: false,
                                 callbacks: {
-                                    label: (item) => item.formattedValue + "%",
+                                    label: (item) => {
+                                        return `${item.dataset.label}: ${item.formattedValue}%`;
+                                    },
                                 },
-                            },
-                        },
-                        elements: {
-                            point: {
-                                radius: 0, // Set the radius to 0 to hide the dots
-                            },
-                        },
-                    }
-                });
-
-            },
-            updateVoltageChart: function() {
-
-                // get chart context
-                const ctx = window.document.getElementById('voltageChart')?.getContext('2d');
-                if(!ctx){
-                    return;
-                }
-
-                // get voltage metrics
-                const voltageMetrics = this.selectedNodeDeviceMetrics.filter((deviceMetric) => {
-                    return deviceMetric.voltage != null;
-                });
-
-                new window.Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: voltageMetrics.map((deviceMetric) => {
-                            return new Date(deviceMetric.created_at).toLocaleTimeString();
-                        }),
-                        datasets: [{
-                            label: 'Voltage',
-                            data: voltageMetrics.map((deviceMetric) => {
-                                return deviceMetric.voltage;
-                            }),
-                            borderColor: '#22c55e',
-                            backgroundColor: '#e5e7eb',
-                            fill: true,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            x: {
-                                display: false, // Hide x-axis labels
-                            },
-                            y: {
-                                display: false, // Hide y-axis labels
-                                min: 2,
-                                max: 5,
-                            },
-                        },
-                        plugins: {
-                            legend: {
-                                display: false, // Hide the legend
-                            },
-                            tooltip: {
-                                yAlign: 'top',
-                                intersect: false,
-                                displayColors: false,
-                                callbacks: {
-                                    label: (item) => item.formattedValue + "V",
-                                },
-                            },
-                        },
-                        elements: {
-                            point: {
-                                radius: 0, // Set the radius to 0 to hide the dots
-                            },
-                        },
-                    }
-                });
-
-            },
-            updateChannelUtilizationChart: function() {
-
-                // get chart context
-                const ctx = window.document.getElementById('channelUtilizationChart')?.getContext('2d');
-                if(!ctx){
-                    return;
-                }
-
-                // get channel utilization metrics
-                const channelUtilizationMetrics = this.selectedNodeDeviceMetrics.filter((deviceMetric) => {
-                    return deviceMetric.channel_utilization != null;
-                });
-
-                new window.Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: channelUtilizationMetrics.map((deviceMetric) => {
-                            return new Date(deviceMetric.created_at).toLocaleTimeString();
-                        }),
-                        datasets: [{
-                            label: 'Channel Utilization',
-                            data: channelUtilizationMetrics.map((deviceMetric) => {
-                                return deviceMetric.channel_utilization;
-                            }),
-                            borderColor: '#22c55e',
-                            backgroundColor: '#e5e7eb',
-                            fill: true,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            x: {
-                                display: false, // Hide x-axis labels
-                            },
-                            y: {
-                                display: false, // Hide y-axis labels
-                                min: -5,
-                                max: 100,
-                            },
-                        },
-                        plugins: {
-                            legend: {
-                                display: false, // Hide the legend
-                            },
-                            tooltip: {
-                                yAlign: 'top',
-                                intersect: false,
-                                displayColors: false,
-                                callbacks: {
-                                    label: (item) => item.formattedValue + "%",
-                                },
-                            },
-                        },
-                        elements: {
-                            point: {
-                                radius: 0, // Set the radius to 0 to hide the dots
-                            },
-                        },
-                    }
-                });
-
-            },
-            updateAirUtilTxChart: function() {
-
-                // get chart context
-                const ctx = window.document.getElementById('airUtilTxChart')?.getContext('2d');
-                if(!ctx){
-                    return;
-                }
-
-                // get air util tx metrics
-                const airUtilTxMetrics = this.selectedNodeDeviceMetrics.filter((deviceMetric) => {
-                    return deviceMetric.air_util_tx != null;
-                });
-
-                new window.Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: airUtilTxMetrics.map((deviceMetric) => {
-                            return new Date(deviceMetric.created_at).toLocaleTimeString();
-                        }),
-                        datasets: [{
-                            label: 'Air Util Tx',
-                            data: airUtilTxMetrics.map((deviceMetric) => {
-                                return deviceMetric.air_util_tx;
-                            }),
-                            borderColor: '#22c55e',
-                            backgroundColor: '#e5e7eb',
-                            fill: true,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            x: {
-                                display: false, // Hide x-axis labels
-                            },
-                            y: {
-                                display: false, // Hide y-axis labels
-                                min: -5,
-                                max: 100,
-                            },
-                        },
-                        plugins: {
-                            legend: {
-                                display: false, // Hide the legend
-                            },
-                            tooltip: {
-                                yAlign: 'top',
-                                intersect: false,
-                                displayColors: false,
-                                callbacks: {
-                                    label: (item) => item.formattedValue + "%",
-                                },
-                            },
-                        },
-                        elements: {
-                            point: {
-                                radius: 0, // Set the radius to 0 to hide the dots
                             },
                         },
                     }
