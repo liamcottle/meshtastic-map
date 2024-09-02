@@ -667,6 +667,18 @@
                                 <div class="bg-gray-200 p-2 font-semibold">Details</div>
                                 <ul role="list" class="flex-1 divide-y divide-gray-200">
 
+                                    <!-- id -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">ID</div>
+                                        <div class="ml-auto text-sm text-gray-700">{{ selectedNode.node_id }}</div>
+                                    </li>
+
+                                    <!-- hex id -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Hex ID</div>
+                                        <div class="ml-auto text-sm text-gray-700">{{ selectedNode.node_id_hex }}</div>
+                                    </li>
+
                                     <!-- role -->
                                     <li class="flex p-3">
                                         <div class="text-sm font-medium text-gray-900">Role</div>
@@ -1054,18 +1066,6 @@
                             <div>
                                 <div class="bg-gray-200 p-2 font-semibold">Other</div>
                                 <ul role="list" class="flex-1 divide-y divide-gray-200">
-
-                                    <!-- id -->
-                                    <li class="flex p-3">
-                                        <div class="text-sm font-medium text-gray-900">ID</div>
-                                        <div class="ml-auto text-sm text-gray-700">{{ selectedNode.node_id }}</div>
-                                    </li>
-
-                                    <!-- hex id -->
-                                    <li class="flex p-3">
-                                        <div class="text-sm font-medium text-gray-900">Hex ID</div>
-                                        <div class="ml-auto text-sm text-gray-700">{{ selectedNode.node_id_hex }}</div>
-                                    </li>
 
                                     <!-- first seen -->
                                     <li class="flex p-3">
