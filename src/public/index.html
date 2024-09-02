@@ -1997,6 +1997,9 @@
                             y: {
                                 min: 0,
                                 max: 101, // 101 is "Plugged In", need to include for tooltip to work
+                                ticks: {
+                                    callback: (label) => `${label}%`,
+                                },
                             },
                         },
                         plugins: {
