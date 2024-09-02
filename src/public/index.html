@@ -750,35 +750,21 @@
                                 </div>
                                 <ul role="list" class="flex-1 divide-y divide-gray-200">
 
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="truncate">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Latitude, Longitude</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.latitude && selectedNode.longitude">{{ selectedNode.latitude }}, {{ selectedNode.longitude }}</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <!-- position -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Lat/Long</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.latitude && selectedNode.longitude">{{ selectedNode.latitude }}, {{ selectedNode.longitude }}</span>
+                                            <span v-else>???</span>
                                         </div>
                                     </li>
 
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="truncate">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Altitude</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.altitude">{{ selectedNode.altitude }}m</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <!-- altitude -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Altitude</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.altitude">{{ selectedNode.altitude }}m</span>
+                                            <span v-else>???</span>
                                         </div>
                                     </li>
 
