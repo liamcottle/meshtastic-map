@@ -743,51 +743,30 @@
                                 <div class="bg-gray-200 p-2 font-semibold">LoRa Config</div>
                                 <ul role="list" class="flex-1 divide-y divide-gray-200">
 
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="truncate">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Region</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.region_name">{{ selectedNode.region_name }} ({{ getRegionFrequencyRange(selectedNode.region_name) }})</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <!-- region -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Region</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.region_name">{{ selectedNode.region_name }} ({{ getRegionFrequencyRange(selectedNode.region_name) }})</span>
+                                            <span v-else>???</span>
                                         </div>
                                     </li>
 
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="truncate">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Modem Preset</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.modem_preset_name">{{ selectedNode.modem_preset_name }}</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <!-- modem preset -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Modem Preset</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.modem_preset_name">{{ selectedNode.modem_preset_name }}</span>
+                                            <span v-else>???</span>
                                         </div>
                                     </li>
 
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="truncate">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Has Default Channel</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.has_default_channel != null">{{ selectedNode.has_default_channel ? "Yes" : "No" }}</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <!-- has default channel -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Has Default Channel</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.has_default_channel != null">{{ selectedNode.has_default_channel ? "Yes" : "No" }}</span>
+                                            <span v-else>???</span>
                                         </div>
                                     </li>
 
