@@ -1761,7 +1761,6 @@
                 selectedNodeMqttMetrics: [],
                 selectedNodeTraceroutes: [],
 
-                deviceMetricsChart: null,
                 deviceMetricsTimeRange: "3d",
 
                 positionHistoryDateTimeFrom: null,
@@ -1960,17 +1959,19 @@
             updateDeviceMetricsChart: function() {
 
                 // destroy existing chart
-                if(this.deviceMetricsChart){
-                    this.deviceMetricsChart.destroy();
-                    this.deviceMetricsChart = null;
+                const chartElementId = "deviceMetricsChart";
+                const existingChart = window.Chart.getChart(chartElementId);
+                if(existingChart != null){
+                    existingChart.destroy();
                 }
 
-                // get chart context
-                const ctx = window.document.getElementById('deviceMetricsChart')?.getContext('2d');
-                if(!ctx){
+                // get chart element
+                const chartElement = window.document.getElementById(chartElementId);
+                if(!chartElement){
                     return;
                 }
 
+                // create chart data
                 const labels = [];
                 const batteryMetrics = [];
                 const channelUtilizationMetrics = [];
@@ -1982,7 +1983,8 @@
                     airUtilTxMetrics.push(deviceMetric.air_util_tx);
                 }
 
-                this.deviceMetricsChart = new window.Chart(ctx, {
+                // create chart
+                new window.Chart(chartElement, {
                     type: 'line',
                     data: {
                         labels: labels,
