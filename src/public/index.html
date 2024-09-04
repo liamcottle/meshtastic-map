@@ -776,7 +776,7 @@
                                 <div class="flex bg-gray-200 p-2 font-semibold">
                                     <div class="my-auto">Device Metrics</div>
                                     <div class="my-auto ml-auto">
-                                        <select v-model="deviceMetricsTimeRange" class="block w-full rounded-md border-0 py-1 pl-2 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 sm:text-sm sm:leading-6">
+                                        <select v-model="deviceMetricsTimeRange" class="block w-full rounded-md border-0 py-0.5 pl-2 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 sm:text-sm sm:leading-6">
                                             <option value="1d">1 Day</option>
                                             <option value="3d">3 Days</option>
                                             <option value="7d">7 Days</option>
@@ -925,7 +925,16 @@
 
                             <!-- power metrics -->
                             <div>
-                                <div class="bg-gray-200 p-2 font-semibold">Power Metrics</div>
+                                <div class="flex bg-gray-200 p-2 font-semibold">
+                                    <div class="my-auto">Power Metrics</div>
+                                    <div class="my-auto ml-auto">
+                                        <select v-model="powerMetricsTimeRange" class="block w-full rounded-md border-0 py-0.5 pl-2 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 sm:text-sm sm:leading-6">
+                                            <option value="1d">1 Day</option>
+                                            <option value="3d">3 Days</option>
+                                            <option value="7d">7 Days</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <ul role="list" class="flex-1 divide-y divide-gray-200">
 
                                     <!-- power metrics chart -->
@@ -1762,6 +1771,7 @@
                 selectedNodeTraceroutes: [],
 
                 deviceMetricsTimeRange: "3d",
+                powerMetricsTimeRange: "3d",
 
                 positionHistoryDateTimeFrom: null,
                 positionHistoryDateTimeTo: null,
@@ -1895,11 +1905,32 @@
                 });
             },
             loadNodePowerMetrics: function(nodeId) {
-                // load the last 3 days worth of power metrics
+
+                // calculate unix timestamps in milliseconds for supported time ranges
+                const oneDayAgoInMilliseconds = new Date().getTime() - (86400 * 1000);
                 const threeDaysAgoInMilliseconds = new Date().getTime() - (259200 * 1000);
+                const sevenDaysAgoInMilliseconds = new Date().getTime() - (604800 * 1000);
+
+                // determine how long back to load power metrics from
+                var timeFrom = threeDaysAgoInMilliseconds;
+                switch(this.powerMetricsTimeRange){
+                    case "1d": {
+                        timeFrom = oneDayAgoInMilliseconds;
+                        break;
+                    }
+                    case "3d": {
+                        timeFrom = threeDaysAgoInMilliseconds;
+                        break;
+                    }
+                    case "7d": {
+                        timeFrom = sevenDaysAgoInMilliseconds;
+                        break;
+                    }
+                }
+
                 window.axios.get(`/api/v1/nodes/${nodeId}/power-metrics`, {
                     params: {
-                        time_from: threeDaysAgoInMilliseconds,
+                        time_from: timeFrom,
                     },
                 }).then((response) => {
                     // reverse response, as it's newest to oldest, but we want oldest to newest
@@ -2200,12 +2231,20 @@
             },
             updatePowerMetricsChart: function() {
 
-                // get chart context
-                const ctx = window.document.getElementById('powerMetricsChart')?.getContext('2d');
-                if(!ctx){
+                // destroy existing chart
+                const chartElementId = "powerMetricsChart";
+                const existingChart = window.Chart.getChart(chartElementId);
+                if(existingChart != null){
+                    existingChart.destroy();
+                }
+
+                // get chart element
+                const chartElement = window.document.getElementById(chartElementId);
+                if(!chartElement){
                     return;
                 }
 
+                // create chart data
                 const labels = [];
                 const channel1VoltageReadings = [];
                 const channel2VoltageReadings = [];
@@ -2223,7 +2262,8 @@
                     channel3CurrentReadings.push(powerMetric.ch3_current);
                 }
 
-                new window.Chart(ctx, {
+                // create chart
+                new window.Chart(chartElement, {
                     type: 'line',
                     data: {
                         labels: labels,
@@ -2561,6 +2601,9 @@
             },
             deviceMetricsTimeRange() {
                 this.loadNodeDeviceMetrics(this.selectedNode.node_id);
+            },
+            powerMetricsTimeRange() {
+                this.loadNodePowerMetrics(this.selectedNode.node_id);
             },
         },
     }).mount('#app');
