@@ -215,6 +215,9 @@
                                     </div>
                                 </div>
                             </div>
+                            <div v-if="searchedNodes.length === 500" class="text-gray-500 text-sm px-2 py-1">
+                                Only the first 500 results are shown.
+                            </div>
                         </template>
 
                         <template v-else>
@@ -2566,7 +2569,8 @@
                     return nodeALongName.localeCompare(nodeBLongName);
                 });
 
-                return nodes;
+                // only return the first 500 results to avoid ui lag...
+                return nodes.slice(0, 500);
 
             },
             selectedNodeLatestPowerMetric() {
