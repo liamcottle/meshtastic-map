@@ -621,6 +621,16 @@
 
                         <div class="overflow-y-auto">
 
+                            <!-- no position banner -->
+                            <div v-if="findNodeMarkerById(selectedNode.node_id) == null" class="flex bg-orange-500 text-white p-2">
+                                <div class="my-auto mr-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                        <path fill-rule="evenodd" d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="my-auto">This node has not reported a position.</div>
+                            </div>
+
                             <div class="flex flex-col my-2">
                                 <div class="mx-auto">
                                     <img class="h-48 w-48 rounded object-contain" :src="`/images/devices/${selectedNode.hardware_model_name}.png`" alt="" onerror="if(this.src != '/images/no_image.png') this.src = '/images/no_image.png';">
@@ -2400,6 +2410,9 @@
             findNodeById: function(id) {
                 return window.findNodeById(id);
             },
+            findNodeMarkerById: function(id) {
+                return window.findNodeMarkerById(id);
+            },
             onSearchResultNodeClick: function(node) {
 
                 // clear search
@@ -2868,7 +2881,6 @@
         // find node marker by id
         var nodeMarker = findNodeMarkerById(id);
         if(!nodeMarker){
-            alert("Could not find a position for node: " + id);
             return false;
         }
 
@@ -2900,7 +2912,15 @@
         if(nodes.length > 0){
             const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
             if(randomNode){
-                goToNode(randomNode.node_id);
+
+                // go to node
+                if(window.goToNode(randomNode.node_id)){
+                    return;
+                }
+
+                // fallback to showing node details since we can't go to the node
+                window.showNodeDetails(randomNode.node_id);
+
             }
         }
     }
