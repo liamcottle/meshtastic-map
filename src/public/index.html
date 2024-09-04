@@ -1552,12 +1552,24 @@
                 <div v-if="selectedNodeToShowPositionHistory != null" class="mx-auto w-screen max-w-md p-4">
                     <div class="flex h-full flex-col bg-white shadow-xl rounded-xl border">
                         <div>
-                            <div class="flex p-2 border-b">
+                            <div class="flex p-2">
+                                <div class="flex my-auto mr-3 space-x-2">
+                                    <a href="javascript:void(0)" @click="isPositionHistoryModalExpanded = !isPositionHistoryModalExpanded" class="rounded-full">
+                                        <div class="bg-gray-100 hover:bg-gray-200 p-1 rounded-full">
+                                            <svg v-if="isPositionHistoryModalExpanded" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                            </svg>
+                                            <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                            </svg>
+                                        </div>
+                                    </a>
+                                </div>
                                 <div class="my-auto mr-auto font-bold">{{ selectedNodeToShowPositionHistory.short_name }} Position History</div>
-                                <div class="my-auto ml-3">
+                                <div class="flex my-auto ml-3 space-x-2">
                                     <a href="javascript:void(0)" class="rounded-full" @click="dismissShowingNodePositionHistory">
                                         <div class="bg-gray-100 hover:bg-gray-200 p-1 rounded-full">
-                                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <svg class="size-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                                 <path d="M18 6l-12 12"></path>
                                                 <path d="M6 6l12 12"></path>
@@ -1566,7 +1578,7 @@
                                     </a>
                                 </div>
                             </div>
-                            <div class="divide-y">
+                            <div v-if="isPositionHistoryModalExpanded" class="divide-y border-t">
 
                                 <!-- quick range -->
                                 <div class="flex p-2 space-x-2">
@@ -1789,6 +1801,7 @@
                 deviceMetricsTimeRange: "3d",
                 powerMetricsTimeRange: "3d",
 
+                isPositionHistoryModalExpanded: true,
                 positionHistoryDateTimeFrom: null,
                 positionHistoryDateTimeTo: null,
                 selectedNodePositionHistory: [],
@@ -2448,6 +2461,7 @@
                 // update ui
                 this.selectedNode = null;
                 this.selectedNodeToShowPositionHistory = node;
+                this.isPositionHistoryModalExpanded = true;
 
                 // close node info tooltip as position history shows under it
                 window.closeAllTooltips();
