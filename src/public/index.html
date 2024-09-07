@@ -204,7 +204,7 @@
                         <template v-if="searchedNodes.length > 0">
                             <div @click="onSearchResultNodeClick(node)" class="flex space-x-2 p-2 hover:bg-gray-100 cursor-pointer" v-for="node of searchedNodes">
                                 <div>
-                                    <div class="flex rounded-full h-12 w-12 text-white shadow" :class="[ `bg-[${getNodeColour(node.node_id)}]` ]">
+                                    <div class="flex rounded-full h-12 w-12 text-white shadow" :class="[ `bg-[${getNodeColour(node.node_id)}]`, `text-[${getNodeTextColour(node.node_id)}]` ]">
                                         <div class="mx-auto my-auto drop-shadow-sm">{{ node.short_name }}</div>
                                     </div>
                                 </div>
@@ -590,7 +590,7 @@
                         <div class="p-2 border-b border-gray-200 shadow">
                             <div class="flex">
                                 <div class="my-auto mr-2">
-                                    <div class="flex rounded-full h-12 w-12 text-white shadow" :class="[ `bg-[${getNodeColour(selectedNode.node_id)}]` ]">
+                                    <div class="flex rounded-full h-12 w-12 text-white shadow" :class="[ `bg-[${getNodeColour(selectedNode.node_id)}]`, `text-[${getNodeTextColour(selectedNode.node_id)}]` ]">
                                         <div class="mx-auto my-auto drop-shadow-sm">{{ selectedNode.short_name }}</div>
                                     </div>
                                 </div>
@@ -2575,6 +2575,20 @@
             getNodeColour(nodeId) {
                 // convert node id to a hex colour
                 return "#" + (nodeId & 0x00FFFFFF).toString(16).padStart(6, '0');
+            },
+            getNodeTextColour(nodeId) {
+
+                // extract rgb components
+                const r = (nodeId & 0xFF0000) >> 16;
+                const g = (nodeId & 0x00FF00) >> 8;
+                const b = nodeId & 0x0000FF;
+
+                // calculate brightness
+                const brightness = ((r * 0.299) + (g * 0.587) + (b * 0.114)) / 255;
+
+                // determine text color based on brightness
+                return brightness > 0.5 ? "#000000" : "#FFFFFF";
+
             },
         },
         computed: {
