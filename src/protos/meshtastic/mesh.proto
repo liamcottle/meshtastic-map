@@ -23,17 +23,17 @@ message Position {
    * The new preferred location encoding, multiply by 1e-7 to get degrees
    * in floating point
    */
-  sfixed32 latitude_i = 1;
+  optional sfixed32 latitude_i = 1;
 
   /*
    * TODO: REPLACE
    */
-  sfixed32 longitude_i = 2;
+  optional sfixed32 longitude_i = 2;
 
   /*
    * In meters above MSL (but see issue #359)
    */
-  int32 altitude = 3;
+  optional int32 altitude = 3;
 
   /*
    * This is usually not sent over the mesh (to save space), but it is sent
@@ -122,12 +122,12 @@ message Position {
   /*
    * HAE altitude in meters - can be used instead of MSL altitude
    */
-  sint32 altitude_hae = 9;
+  optional sint32 altitude_hae = 9;
 
   /*
    * Geoidal separation in meters
    */
-  sint32 altitude_geoidal_separation = 10;
+  optional sint32 altitude_geoidal_separation = 10;
 
   /*
    * Horizontal, Vertical and Position Dilution of Precision, in 1/100 units
@@ -163,12 +163,12 @@ message Position {
    * - "yaw" indicates a relative rotation about the vertical axis
    * TODO: REMOVE/INTEGRATE
    */
-  uint32 ground_speed = 15;
+  optional uint32 ground_speed = 15;
 
   /*
    * TODO: REPLACE
    */
-  uint32 ground_track = 16;
+  optional uint32 ground_track = 16;
 
   /*
    * GPS fix quality (from NMEA GxGGA statement or similar)
@@ -580,6 +580,50 @@ enum HardwareModel {
   HELTEC_MESH_NODE_T114 = 69;
 
   /*
+   * Sensecap Indicator from Seeed Studio. ESP32-S3 device with TFT and RP2040 coprocessor
+   */
+  SENSECAP_INDICATOR = 70;
+
+  /*
+  * Seeed studio T1000-E tracker card. NRF52840 w/ LR1110 radio, GPS, button, buzzer, and sensors.
+  */
+  TRACKER_T1000_E = 71;
+
+  /*
+   * RAK3172 STM32WLE5 Module (https://store.rakwireless.com/products/wisduo-lpwan-module-rak3172)
+   */
+  RAK3172 = 72;
+
+  /*
+   * Seeed Studio Wio-E5 (either mini or Dev kit) using STM32WL chip.
+   */
+  WIO_E5 = 73;
+
+  /*
+   * RadioMaster 900 Bandit, https://www.radiomasterrc.com/products/bandit-expresslrs-rf-module
+   * SSD1306 OLED and No GPS
+   */
+  RADIOMASTER_900_BANDIT = 74;
+
+  /*
+  * Minewsemi ME25LS01 (ME25LE01_V1.0). NRF52840 w/ LR1110 radio, buttons and leds and pins.
+  */
+  ME25LS01_4Y10TD = 75;
+
+  /*
+   * RP2040_FEATHER_RFM95
+   * Adafruit Feather RP2040 with RFM95 LoRa Radio RFM95 with SX1272, SSD1306 OLED
+   * https://www.adafruit.com/product/5714
+   * https://www.adafruit.com/product/326
+   * https://www.adafruit.com/product/938
+   *  ^^^ short A0 to switch to I2C address 0x3C
+   *
+   */
+  RP2040_FEATHER_RFM95 = 76;
+  /* M5 esp32 based MCU modules with enclosure, TFT and LORA Shields. All Variants (Basic, Core, Fire, Core2, Paper) https://m5stack.com/ */
+  M5STACK_COREBASIC=77;
+  M5STACK_CORE2=78;
+  /*
    * ------------------------------------------------------------------------------------------------------------------------------------------
    * Reserved ID For developing private Ports. These will show up in live traffic sparsely, so we can use a high number. Keep it within 8 bits.
    * ------------------------------------------------------------------------------------------------------------------------------------------
@@ -655,16 +699,37 @@ message User {
    * Indicates that the user's role in the mesh
    */
   Config.DeviceConfig.Role role = 7;
+
+  /*
+   * The public key of the user's device.
+   * This is sent out to other nodes on the mesh to allow them to compute a shared secret key.
+   */
+  bytes public_key = 8;
 }
 
 /*
- * A message used in our Dynamic Source Routing protocol (RFC 4728 based)
+ * A message used in a traceroute
  */
 message RouteDiscovery {
   /*
-   * The list of nodenums this packet has visited so far
+   * The list of nodenums this packet has visited so far to the destination.
    */
   repeated fixed32 route = 1;
+
+  /*
+   * The list of SNRs (in dB, scaled by 4) in the route towards the destination.
+   */
+  repeated int32 snr_towards = 2;
+
+  /*
+   * The list of nodenums the packet has visited on the way back from the destination.
+   */
+  repeated fixed32 route_back = 3;
+
+  /*
+   * The list of SNRs (in dB, scaled by 4) in the route back from the destination.
+   */
+  repeated int32 snr_back = 4;
 }
 
 /*
@@ -737,6 +802,16 @@ message Routing {
      * (i.e you did not send the request on the required bound channel)
      */
     NOT_AUTHORIZED = 33;
+
+    /*
+     * The client specified a PKI transport, but the node was unable to send the packet using PKI (and did not send the message at all)
+     */
+    PKI_FAILED = 34;
+
+    /*
+     * The receiving node does not have a Public Key to decode with
+     */
+    PKI_UNKNOWN_PUBKEY = 35;
   }
 
   oneof variant {
@@ -813,6 +888,11 @@ message Data {
    * a message a heart or poop emoji.
    */
   fixed32 emoji = 8;
+
+  /*
+   * Bitfield for extra flags. First use is to indicate that user approves the packet being uploaded to MQTT.
+   */
+  optional uint32 bitfield = 9;
 }
 
 /*
@@ -827,12 +907,12 @@ message Waypoint {
   /*
    * latitude_i
    */
-  sfixed32 latitude_i = 2;
+  optional sfixed32 latitude_i = 2;
 
   /*
    * longitude_i
    */
-  sfixed32 longitude_i = 3;
+  optional sfixed32 longitude_i = 3;
 
   /*
    * Time the waypoint is to expire (epoch)
@@ -944,6 +1024,17 @@ message MeshPacket {
      * assume it is important and use a slightly higher priority
      */
     RELIABLE = 70;
+
+    /*
+     * If priority is unset but the packet is a response to a request, we want it to get there relatively quickly.
+     * Furthermore, responses stop relaying packets directed to a node early.
+     */
+    RESPONSE = 80;
+
+    /*
+     * Higher priority for specific message types (portnums) to distinguish between other reliable packets.
+     */
+    HIGH = 100;
 
     /*
      * Ack/naks are sent with very high priority to ensure that retransmission
@@ -1095,6 +1186,16 @@ message MeshPacket {
    * When receiving a packet, the difference between hop_start and hop_limit gives how many hops it traveled.
    */
   uint32 hop_start = 15;
+
+  /*
+   * Records the public key the packet was encrypted with, if applicable.
+   */
+  bytes public_key = 16;
+
+  /*
+   * Indicates whether the packet was en/decrypted using PKI
+   */
+  bool pki_encrypted = 17;
 }
 
 /*
@@ -1281,6 +1382,19 @@ enum CriticalErrorCode {
    * If this occurs on your board, please post in the forum so that we can ask you to collect some information to allow fixing this bug
    */
   RADIO_SPI_BUG = 11;
+
+  /*
+   * Corruption was detected on the flash filesystem but we were able to repair things.
+   * If you see this failure in the field please post in the forum because we are interested in seeing if this is occurring in the field.
+   */
+  FLASH_CORRUPTION_RECOVERABLE = 12;
+
+  /*
+   * Corruption was detected on the flash filesystem but we were unable to repair things.
+   * NOTE: Your node will probably need to be reconfigured the next time it reboots (it will lose the region code etc...)
+   * If you see this failure in the field please post in the forum because we are interested in seeing if this is occurring in the field.
+   */
+  FLASH_CORRUPTION_UNRECOVERABLE = 13;
 }
 
 /*
@@ -1485,7 +1599,39 @@ message FromRadio {
      * File system manifest messages
      */
     FileInfo fileInfo = 15;
+
+    /*
+     * Notification message to the client
+     */
+    ClientNotification clientNotification = 16;
   }
+}
+
+/*
+ * A notification message from the device to the client
+ * To be used for important messages that should to be displayed to the user
+ * in the form of push notifications or validation messages when saving
+ * invalid configuration.
+ */
+message ClientNotification {
+  /*
+   * The id of the packet we're notifying in response to
+   */
+  optional uint32 reply_id = 1;
+
+  /*
+   * Seconds since 1970 - or 0 for unknown/unset
+   */
+  fixed32 time = 2;
+
+  /*
+   * The level type of notification
+   */
+  LogRecord.Level level = 3;
+  /*
+   * The message body of the notification
+   */
+  string message = 4;
 }
 
 /*
