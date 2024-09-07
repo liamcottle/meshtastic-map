@@ -3317,14 +3317,15 @@
         nodes = [];
 
         // get config
+        const now = moment();
+        const configNodesMaxAgeInSeconds = getConfigNodesMaxAgeInSeconds();
+        const configNodesOfflineAgeInSeconds = getConfigNodesOfflineAgeInSeconds();
         const configNeighboursMaxDistanceInMeters = getConfigNeighboursMaxDistanceInMeters();
 
         // add nodes
-        for(var node of updatedNodes){
+        for(const node of updatedNodes){
 
             // skip nodes older than configured node max age
-            const now = moment();
-            const configNodesMaxAgeInSeconds = getConfigNodesMaxAgeInSeconds();
             if(configNodesMaxAgeInSeconds){
                 const lastUpdatedAgeInMillis = now.diff(moment(node.updated_at));
                 if(lastUpdatedAgeInMillis > configNodesMaxAgeInSeconds * 1000){
@@ -3344,96 +3345,93 @@
             node.latitude = node.latitude / 10000000;
             node.longitude = node.longitude / 10000000;
 
-            var hasLocation = isValidLatLng(node.latitude, node.longitude);
-
-            if(hasLocation){
-
-                // wrap longitude for shortest path, everything to left of australia should be shown on the right
-                var longitude = parseFloat(node.longitude);
-                if(longitude <= 100){
-                    longitude += 360;
-                }
-
-                // icon based on mqtt connection state
-                var icon = iconMqttDisconnected;
-
-                // use offline icon for nodes older than configured node offline age
-                const now = moment();
-                const configNodesOfflineAgeInSeconds = getConfigNodesOfflineAgeInSeconds();
-                if(configNodesOfflineAgeInSeconds){
-                    const lastUpdatedAgeInMillis = now.diff(moment(node.updated_at));
-                    if(lastUpdatedAgeInMillis > configNodesOfflineAgeInSeconds * 1000){
-                        icon = iconOffline;
-                    }
-                }
-
-                // determine if node was recently heard uplinking packets to mqtt
-                const nodeHasUplinkedToMqttRecently = hasNodeUplinkedToMqttRecently(node);
-                if(nodeHasUplinkedToMqttRecently){
-                    icon = iconMqttConnected;
-                }
-
-                // create node marker
-                var marker = L.marker([node.latitude, longitude], {
-                    icon: icon,
-                    tagName: node.node_id,
-                    // we want to show online nodes above offline, but without needing to use separate layer groups
-                    zIndexOffset: nodeHasUplinkedToMqttRecently ? 1000 : -1000,
-                }).on('click', function(event) {
-                    // close tooltip on click to prevent tooltip and popup showing at same time
-                    event.target.closeTooltip();
-                });
-
-                // add marker to node layer groups
-                marker.addTo(nodesLayerGroup);
-                nodesClusteredLayerGroup.addLayer(marker);
-
-                // add markers for routers and repeaters to routers layer group
-                if(node.role_name === "ROUTER"
-                    || node.role_name === "ROUTER_CLIENT"
-                    || node.role_name === "REPEATER"){
-                    nodesRouterLayerGroup.addLayer(marker);
-                }
-
-                // show tooltip on desktop only
-                if(!isMobile()){
-                    marker.bindTooltip(getTooltipContentForNode(node), {
-                        interactive: true,
-                    });
-                }
-
-                // show node info tooltip when clicking node marker
-                marker.on("click", function(event) {
-
-                    // close all other popups and tooltips
-                    closeAllTooltips();
-                    closeAllPopups();
-
-                    // find node
-                    const node = findNodeById(event.target.options.tagName);
-                    if(!node){
-                        return;
-                    }
-
-                    // show position precision outline
-                    showNodeOutline(node.node_id);
-
-                    // open tooltip for node
-                    map.openTooltip(getTooltipContentForNode(node), event.target.getLatLng(), {
-                        interactive: true, // allow clicking buttons inside tooltip
-                        permanent: true, // don't auto dismiss when clicking buttons inside tooltip
-                    });
-
-                });
-
-                // add to cache
-                nodeMarkers[node.node_id] = marker;
-
+            // skip nodes with invalid position
+            if(!isValidLatLng(node.latitude, node.longitude)){
+                continue;
             }
+
+            // wrap longitude for shortest path, everything to left of australia should be shown on the right
+            var longitude = parseFloat(node.longitude);
+            if(longitude <= 100){
+                longitude += 360;
+            }
+
+            // icon based on mqtt connection state
+            var icon = iconMqttDisconnected;
+
+            // use offline icon for nodes older than configured node offline age
+            if(configNodesOfflineAgeInSeconds){
+                const lastUpdatedAgeInMillis = now.diff(moment(node.updated_at));
+                if(lastUpdatedAgeInMillis > configNodesOfflineAgeInSeconds * 1000){
+                    icon = iconOffline;
+                }
+            }
+
+            // determine if node was recently heard uplinking packets to mqtt
+            const nodeHasUplinkedToMqttRecently = hasNodeUplinkedToMqttRecently(node);
+            if(nodeHasUplinkedToMqttRecently){
+                icon = iconMqttConnected;
+            }
+
+            // create node marker
+            const marker = L.marker([node.latitude, longitude], {
+                icon: icon,
+                tagName: node.node_id,
+                // we want to show online nodes above offline, but without needing to use separate layer groups
+                zIndexOffset: nodeHasUplinkedToMqttRecently ? 1000 : -1000,
+            }).on('click', function(event) {
+                // close tooltip on click to prevent tooltip and popup showing at same time
+                event.target.closeTooltip();
+            });
+
+            // add marker to node layer groups
+            marker.addTo(nodesLayerGroup);
+            nodesClusteredLayerGroup.addLayer(marker);
+
+            // add markers for routers and repeaters to routers layer group
+            if(node.role_name === "ROUTER"
+                || node.role_name === "ROUTER_CLIENT"
+                || node.role_name === "REPEATER"){
+                nodesRouterLayerGroup.addLayer(marker);
+            }
+
+            // show tooltip on desktop only
+            if(!isMobile()){
+                marker.bindTooltip(getTooltipContentForNode(node), {
+                    interactive: true,
+                });
+            }
+
+            // show node info tooltip when clicking node marker
+            marker.on("click", function(event) {
+
+                // close all other popups and tooltips
+                closeAllTooltips();
+                closeAllPopups();
+
+                // find node
+                const node = findNodeById(event.target.options.tagName);
+                if(!node){
+                    return;
+                }
+
+                // show position precision outline
+                showNodeOutline(node.node_id);
+
+                // open tooltip for node
+                map.openTooltip(getTooltipContentForNode(node), event.target.getLatLng(), {
+                    interactive: true, // allow clicking buttons inside tooltip
+                    permanent: true, // don't auto dismiss when clicking buttons inside tooltip
+                });
+
+            });
+
+            // add to cache
+            nodeMarkers[node.node_id] = marker;
 
         }
 
-        for(var node of updatedNodes){
+        for(const node of updatedNodes){
 
             // find current node
             const currentNode = findNodeMarkerById(node.node_id);
@@ -3522,12 +3520,14 @@
         // clear nodes cache
         waypoints = [];
 
+        // get config
+        const now = moment();
+        const configWaypointsMaxAgeInSeconds = getConfigWaypointsMaxAgeInSeconds();
+
         // add nodes
-        for(var waypoint of updatedWaypoints){
+        for(const waypoint of updatedWaypoints){
 
             // skip waypoints older than configured waypoint max age
-            const now = moment();
-            const configWaypointsMaxAgeInSeconds = getConfigWaypointsMaxAgeInSeconds();
             if(configWaypointsMaxAgeInSeconds){
                 const lastUpdatedAgeInMillis = now.diff(moment(waypoint.updated_at));
                 if(lastUpdatedAgeInMillis > configWaypointsMaxAgeInSeconds * 1000){
@@ -3540,7 +3540,7 @@
                 continue;
             }
 
-            // skip nodes without position
+            // skip waypoints without position
             if(!waypoint.latitude || !waypoint.longitude){
                 continue;
             }
@@ -3549,48 +3549,47 @@
             waypoint.latitude = waypoint.latitude / 10000000;
             waypoint.longitude = waypoint.longitude / 10000000;
 
-            var hasLocation = isValidLatLng(waypoint.latitude, waypoint.longitude);
-
-            if(hasLocation){
-
-                // wrap longitude for shortest path, everything to left of australia should be shown on the right
-                var longitude = parseFloat(waypoint.longitude);
-                if(longitude <= 100){
-                    longitude += 360;
-                }
-
-                // determine emoji to show as marker icon
-                const emoji = waypoint.icon === 0 ? 128205 : waypoint.icon;
-                const emojiText = String.fromCodePoint(emoji)
-
-                var tooltip = getTooltipContentForWaypoint(waypoint);
-
-                // create waypoint marker
-                var marker = L.marker([waypoint.latitude, longitude], {
-                    icon: L.divIcon({
-                        className: 'waypoint-label',
-                        iconSize: [26, 26], // increase from 12px to 26px
-                        html: emojiText,
-                    }),
-                }).bindPopup(tooltip).on('click', function(event) {
-                    // close tooltip on click to prevent tooltip and popup showing at same time
-                    event.target.closeTooltip();
-                });
-
-                // show tooltip on desktop only
-                if(!isMobile()){
-                    marker.bindTooltip(tooltip, {
-                        interactive: true,
-                    });
-                }
-
-                // add marker to waypoints layer groups
-                marker.addTo(waypointsLayerGroup);
-
-                // add to cache
-                waypoints.push(waypoint);
-
+            // skip waypoints with invalid position
+            if(!isValidLatLng(waypoint.latitude, waypoint.longitude)){
+                continue;
             }
+
+            // wrap longitude for shortest path, everything to left of australia should be shown on the right
+            var longitude = parseFloat(waypoint.longitude);
+            if(longitude <= 100){
+                longitude += 360;
+            }
+
+            // determine emoji to show as marker icon
+            const emoji = waypoint.icon === 0 ? 128205 : waypoint.icon;
+            const emojiText = String.fromCodePoint(emoji)
+
+            var tooltip = getTooltipContentForWaypoint(waypoint);
+
+            // create waypoint marker
+            const marker = L.marker([waypoint.latitude, longitude], {
+                icon: L.divIcon({
+                    className: 'waypoint-label',
+                    iconSize: [26, 26], // increase from 12px to 26px
+                    html: emojiText,
+                }),
+            }).bindPopup(tooltip).on('click', function(event) {
+                // close tooltip on click to prevent tooltip and popup showing at same time
+                event.target.closeTooltip();
+            });
+
+            // show tooltip on desktop only
+            if(!isMobile()){
+                marker.bindTooltip(tooltip, {
+                    interactive: true,
+                });
+            }
+
+            // add marker to waypoints layer groups
+            marker.addTo(waypointsLayerGroup);
+
+            // add to cache
+            waypoints.push(waypoint);
 
         }
 
@@ -3601,7 +3600,7 @@
         let positionHistoryLinesCords = [];
 
         // add nodes
-        for(var positionHistory of updatedPositionHistories) {
+        for(const positionHistory of updatedPositionHistories) {
 
             // skip position history without position
             if(!positionHistory.latitude || !positionHistory.longitude){
@@ -3618,46 +3617,46 @@
             positionHistory.latitude = positionHistory.latitude / 10000000;
             positionHistory.longitude = positionHistory.longitude / 10000000;
 
-            var hasLocation = isValidLatLng(positionHistory.latitude, positionHistory.longitude);
-            if(hasLocation){
-
-                // wrap longitude for shortest path, everything to left of australia should be shown on the right
-                var longitude = parseFloat(positionHistory.longitude);
-                if(longitude <= 100){
-                    longitude += 360;
-                }
-
-                positionHistoryLinesCords.push([positionHistory.latitude, longitude]);
-
-                let tooltip = "";
-                if(positionHistory.type === "position"){
-                    tooltip += `<b>Position</b>`;
-                } else if(positionHistory.type === "map_report"){
-                    tooltip += `<b>Map Report</b>`;
-                }
-                tooltip += `<br/>[${escapeString(node.short_name)}] ${escapeString(node.long_name)}`;
-                tooltip += `<br/>${positionHistory.latitude}, ${positionHistory.longitude}`;
-                tooltip += `<br/>Heard on: ${moment(new Date(positionHistory.created_at)).format("DD/MM/YYYY hh:mm A")}`;
-
-                // add gateway info if available
-                if(positionHistory.gateway_id){
-                    const gatewayNode = findNodeById(positionHistory.gateway_id);
-                    const gatewayNodeInfo = gatewayNode ? `[${gatewayNode.short_name}] ${gatewayNode.long_name}` : "???";
-                    tooltip += `<br/>Heard by: <a href="javascript:void(0);" onclick="goToNode(${positionHistory.gateway_id})">${gatewayNodeInfo}</a>`;
-                }
-
-                // create position history marker
-                const marker = L.marker([positionHistory.latitude, longitude],{
-                    icon: iconPositionHistory,
-                }).bindTooltip(tooltip).bindPopup(tooltip).on('click', function(event) {
-                    // close tooltip on click to prevent tooltip and popup showing at same time
-                    event.target.closeTooltip();
-                });
-
-                // add marker to position history layer group
-                marker.addTo(nodePositionHistoryLayerGroup);
-
+            // skip position history with invalid position
+            if(!isValidLatLng(positionHistory.latitude, positionHistory.longitude)){
+                continue;
             }
+
+            // wrap longitude for shortest path, everything to left of australia should be shown on the right
+            var longitude = parseFloat(positionHistory.longitude);
+            if(longitude <= 100){
+                longitude += 360;
+            }
+
+            positionHistoryLinesCords.push([positionHistory.latitude, longitude]);
+
+            let tooltip = "";
+            if(positionHistory.type === "position"){
+                tooltip += `<b>Position</b>`;
+            } else if(positionHistory.type === "map_report"){
+                tooltip += `<b>Map Report</b>`;
+            }
+            tooltip += `<br/>[${escapeString(node.short_name)}] ${escapeString(node.long_name)}`;
+            tooltip += `<br/>${positionHistory.latitude}, ${positionHistory.longitude}`;
+            tooltip += `<br/>Heard on: ${moment(new Date(positionHistory.created_at)).format("DD/MM/YYYY hh:mm A")}`;
+
+            // add gateway info if available
+            if(positionHistory.gateway_id){
+                const gatewayNode = findNodeById(positionHistory.gateway_id);
+                const gatewayNodeInfo = gatewayNode ? `[${gatewayNode.short_name}] ${gatewayNode.long_name}` : "???";
+                tooltip += `<br/>Heard by: <a href="javascript:void(0);" onclick="goToNode(${positionHistory.gateway_id})">${gatewayNodeInfo}</a>`;
+            }
+
+            // create position history marker
+            const marker = L.marker([positionHistory.latitude, longitude],{
+                icon: iconPositionHistory,
+            }).bindTooltip(tooltip).bindPopup(tooltip).on('click', function(event) {
+                // close tooltip on click to prevent tooltip and popup showing at same time
+                event.target.closeTooltip();
+            });
+
+            // add marker to position history layer group
+            marker.addTo(nodePositionHistoryLayerGroup);
 
         }
 
