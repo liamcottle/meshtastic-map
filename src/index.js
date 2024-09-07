@@ -115,8 +115,15 @@ app.get('/api', async (req, res) => {
 app.get('/api/v1/nodes', async (req, res) => {
     try {
 
+        // get query params
+        const hardwareModel = req.query.hardware_model ? parseInt(req.query.hardware_model) : undefined;
+
         // get nodes from db
-        const nodes = await prisma.node.findMany();
+        const nodes = await prisma.node.findMany({
+            where: {
+                hardware_model: hardwareModel,
+            },
+        });
 
         const nodesWithInfo = [];
         for(const node of nodes){
