@@ -3697,11 +3697,10 @@
         clearMap();
 
         // fetch nodes
-        await fetch('/api/v1/nodes').then(async (response) => {
+        await window.axios.get('/api/v1/nodes').then(async (response) => {
 
             // update nodes
-            var json = await response.json();
-            onNodesUpdated(json.nodes);
+            onNodesUpdated(response.data.nodes);
 
             // hide loading
             setLoading(false);
@@ -3722,12 +3721,8 @@
         });
 
         // fetch waypoints (after awaiting nodes, so we can use nodes cache in waypoint tooltips)
-        await fetch('/api/v1/waypoints').then(async (response) => {
-
-            // update waypoints
-            var json = await response.json();
-            onWaypointsUpdated(json.waypoints);
-
+        await window.axios.get('/api/v1/waypoints').then(async (response) => {
+            onWaypointsUpdated(response.data.waypoints);
         });
 
     }
