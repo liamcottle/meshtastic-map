@@ -116,11 +116,13 @@ app.get('/api/v1/nodes', async (req, res) => {
     try {
 
         // get query params
+        const role = req.query.role ? parseInt(req.query.role) : undefined;
         const hardwareModel = req.query.hardware_model ? parseInt(req.query.hardware_model) : undefined;
 
         // get nodes from db
         const nodes = await prisma.node.findMany({
             where: {
+                role: role,
                 hardware_model: hardwareModel,
             },
         });
