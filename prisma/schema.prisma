@@ -242,6 +242,9 @@ model TraceRoute {
   from          BigInt
   want_response Boolean
   route         Json
+  snr_towards   Json?
+  route_back    Json?
+  snr_back      Json?
 
   channel    Int?
   packet_id  BigInt?
