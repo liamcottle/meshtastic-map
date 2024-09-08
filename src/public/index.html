@@ -879,60 +879,67 @@
 
                             <!-- environment metrics -->
                             <div>
-                                <div class="bg-gray-200 p-2 font-semibold">Environment Metrics</div>
+                                <div class="flex bg-gray-200 p-2 font-semibold">
+                                    <div class="my-auto">Environment Metrics</div>
+                                    <div class="my-auto ml-auto">
+                                        <select v-model="environmentMetricsTimeRange" class="block w-full rounded-md border-0 py-0.5 pl-2 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 sm:text-sm sm:leading-6">
+                                            <option value="1d">1 Day</option>
+                                            <option value="3d">3 Days</option>
+                                            <option value="7d">7 Days</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <ul role="list" class="flex-1 divide-y divide-gray-200">
 
+                                    <!-- environment metrics chart -->
                                     <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="w-full">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Temperature</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.temperature">{{ formatTemperature(selectedNode.temperature) }}</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <canvas id="temperatureChart" style="width:150px;height:50px;"></canvas>
+                                        <div class="px-4 py-2">
+                                            <div class="w-full">
+                                                <canvas id="environmentMetricsChart" style="height:150px;"></canvas>
+                                                <div class="flex">
+                                                    <div class="mx-auto flex space-x-2">
+                                                        <div class="flex mx-auto">
+                                                            <div class="my-auto w-2 h-2 bg-blue-500 rounded-full"></div>
+                                                            <div class="my-auto ml-1 text-sm text-gray-500">Temperature</div>
+                                                        </div>
+                                                        <div class="flex mx-auto">
+                                                            <div class="my-auto w-2 h-2 bg-green-500 rounded-full"></div>
+                                                            <div class="my-auto ml-1 text-sm text-gray-500">Humidity</div>
+                                                        </div>
+                                                        <div class="flex mx-auto">
+                                                            <div class="my-auto w-2 h-2 bg-orange-500 rounded-full"></div>
+                                                            <div class="my-auto ml-1 text-sm text-gray-500">Pressure</div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </li>
 
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="w-full">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Relative Humidity</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.relative_humidity">{{ Number(selectedNode.relative_humidity).toFixed(0) }}%</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <canvas id="relativeHumidityChart" style="width:150px;height:50px;"></canvas>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <!-- temperature -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Temperature</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.temperature">{{ formatTemperature(selectedNode.temperature) }}</span>
+                                            <span v-else>???</span>
                                         </div>
                                     </li>
 
-                                    <li>
-                                        <div class="relative flex items-center">
-                                            <div class="block flex-1 px-4 py-2">
-                                                <div class="relative flex min-w-0 flex-1 items-center">
-                                                    <div class="w-full">
-                                                        <p class="truncate text-sm font-medium text-gray-900">Barometric Pressure</p>
-                                                        <p class="truncate text-sm text-gray-700">
-                                                            <span v-if="selectedNode.barometric_pressure">{{ Number(selectedNode.barometric_pressure).toFixed(1) }}hPa</span>
-                                                            <span v-else class="text-gray-500">???</span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <!-- relative humidity -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Relative Humidity</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.relative_humidity">{{ Number(selectedNode.relative_humidity).toFixed(0) }}%</span>
+                                            <span v-else>???</span>
+                                        </div>
+                                    </li>
+
+                                    <!-- barometric pressure -->
+                                    <li class="flex p-3">
+                                        <div class="text-sm font-medium text-gray-900">Barometric Pressure</div>
+                                        <div class="ml-auto text-sm text-gray-700">
+                                            <span v-if="selectedNode.barometric_pressure">{{ Number(selectedNode.barometric_pressure).toFixed(1) }}hPa</span>
+                                            <span v-else>???</span>
                                         </div>
                                     </li>
 
@@ -1813,6 +1820,7 @@
                 selectedNodeTraceroutes: [],
 
                 deviceMetricsTimeRange: "3d",
+                environmentMetricsTimeRange: "3d",
                 powerMetricsTimeRange: "3d",
 
                 isPositionHistoryModalExpanded: true,
@@ -1934,9 +1942,32 @@
                 });
             },
             loadNodeEnvironmentMetrics: function(nodeId) {
+
+                // calculate unix timestamps in milliseconds for supported time ranges
+                const oneDayAgoInMilliseconds = new Date().getTime() - (86400 * 1000);
+                const threeDaysAgoInMilliseconds = new Date().getTime() - (259200 * 1000);
+                const sevenDaysAgoInMilliseconds = new Date().getTime() - (604800 * 1000);
+
+                // determine how long back to load environment metrics from
+                var timeFrom = threeDaysAgoInMilliseconds;
+                switch(this.environmentMetricsTimeRange){
+                    case "1d": {
+                        timeFrom = oneDayAgoInMilliseconds;
+                        break;
+                    }
+                    case "3d": {
+                        timeFrom = threeDaysAgoInMilliseconds;
+                        break;
+                    }
+                    case "7d": {
+                        timeFrom = sevenDaysAgoInMilliseconds;
+                        break;
+                    }
+                }
+
                 window.axios.get(`/api/v1/nodes/${nodeId}/environment-metrics`, {
                     params: {
-                        count: 100,
+                        time_from: timeFrom,
                     },
                 }).then((response) => {
                     // reverse response, as it's newest to oldest, but we want oldest to newest
@@ -2136,129 +2167,127 @@
 
             },
             renderEnvironmentMetricCharts: function() {
-                this.updateTemperatureChart();
-                this.updateRelativeHumidityChart();
+                try {
+                    this.updateEnvironmentMetricsChart();
+                } catch(e) {
+                    console.log(e);
+                }
             },
-            updateTemperatureChart: function() {
+            updateEnvironmentMetricsChart: function() {
 
-                // get chart context
-                const ctx = window.document.getElementById('temperatureChart')?.getContext('2d');
-                if(!ctx){
+                // destroy existing chart
+                const chartElementId = "environmentMetricsChart";
+                const existingChart = window.Chart.getChart(chartElementId);
+                if(existingChart != null){
+                    existingChart.destroy();
+                }
+
+                // get chart element
+                const chartElement = window.document.getElementById(chartElementId);
+                if(!chartElement){
                     return;
                 }
 
-                // get temperature metrics
-                const environmentMetrics = this.selectedNodeEnvironmentMetrics.filter((environmentMetric) => {
-                    return environmentMetric.temperature != null;
-                });
+                // create chart data
+                const labels = [];
+                const temperatureMetrics = [];
+                const relativeHumidityMetrics = [];
+                const barometricPressureMetrics = [];
+                for(const deviceMetric of this.selectedNodeEnvironmentMetrics){
+                    labels.push(moment(deviceMetric.created_at));
+                    temperatureMetrics.push(deviceMetric.temperature);
+                    relativeHumidityMetrics.push(deviceMetric.relative_humidity);
+                    barometricPressureMetrics.push(deviceMetric.barometric_pressure);
+                }
 
-                new window.Chart(ctx, {
+                // create chart
+                new window.Chart(chartElement, {
                     type: 'line',
                     data: {
-                        labels: environmentMetrics.map((environmentMetric) => {
-                            return new Date(environmentMetric.created_at).toLocaleTimeString();
-                        }),
-                        datasets: [{
-                            label: 'Temperature',
-                            data: environmentMetrics.map((environmentMetric) => {
-                                return this.convertTemperature(environmentMetric.temperature);
-                            }),
-                            borderColor: '#22c55e',
-                            backgroundColor: '#e5e7eb',
-                            fill: true,
-                        }]
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Temperature',
+                                suffix: 'ºC',
+                                borderColor: '#3b82f6',
+                                backgroundColor: '#3b82f6',
+                                pointStyle: false, // no points
+                                fill: false,
+                                data: temperatureMetrics,
+                                yAxisID: 'y',
+                            },
+                            {
+                                label: 'Humidity',
+                                suffix: '%',
+                                borderColor: '#22c55e',
+                                backgroundColor: '#22c55e',
+                                pointStyle: false, // no points
+                                fill: false,
+                                data: relativeHumidityMetrics,
+                                yAxisID: 'y',
+                            },
+                            {
+                                label: 'Pressure',
+                                suffix: 'hPa',
+                                borderColor: '#f97316',
+                                backgroundColor: '#f97316',
+                                pointStyle: false, // no points
+                                fill: false,
+                                data: barometricPressureMetrics,
+                                yAxisID: 'y1',
+
+                            },
+                        ],
                     },
                     options: {
                         responsive: true,
-                        scales: {
-                            x: {
-                                display: false, // Hide x-axis labels
-                            },
-                            y: {
-                                display: false, // Hide y-axis labels
-                                min: -25,
-                                max: 200,
-                            },
-                        },
-                        plugins: {
-                            legend: {
-                                display: false, // Hide the legend
-                            },
-                            tooltip: {
-                                yAlign: 'top',
-                                intersect: false,
-                                displayColors: false,
-                                callbacks: {
-                                    label: (item) => item.formattedValue + this.getTemperatureUnit(),
-                                },
-                            },
-                        },
+                        borderWidth: 2,
+                        spanGaps: 1000 * 60 * 60 * 3, // only show lines between metrics with a 3 hour or less gap
                         elements: {
                             point: {
-                                radius: 0, // Set the radius to 0 to hide the dots
+                                radius: 2,
                             },
                         },
-                    }
-                });
-
-            },
-            updateRelativeHumidityChart: function() {
-
-                // get chart context
-                const ctx = window.document.getElementById('relativeHumidityChart')?.getContext('2d');
-                if(!ctx){
-                    return;
-                }
-
-                // get temperature metrics
-                const environmentMetrics = this.selectedNodeEnvironmentMetrics.filter((environmentMetric) => {
-                    return environmentMetric.relative_humidity != null;
-                });
-
-                new window.Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: environmentMetrics.map((environmentMetric) => {
-                            return new Date(environmentMetric.created_at).toLocaleTimeString();
-                        }),
-                        datasets: [{
-                            label: 'Relative Humidity',
-                            data: environmentMetrics.map((environmentMetric) => {
-                                return environmentMetric.relative_humidity;
-                            }),
-                            borderColor: '#22c55e',
-                            backgroundColor: '#e5e7eb',
-                            fill: true,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
                         scales: {
                             x: {
-                                display: false, // Hide x-axis labels
+                                position: 'top',
+                                type: 'time',
+                                time: {
+                                    unit: 'day',
+                                    displayFormats: {
+                                        day: 'MMM DD', // Jan 01
+                                    },
+                                },
                             },
                             y: {
-                                display: false, // Hide y-axis labels
                                 min: 0,
                                 max: 100,
                             },
-                        },
-                        plugins: {
-                            legend: {
-                                display: false, // Hide the legend
-                            },
-                            tooltip: {
-                                yAlign: 'top',
-                                intersect: false,
-                                displayColors: false,
-                                callbacks: {
-                                    label: (item) => item.formattedValue + "%",
+                            y1: {
+                                min: 0,
+                                max: 2000,
+                                ticks: {
+                                    stepSize: 100,
+                                    callback: (label) => `${label} hPa`,
+                                },
+                                position: 'right',
+                                grid: {
+                                    drawOnChartArea: false, // only want the grid lines for one axis to show up
                                 },
                             },
                         },
-                        elements: {
-                            point: {
-                                radius: 0, // Set the radius to 0 to hide the dots
+                        plugins: {
+                            legend: {
+                                display: false,
+                            },
+                            tooltip: {
+                                mode: "index",
+                                intersect: false,
+                                callbacks: {
+                                    label: (item) => {
+                                        return `${item.dataset.label}: ${item.formattedValue}${item.dataset.suffix}`;
+                                    },
+                                },
                             },
                         },
                     }
@@ -2663,6 +2692,9 @@
             },
             deviceMetricsTimeRange() {
                 this.loadNodeDeviceMetrics(this.selectedNode.node_id);
+            },
+            environmentMetricsTimeRange() {
+                this.loadNodeEnvironmentMetrics(this.selectedNode.node_id);
             },
             powerMetricsTimeRange() {
                 this.loadNodePowerMetrics(this.selectedNode.node_id);
