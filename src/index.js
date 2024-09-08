@@ -439,10 +439,29 @@ app.get('/api/v1/nodes/:nodeId/traceroutes', async (req, res) => {
 
         res.json({
             traceroutes: traceroutes.map((trace) => {
-                if (typeof(trace.route) === "string") {
+
+                // ensure route is json array
+                if(typeof(trace.route) === "string"){
                     trace.route = JSON.parse(trace.route);
                 }
+
+                // ensure route_back is json array
+                if(typeof(trace.route_back) === "string"){
+                    trace.route_back = JSON.parse(trace.route_back);
+                }
+
+                // ensure snr_towards is json array
+                if(typeof(trace.snr_towards) === "string"){
+                    trace.snr_towards = JSON.parse(trace.snr_towards);
+                }
+
+                // ensure snr_back is json array
+                if(typeof(trace.snr_back) === "string"){
+                    trace.snr_back = JSON.parse(trace.snr_back);
+                }
+
                 return trace;
+
             }),
         });
 
