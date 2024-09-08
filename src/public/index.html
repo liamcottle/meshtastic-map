@@ -1217,15 +1217,19 @@
 
                             <!-- details -->
                             <div class="p-2">
-                                <ul role="list" class="space-y-6">
+                                <ul role="list" class="space-y-3">
 
                                     <!-- node that initiated traceroute -->
                                     <li :onclick="`goToNode(${selectedTraceRoute.to})`" class="relative flex gap-x-4">
-                                        <div class="absolute left-0 top-0 flex w-6 justify-center top-6 -bottom-6">
+                                        <div class="absolute left-0 top-0 flex w-12 justify-center top-3 -bottom-3">
                                             <div class="w-px bg-gray-200"></div>
                                         </div>
-                                        <div class="my-auto relative flex h-6 w-6 flex-none items-center justify-center bg-white">
-                                            <div class="h-4 w-4 rounded-full bg-gray-100 ring-1 ring-gray-300"></div>
+                                        <div class="my-auto relative flex flex-none items-center justify-center">
+                                            <div>
+                                                <div class="flex rounded-full h-12 w-12 text-white shadow" :class="[ `bg-[${getNodeColour(selectedTraceRoute.to)}]`, `text-[${getNodeTextColour(selectedTraceRoute.to)}]` ]">
+                                                    <div class="mx-auto my-auto drop-shadow-sm">{{ findNodeById(selectedTraceRoute.to)?.short_name ?? "?" }}</div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
                                             <div class="font-medium text-gray-900">{{ findNodeById(selectedTraceRoute.to)?.long_name || '???' }}</div>
@@ -1236,11 +1240,15 @@
 
                                     <!-- middleman nodes -->
                                     <li :onclick="`goToNode(${route})`" v-for="route of selectedTraceRoute.route" class="relative flex gap-x-4">
-                                        <div class="absolute left-0 top-0 flex w-6 justify-center -bottom-6">
+                                        <div class="absolute left-0 top-0 flex w-12 justify-center -bottom-3">
                                             <div class="w-px bg-gray-200"></div>
                                         </div>
-                                        <div class="my-auto relative flex h-6 w-6 flex-none items-center justify-center bg-white">
-                                            <div class="h-4 w-4 rounded-full bg-gray-100 ring-1 ring-gray-300"></div>
+                                        <div class="my-auto relative flex flex-none items-center justify-center">
+                                            <div>
+                                                <div class="flex rounded-full h-12 w-12 text-white shadow" :class="[ `bg-[${getNodeColour(route)}]`, `text-[${getNodeTextColour(route)}]` ]">
+                                                    <div class="mx-auto my-auto drop-shadow-sm">{{ findNodeById(route)?.short_name ?? "?" }}</div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
                                             <div class="font-medium text-gray-900">{{ findNodeById(route)?.long_name || '???' }}</div>
@@ -1251,11 +1259,15 @@
 
                                     <!-- node that replied to traceroute -->
                                     <li :onclick="`goToNode(${selectedTraceRoute.from})`" v-if="selectedTraceRoute.from" class="relative flex gap-x-4">
-                                        <div class="absolute left-0 top-0 flex w-6 justify-center -bottom-6">
+                                        <div class="absolute left-0 top-0 flex w-12 justify-center -bottom-3">
                                             <div class="w-px bg-gray-200"></div>
                                         </div>
-                                        <div class="my-auto relative flex h-6 w-6 flex-none items-center justify-center bg-white">
-                                            <div class="h-4 w-4 rounded-full bg-gray-100 ring-1 ring-gray-300"></div>
+                                        <div class="my-auto relative flex flex-none items-center justify-center">
+                                            <div>
+                                                <div class="flex rounded-full h-12 w-12 text-white shadow" :class="[ `bg-[${getNodeColour(selectedTraceRoute.from)}]`, `text-[${getNodeTextColour(selectedTraceRoute.from)}]` ]">
+                                                    <div class="mx-auto my-auto drop-shadow-sm">{{ findNodeById(selectedTraceRoute.from)?.short_name ?? "?" }}</div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
                                             <div class="font-medium text-gray-900">{{ findNodeById(selectedTraceRoute.from)?.long_name || '???' }}</div>
@@ -1266,13 +1278,15 @@
 
                                     <!-- node that gated traceroute to mqtt -->
                                     <li :onclick="`goToNode(${selectedTraceRoute.gateway_id})`" v-if="selectedTraceRoute.gateway_id" class="relative flex gap-x-4">
-                                        <div class="absolute left-0 top-0 flex w-6 justify-center h-6">
+                                        <div class="absolute left-0 top-0 flex w-12 justify-center h-6">
                                             <div class="w-px bg-gray-200"></div>
                                         </div>
-                                        <div class="my-auto relative flex h-6 w-6 flex-none items-center justify-center bg-white">
-                                            <svg class="h-6 w-6 text-green-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                                <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
-                                            </svg>
+                                        <div class="my-auto relative flex flex-none items-center justify-center">
+                                            <div>
+                                                <div class="flex rounded-full h-12 w-12 text-white shadow" :class="[ `bg-[${getNodeColour(selectedTraceRoute.gateway_id)}]`, `text-[${getNodeTextColour(selectedTraceRoute.gateway_id)}]` ]">
+                                                    <div class="mx-auto my-auto drop-shadow-sm">{{ findNodeById(selectedTraceRoute.gateway_id)?.short_name ?? "?" }}</div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
                                             <div class="font-medium text-gray-900">{{ findNodeById(selectedTraceRoute.gateway_id)?.long_name || '???' }}</div>
