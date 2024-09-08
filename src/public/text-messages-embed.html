@@ -79,6 +79,7 @@
                                 <div class="w-full space-y-0.5 px-2.5 py-1" v-html="escapeMessageText(message.text)" style="white-space:pre-wrap;word-break:break-word;"></div>
                                 <div v-if="message.is_details_expanded" class="text-xs text-gray-500 px-2 py-1">
                                     <span :title="message.created_at">{{ moment(new Date(message.created_at)).fromNow() }}</span>
+                                    <span> • Gated by <a target="_blank" :href="`/?node_id=${message.gateway_id}`" class="hover:text-blue-500">{{ getNodeName(message.gateway_id) }}</a></span>
                                 </div>
                             </div>
                         </div>
@@ -216,6 +217,7 @@
                     for(const message of messages){
                         await this.fetchNodeInfo(message.to);
                         await this.fetchNodeInfo(message.from);
+                        await this.fetchNodeInfo(message.gateway_id);
                     }
 
                 } catch(e) {
@@ -264,6 +266,7 @@
                     for(const message of messages){
                         await this.fetchNodeInfo(message.to);
                         await this.fetchNodeInfo(message.from);
+                        await this.fetchNodeInfo(message.gateway_id);
                     }
 
                 } catch(e) {
@@ -305,12 +308,15 @@
                     container.scrollTop = container.scrollHeight;
                 });
             },
+            getNodeHexId(nodeId) {
+                return "!" + parseInt(nodeId).toString(16);
+            },
             getNodeName(nodeId) {
 
                 // find node by id
                 const node = this.nodesById[nodeId];
                 if(!node){
-                    return "Unknown";
+                    return this.getNodeHexId(nodeId);
                 }
 
                 return `[${node.short_name}] ${node.long_name}`;
@@ -320,7 +326,7 @@
                 return this.nodesById[nodeId]?.short_name?.substring(0, 4) ?? "?";
             },
             getNodeLongName(nodeId) {
-                return this.nodesById[nodeId]?.long_name ?? "???";
+                return this.nodesById[nodeId]?.long_name ?? this.getNodeHexId(nodeId);
             },
             getNodeColour(nodeId) {
                 // convert node id to a hex colour
