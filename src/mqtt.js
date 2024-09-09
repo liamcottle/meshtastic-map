@@ -1122,15 +1122,6 @@ client.on("message", async (topic, message) => {
 
             const mapReport = MapReport.decode(envelope.packet.decoded.payload);
 
-            // congrats! you got blocked for spamming map reports with 0 sec interval. your map reports will be ignored.
-            // fix your settings and update your firmware to automatically get unblocked :)
-            if(envelope.packet.from === 3774324368 && mapReport.firmwareVersion === "2.3.0.5f47ca1" // [3202] T-Beam 3202
-                || envelope.packet.from === 3663859228 && mapReport.firmwareVersion === "2.3.1.4fa7f5a" // [chrs] chris
-                || envelope.packet.from === 1153561478 && mapReport.firmwareVersion === "2.3.1.4fa7f5a" // [Desc] Descend
-                || envelope.packet.from === 3664091724 && mapReport.firmwareVersion === "2.3.0.5f47ca1"){ // [Del1] Delaware_Mesh
-                return;
-            }
-
             if(logKnownPacketTypes) {
                 console.log("MAP_REPORT_APP", {
                     from: envelope.packet.from.toString(16),
