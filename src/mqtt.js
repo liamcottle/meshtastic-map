@@ -44,6 +44,11 @@ const optionsList = [
         description: "MQTT Topic to subscribe to (e.g: msh/#)",
     },
     {
+        name: "log-unknown-portnums",
+        type: Boolean,
+        description: "This option will log packets for unknown portnums to the console.",
+    },
+    {
         name: "collect-service-envelopes",
         type: Boolean,
         description: "This option will save all received service envelopes to the database.",
@@ -172,6 +177,7 @@ const mqttUsername = options["mqtt-username"] ?? "meshdev";
 const mqttPassword = options["mqtt-password"] ?? "large4cats";
 const mqttClientId = options["mqtt-client-id"] ?? null;
 const mqttTopics = options["mqtt-topic"] ?? ["msh/#"];
+const logUnknownPortnums = options["log-unknown-portnums"] ?? false;
 const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
 const collectPositions = options["collect-positions"] ?? true;
 const collectTextMessages = options["collect-text-messages"] ?? false;
@@ -655,7 +661,6 @@ client.on("message", async (topic, message) => {
         }
 
         const logKnownPacketTypes = false;
-        const logUnknownPacketTypes = false;
         const portnum = envelope.packet?.decoded?.portnum;
 
         if(portnum === 1) {
@@ -1212,7 +1217,7 @@ client.on("message", async (topic, message) => {
         }
 
         else {
-            if(logUnknownPacketTypes){
+            if(logUnknownPortnums){
 
                 // ignore packets we don't want to see for now
                 if(portnum === undefined // ignore failed to decrypt
