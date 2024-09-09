@@ -44,6 +44,13 @@ const optionsList = [
         description: "MQTT Topic to subscribe to (e.g: msh/#)",
     },
     {
+        name: "allowed-portnums",
+        type: Number,
+        multiple: true,
+        typeLabel: '<portnum> ...',
+        description: "If provided, only packets with these portnums will be processed.",
+    },
+    {
         name: "log-unknown-portnums",
         type: Boolean,
         description: "This option will log packets for unknown portnums to the console.",
@@ -177,6 +184,7 @@ const mqttUsername = options["mqtt-username"] ?? "meshdev";
 const mqttPassword = options["mqtt-password"] ?? "large4cats";
 const mqttClientId = options["mqtt-client-id"] ?? null;
 const mqttTopics = options["mqtt-topic"] ?? ["msh/#"];
+const allowedPortnums = options["allowed-portnums"] ?? null;
 const logUnknownPortnums = options["log-unknown-portnums"] ?? false;
 const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
 const collectPositions = options["collect-positions"] ?? true;
@@ -662,6 +670,11 @@ client.on("message", async (topic, message) => {
 
         const logKnownPacketTypes = false;
         const portnum = envelope.packet?.decoded?.portnum;
+
+        // if allowed portnums are configured, ignore portnums that are not in the list
+        if(allowedPortnums != null && !allowedPortnums.includes(portnum)){
+            return;
+        }
 
         if(portnum === 1) {
 
