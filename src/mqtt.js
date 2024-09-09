@@ -734,6 +734,7 @@ client.on("message", async (topic, message) => {
                 }
             }
 
+            // don't collect position history if not enabled, but we still want to update the node above
             if(!collectPositions){
                 return;
             }
@@ -1170,6 +1171,7 @@ client.on("message", async (topic, message) => {
                 console.error(e);
             }
 
+            // don't collect map report history if not enabled, but we still want to update the node above
             if(!collectMapReports){
                 return;
             }
