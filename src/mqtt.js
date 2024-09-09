@@ -187,12 +187,12 @@ const mqttTopics = options["mqtt-topic"] ?? ["msh/#"];
 const allowedPortnums = options["allowed-portnums"] ?? null;
 const logUnknownPortnums = options["log-unknown-portnums"] ?? false;
 const collectServiceEnvelopes = options["collect-service-envelopes"] ?? false;
-const collectPositions = options["collect-positions"] ?? true;
+const collectPositions = options["collect-positions"] ?? false;
 const collectTextMessages = options["collect-text-messages"] ?? false;
 const ignoreDirectMessages = options["ignore-direct-messages"] ?? false;
-const collectWaypoints = options["collect-waypoints"] ?? true;
+const collectWaypoints = options["collect-waypoints"] ?? false;
 const collectNeighbourInfo = options["collect-neighbour-info"] ?? false;
-const collectMapReports = options["collect-map-reports"] ?? true;
+const collectMapReports = options["collect-map-reports"] ?? false;
 const decryptionKeys = options["decryption-keys"] ?? [
     "1PG7OiApB1nwvP+rz05pAQ==", // add default "AQ==" decryption key
 ];
