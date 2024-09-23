@@ -209,6 +209,7 @@ const purgeTextMessagesAfterSeconds = options["purge-text-messages-after-seconds
 const purgeTraceroutesAfterSeconds = options["purge-traceroutes-after-seconds"] ?? null;
 const purgeWaypointsAfterSeconds = options["purge-waypoints-after-seconds"] ?? null;
 const obfuscatePositions = options["obfuscate-positions"] ?? false;
+const obfuscatePrecision = options["obfuscate-precision"] ?? 2;
 
 // create mqtt client
 const client = mqtt.connect(mqttBrokerUrl, {
@@ -622,10 +623,10 @@ function obfuscateCoordinate(coordinate) {
     if (coordinate.includes(".")) {
         const parts = coordinate.split(".");
         let precisionPart = parts[1];
-        // This will catch anything 1.1km or more precise, or two decimal places
-        if (parts[1].length > 1) {
+        // Takes the configurable precision, and randomizes the last point of precision
+        if (parts[1].length >= obfuscatePrecision) {
             // Take only the first digit
-            precisionPart = precisionPart.substring(0, 1);
+            precisionPart = precisionPart.substring(0, obfuscatePrecision - 1);
             // Add a random digit for the 1.1km precision point
             precisionPart += Math.floor(Math.random() * 10);
         }
