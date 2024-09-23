@@ -208,6 +208,7 @@ const purgeServiceEnvelopesAfterSeconds = options["purge-service-envelopes-after
 const purgeTextMessagesAfterSeconds = options["purge-text-messages-after-seconds"] ?? null;
 const purgeTraceroutesAfterSeconds = options["purge-traceroutes-after-seconds"] ?? null;
 const purgeWaypointsAfterSeconds = options["purge-waypoints-after-seconds"] ?? null;
+const obfuscatePositions = options["obfuscate-positions"] ?? false;
 
 // create mqtt client
 const client = mqtt.connect(mqttBrokerUrl, {
@@ -614,6 +615,9 @@ function convertHexIdToNumericId(hexId) {
  * @returns {coordinate} the obfuscated coordinate
  */
 function obfuscateCoordinate(coordinate) {
+    // Only obfuscate if option enabled
+    if (!obfuscatePositions) return coordinate;
+
     // Leave this as a string rather than try to unnecessarily parseFloat
     if (coordinate.includes(".")) {
         const parts = coordinate.split(".");
