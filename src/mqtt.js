@@ -608,6 +608,28 @@ function convertHexIdToNumericId(hexId) {
     return BigInt('0x' + hexId.replaceAll("!", ""));
 }
 
+/**
+ * Obfuscates overly precise location data
+ * @param coordinate the original coordinate (lat or lng)
+ * @returns {coordinate} the obfuscated coordinate
+ */
+function obfuscateCoordinate(coordinate) {
+    // Leave this as a string rather than try to unnecessarily parseFloat
+    if (coordinate.includes(".")) {
+        const parts = coordinate.split(".");
+        let precisionPart = parts[1];
+        // This will catch anything 1.1km or more precise, or two decimal places
+        if (parts[1].length > 1) {
+            // Take only the first digit
+            precisionPart = precisionPart.substring(0, 1);
+            // Add a random digit for the 1.1km precision point
+            precisionPart += Math.floor(Math.random() * 10);
+        }
+        return parts[0] + "." + precisionPart;
+    }
+    return coordinate;
+}
+
 // subscribe to everything when connected
 client.on("connect", () => {
     for(const mqttTopic of mqttTopics){
