@@ -157,6 +157,16 @@ const optionsList = [
         type: Number,
         description: "Waypoints older than this many seconds will be purged from the database.",
     },
+    {
+        name: "obfuscate-positions",
+        type: Boolean,
+        description: "Automatically obfuscate position reports.",
+    },
+    {
+        name: "obfuscate-precision",
+        type: Number,
+        description: "Number of decimal points of precision to retain.",
+    },
 ];
 
 // parse command line args
