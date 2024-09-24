@@ -622,27 +622,27 @@ function convertHexIdToNumericId(hexId) {
 
 /**
  * Obfuscates overly precise location data
- * @param coordinate the original coordinate (lat or lng)
- * @returns {coordinate} the obfuscated coordinate
+ * @param coordinateI the original coordinate (lat or lng) as an integer
+ * @returns {coordinateI} the obfuscated coordinate as an integer
  */
-function obfuscateCoordinate(coordinate) {
+function obfuscateCoordinate(coordinateI) {
     // Only obfuscate if option enabled
-    if (!obfuscatePositions) return coordinate;
+    if (!obfuscatePositions) return coordinateI;
+
+		// Coordinates come in as integers
+    const coordinateS = (coordinateI * .0000001).toString();
 
     // Leave this as a string rather than try to unnecessarily parseFloat
-    if (coordinate.includes(".")) {
-        const parts = coordinate.split(".");
-        let precisionPart = parts[1];
-        // Takes the configurable precision, and randomizes the last point of precision
-        if (parts[1].length >= obfuscatePrecision) {
-            // Take only the first digit
-            precisionPart = precisionPart.substring(0, obfuscatePrecision - 1);
-            // Add a random digit for the 1.1km precision point
-            precisionPart += Math.floor(Math.random() * 10);
-        }
-        return parts[0] + "." + precisionPart;
+    const parts = coordinateS.split(".");
+    let precisionPart = parts[1];
+    // Takes the configurable precision, and randomizes the last point of precision
+    if (precisionPart.length >= obfuscatePrecision) {
+        // Take only the first digit
+        precisionPart = precisionPart.substring(0, obfuscatePrecision - 1);
+        // Add a random digit for the 1.1km precision point
+        precisionPart += Math.floor(Math.random() * 10);
     }
-    return coordinate;
+    return parseFloat(parts[0] + "." + precisionPart) * 10000000;
 }
 
 // subscribe to everything when connected
