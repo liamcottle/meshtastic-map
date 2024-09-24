@@ -642,7 +642,7 @@ function obfuscateCoordinate(coordinateI) {
         // Add a random digit for the 1.1km precision point
         precisionPart += Math.floor(Math.random() * 10);
     }
-    return parseFloat(parts[0] + "." + precisionPart) * 10000000;
+    return (parts[0] + precisionPart) * 100000;
 }
 
 // subscribe to everything when connected
