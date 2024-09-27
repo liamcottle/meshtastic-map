@@ -427,7 +427,7 @@
                                             <div class="font-semibold">How do I add my node to the map?</div>
                                             <div>Your node, or a node that hears your node must uplink to our MQTT server.</div>
                                             <div>Your position packet must be unencrypted, or encrypted with the default key.</div>
-                                            <div>If your node is on v2.5 firmware or newer, you must enable "OK to MQTT".</div>
+                                            <div>If your node has v2.5 firmware or newer, you must enable "OK to MQTT".</div>
                                             <div>Use the MQTT server details below to uplink to this map.</div>
                                         </div>
                                         <div class="bg-gray-100 rounded p-2 border border-gray-200">
@@ -448,6 +448,7 @@
                                             <div>Nodes that have not been heard for 7 days are automatically removed.</div>
                                             <div>Disable position reporting in your node to prevent it coming back.</div>
                                             <div>Use custom encryption keys so the public can't see your position data.</div>
+                                            <div>If your node has v2.5 firmware or newer, we ignore packets if "OK to MQTT" is disabled.</div>
                                             <div>To have your node removed now, please <a target="_blank" href="https://liamcottle.com/contact" class="link">contact me</a>.</div>
                                         </div>
                                         <div class="bg-gray-100 rounded p-2 border border-gray-200">
