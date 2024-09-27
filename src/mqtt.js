@@ -9,6 +9,10 @@ const commandLineUsage = require("command-line-usage");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+// meshtastic bitfield flags
+const BITFIELD_OK_TO_MQTT_SHIFT = 0;
+const BITFIELD_OK_TO_MQTT_MASK = (1 << BITFIELD_OK_TO_MQTT_SHIFT);
+
 const optionsList = [
     {
         name: 'help',
@@ -96,6 +100,11 @@ const optionsList = [
         multiple: true,
         typeLabel: '<base64DecryptionKey> ...',
         description: "Decryption keys encoded in base64 to use when decrypting service envelopes.",
+    },
+    {
+        name: "drop-packets-not-ok-to-mqtt",
+        type: Boolean,
+        description: "This option will drop all packets that have 'OK to MQTT' set to false.",
     },
     {
         name: "purge-interval-seconds",
@@ -196,6 +205,7 @@ const collectMapReports = options["collect-map-reports"] ?? false;
 const decryptionKeys = options["decryption-keys"] ?? [
     "1PG7OiApB1nwvP+rz05pAQ==", // add default "AQ==" decryption key
 ];
+const dropPacketsNotOkToMqtt = options["drop-packets-not-ok-to-mqtt"] ?? false;
 const purgeIntervalSeconds = options["purge-interval-seconds"] ?? 10;
 const purgeNodesUnheardForSeconds = options["purge-nodes-unheard-for-seconds"] ?? null;
 const purgeDeviceMetricsAfterSeconds = options["purge-device-metrics-after-seconds"] ?? null;
@@ -625,6 +635,36 @@ client.on("message", async (topic, message) => {
             return;
         }
 
+        // attempt to decrypt encrypted packets
+        const isEncrypted = envelope.packet.encrypted?.length > 0;
+        if(isEncrypted){
+            const decoded = decrypt(envelope.packet);
+            if(decoded){
+                envelope.packet.decoded = decoded;
+            }
+        }
+
+        // check if we can see the decrypted packet data, so we can see if it has the "OK to MQTT" bitfield flag set
+        if(envelope.packet.decoded != null){
+
+            // get bitfield from decoded packet
+            // bitfield was added in v2.5 of meshtastic firmware
+            // this value will be null for packets from v2.4.x and below, and will be an integer in v2.5.x and above
+            const bitfield = envelope.packet.decoded.bitfield;
+
+            // check if bitfield is available (v2.5.x firmware or newer)
+            if(bitfield != null){
+
+                // drop packets where "OK to MQTT" is false
+                const isOkToMqtt = bitfield & BITFIELD_OK_TO_MQTT_MASK;
+                if(dropPacketsNotOkToMqtt && !isOkToMqtt){
+                    return;
+                }
+
+            }
+
+        }
+
         // create service envelope in db
         if(collectServiceEnvelopes){
             try {
@@ -657,15 +697,6 @@ client.on("message", async (topic, message) => {
             });
         } catch(e) {
             // don't care if updating mqtt timestamp fails
-        }
-
-        // attempt to decrypt encrypted packets
-        const isEncrypted = envelope.packet.encrypted?.length > 0;
-        if(isEncrypted){
-            const decoded = decrypt(envelope.packet);
-            if(decoded){
-                envelope.packet.decoded = decoded;
-            }
         }
 
         const logKnownPacketTypes = false;
