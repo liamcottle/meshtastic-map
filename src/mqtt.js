@@ -107,6 +107,13 @@ const optionsList = [
         description: "This option will drop all packets that have 'OK to MQTT' set to false.",
     },
     {
+        name: "drop-portnums-without-bitfield",
+        type: Number,
+        multiple: true,
+        typeLabel: '<portnum> ...',
+        description: "If provided, packets with these portnums will be dropped if they don't have a bitfield. (bitfield available from firmware v2.5+)",
+    },
+    {
         name: "purge-interval-seconds",
         type: Number,
         description: "How long to wait between each automatic database purge.",
@@ -206,6 +213,7 @@ const decryptionKeys = options["decryption-keys"] ?? [
     "1PG7OiApB1nwvP+rz05pAQ==", // add default "AQ==" decryption key
 ];
 const dropPacketsNotOkToMqtt = options["drop-packets-not-ok-to-mqtt"] ?? false;
+const dropPortnumsWithoutBitfield = options["drop-portnums-without-bitfield"] ?? null;
 const purgeIntervalSeconds = options["purge-interval-seconds"] ?? 10;
 const purgeNodesUnheardForSeconds = options["purge-nodes-unheard-for-seconds"] ?? null;
 const purgeDeviceMetricsAfterSeconds = options["purge-device-metrics-after-seconds"] ?? null;
@@ -644,6 +652,9 @@ client.on("message", async (topic, message) => {
             }
         }
 
+        // get portnum from packet
+        const portnum = envelope.packet?.decoded?.portnum;
+
         // check if we can see the decrypted packet data, so we can see if it has the "OK to MQTT" bitfield flag set
         if(envelope.packet.decoded != null){
 
@@ -658,6 +669,17 @@ client.on("message", async (topic, message) => {
                 // drop packets where "OK to MQTT" is false
                 const isOkToMqtt = bitfield & BITFIELD_OK_TO_MQTT_MASK;
                 if(dropPacketsNotOkToMqtt && !isOkToMqtt){
+                    return;
+                }
+
+            }
+
+            // if bitfield is not available for this packet, check if we want to drop this portnum
+            if(bitfield == null){
+
+                // drop packet if portnum is in drop list
+                // this is useful for dropping specific packet types from firmware older than v2.5
+                if(dropPortnumsWithoutBitfield != null && dropPortnumsWithoutBitfield.includes(portnum)){
                     return;
                 }
 
@@ -700,7 +722,6 @@ client.on("message", async (topic, message) => {
         }
 
         const logKnownPacketTypes = false;
-        const portnum = envelope.packet?.decoded?.portnum;
 
         // if allowed portnums are configured, ignore portnums that are not in the list
         if(allowedPortnums != null && !allowedPortnums.includes(portnum)){
