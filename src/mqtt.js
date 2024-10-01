@@ -4,6 +4,7 @@ const mqtt = require("mqtt");
 const protobufjs = require("protobufjs");
 const commandLineArgs = require("command-line-args");
 const commandLineUsage = require("command-line-usage");
+const PositionUtil = require("./utils/position_util");
 
 // create prisma db client
 const { PrismaClient } = require("@prisma/client");
@@ -114,6 +115,11 @@ const optionsList = [
         description: "If provided, packets with these portnums will be dropped if they don't have a bitfield. (bitfield available from firmware v2.5+)",
     },
     {
+        name: "old-firmware-position-precision",
+        type: Number,
+        description: "If provided, position packets from firmware v2.4 and older will be truncated to this many decimal places.",
+    },
+    {
         name: "purge-interval-seconds",
         type: Number,
         description: "How long to wait between each automatic database purge.",
@@ -214,6 +220,7 @@ const decryptionKeys = options["decryption-keys"] ?? [
 ];
 const dropPacketsNotOkToMqtt = options["drop-packets-not-ok-to-mqtt"] ?? false;
 const dropPortnumsWithoutBitfield = options["drop-portnums-without-bitfield"] ?? null;
+const oldFirmwarePositionPrecision = options["old-firmware-position-precision"] ?? null;
 const purgeIntervalSeconds = options["purge-interval-seconds"] ?? 10;
 const purgeNodesUnheardForSeconds = options["purge-nodes-unheard-for-seconds"] ?? null;
 const purgeDeviceMetricsAfterSeconds = options["purge-device-metrics-after-seconds"] ?? null;
@@ -652,16 +659,16 @@ client.on("message", async (topic, message) => {
             }
         }
 
-        // get portnum from packet
+        // get portnum from decoded packet
         const portnum = envelope.packet?.decoded?.portnum;
 
-        // check if we can see the decrypted packet data, so we can see if it has the "OK to MQTT" bitfield flag set
-        if(envelope.packet.decoded != null){
+        // get bitfield from decoded packet
+        // bitfield was added in v2.5 of meshtastic firmware
+        // this value will be null for packets from v2.4.x and below, and will be an integer in v2.5.x and above
+        const bitfield = envelope.packet?.decoded?.bitfield;
 
-            // get bitfield from decoded packet
-            // bitfield was added in v2.5 of meshtastic firmware
-            // this value will be null for packets from v2.4.x and below, and will be an integer in v2.5.x and above
-            const bitfield = envelope.packet.decoded.bitfield;
+        // check if we can see the decrypted packet data
+        if(envelope.packet.decoded != null){
 
             // check if bitfield is available (v2.5.x firmware or newer)
             if(bitfield != null){
@@ -780,8 +787,35 @@ client.on("message", async (topic, message) => {
                 });
             }
 
-            // update node position in db
+            // process position
             if(position.latitudeI != null && position.longitudeI){
+
+                // if bitfield is not available, we are on firmware v2.4 or below
+                // if configured, truncate position packets to the provided number of decimal places
+                if(bitfield == null && oldFirmwarePositionPrecision != null){
+
+                    // convert lat/long to decimal as string
+                    // e.g: -123456789 -> -12.3456789
+                    const latitudeString = (position.latitudeI / 10000000).toString();
+                    const longitudeString = (position.longitudeI / 10000000).toString();
+
+                    // truncate to desired length
+                    const truncatedLatitudeString = PositionUtil.truncateDecimalPlaces(latitudeString, oldFirmwarePositionPrecision);
+                    const truncatedLongitudeString = PositionUtil.truncateDecimalPlaces(longitudeString, oldFirmwarePositionPrecision);
+
+                    // convert lat/long string back to integer from decimal
+                    // e.g: -12.3456789 -> -123456789
+                    // fixme: sometimes we may get xx.xx99999 recurring, but don't worry about that for now, since we are mangling the precision anyway...
+                    const truncatedLatitudeI = parseInt(parseFloat(truncatedLatitudeString) * 10000000);
+                    const truncatedLongitudeI = parseInt(parseFloat(truncatedLongitudeString) * 10000000);
+
+                    // update position packet with truncated lat/long
+                    position.latitudeI = truncatedLatitudeI;
+                    position.longitudeI = truncatedLongitudeI;
+
+                }
+
+                // update node position in db
                 try {
                     await prisma.node.updateMany({
                         where: {
@@ -797,6 +831,7 @@ client.on("message", async (topic, message) => {
                 } catch (e) {
                     console.error(e);
                 }
+
             }
 
             // don't collect position history if not enabled, but we still want to update the node above
