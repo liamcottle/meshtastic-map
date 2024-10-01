@@ -157,6 +157,8 @@ node src/mqtt.js --mqtt-broker-url mqtt://mqtt.example.com --mqtt-username usern
 
 ## MQTT Connection Status
 
+> TODO: update this section as this info is now outdated. MQTT status is determined based on a timestamp we update when a packet is gated to MQTT by that node.
+
 The map shows a different coloured icon for nodes based on their connection state to MQTT.
 
 - `Green`: Online (connected to MQTT)
