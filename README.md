@@ -201,6 +201,14 @@ This will:
 - Start the Map UI.
 - Expose the map on port 8080.
 
+## Testing
+
+To execute unit tests, run the following;
+
+```
+npm run test
+```
+
 ## Contributing
 
 If you have a feature request, or find a bug, please [open an issue](https://github.com/liamcottle/meshtastic-map/issues) here on GitHub.
