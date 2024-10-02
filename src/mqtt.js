@@ -813,6 +813,8 @@ client.on("message", async (topic, message) => {
                     position.latitudeI = truncatedLatitudeI;
                     position.longitudeI = truncatedLongitudeI;
 
+                    // todo update position precision on packet to show that it is no longer full precision
+
                 }
 
                 // update node position in db
