@@ -826,6 +826,7 @@ client.on("message", async (topic, message) => {
                             latitude: position.latitudeI,
                             longitude: position.longitudeI,
                             altitude: position.altitude !== 0 ? position.altitude : null,
+                            position_precision: position.precisionBits,
                         },
                     });
                 } catch (e) {
