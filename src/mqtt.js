@@ -798,7 +798,8 @@ client.on("message", async (topic, message) => {
                     position.latitudeI = PositionUtil.setPositionPrecision(position.latitudeI, oldFirmwarePositionPrecision);
                     position.longitudeI = PositionUtil.setPositionPrecision(position.longitudeI, oldFirmwarePositionPrecision);
 
-                    // todo update position precision on packet to show that it is no longer full precision
+                    // update position precision on packet to show that it is no longer full precision
+                    position.precisionBits = oldFirmwarePositionPrecision;
 
                 }
 
