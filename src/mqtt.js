@@ -791,27 +791,12 @@ client.on("message", async (topic, message) => {
             if(position.latitudeI != null && position.longitudeI){
 
                 // if bitfield is not available, we are on firmware v2.4 or below
-                // if configured, truncate position packets to the provided number of decimal places
+                // if configured, position packets should have their precision reduced
                 if(bitfield == null && oldFirmwarePositionPrecision != null){
 
-                    // convert lat/long to decimal as string
-                    // e.g: -123456789 -> -12.3456789
-                    const latitudeString = (position.latitudeI / 10000000).toString();
-                    const longitudeString = (position.longitudeI / 10000000).toString();
-
-                    // truncate to desired length
-                    const truncatedLatitudeString = PositionUtil.truncateDecimalPlaces(latitudeString, oldFirmwarePositionPrecision);
-                    const truncatedLongitudeString = PositionUtil.truncateDecimalPlaces(longitudeString, oldFirmwarePositionPrecision);
-
-                    // convert lat/long string back to integer from decimal
-                    // e.g: -12.3456789 -> -123456789
-                    // fixme: sometimes we may get xx.xx99999 recurring, but don't worry about that for now, since we are mangling the precision anyway...
-                    const truncatedLatitudeI = parseInt(parseFloat(truncatedLatitudeString) * 10000000);
-                    const truncatedLongitudeI = parseInt(parseFloat(truncatedLongitudeString) * 10000000);
-
-                    // update position packet with truncated lat/long
-                    position.latitudeI = truncatedLatitudeI;
-                    position.longitudeI = truncatedLongitudeI;
+                    // adjust precision of latitude and longitude
+                    position.latitudeI = PositionUtil.setPositionPrecision(position.latitudeI, oldFirmwarePositionPrecision);
+                    position.longitudeI = PositionUtil.setPositionPrecision(position.longitudeI, oldFirmwarePositionPrecision);
 
                     // todo update position precision on packet to show that it is no longer full precision
 
