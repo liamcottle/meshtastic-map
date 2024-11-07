@@ -78,7 +78,7 @@
                             <div class="border border-gray-300 rounded-xl shadow overflow-hidden bg-[#efefef] divide-y">
                                 <div class="w-full space-y-0.5 px-2.5 py-1" v-html="escapeMessageText(message.text)" style="white-space:pre-wrap;word-break:break-word;"></div>
                                 <div v-if="message.is_details_expanded" class="text-xs text-gray-500 px-2 py-1">
-                                    <span :title="message.created_at">{{ moment(new Date(message.created_at)).fromNow() }}</span>
+                                    <span :title="message.created_at">{{ formatMessageTimestamp(message.created_at) }}</span>
                                     <span> • Gated by <a target="_blank" :href="`/?node_id=${message.gateway_id}`" class="hover:text-blue-500">{{ getNodeName(message.gateway_id) }}</a></span>
                                 </div>
                             </div>
@@ -350,6 +350,9 @@
                 return text.replaceAll('<', '&lt;')
                     .replaceAll('>', '&gt;')
                     .replaceAll('\n', '<br/>');
+            },
+            formatMessageTimestamp(createdAt) {
+                return moment(new Date(createdAt)).local().format("DD/MMM/YYYY hh:mm:A");
             },
         },
         computed: {
