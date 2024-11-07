@@ -352,7 +352,7 @@
                     .replaceAll('\n', '<br/>');
             },
             formatMessageTimestamp(createdAt) {
-                return moment(new Date(createdAt)).local().format("DD/MMM/YYYY hh:mm:A");
+                return moment(new Date(createdAt)).local().format("DD/MMM/YYYY hh:mm A");
             },
         },
         computed: {
