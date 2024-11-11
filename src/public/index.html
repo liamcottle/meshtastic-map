@@ -3548,8 +3548,7 @@
                         + `<br/><br/>ID: ${node.node_id} heard ${neighbourNode.node_id}`
                         + `<br/>Hex ID: ${node.node_id_hex} heard ${neighbourNode.node_id_hex}`
                         + (node.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(node.neighbours_updated_at)).fromNow()}` : '')
-                        + `<br/><br/><span class="text-red-500">Note: Some neighbour lines are clearly wrong.<br/>Firmware older than <a href="https://github.com/meshtastic/firmware/releases/tag/v2.3.2.63df972">v2.3.2</a> reports MQTT nodes as Neighbours.<br/>Fixed in <a href="https://github.com/meshtastic/firmware/pull/3457">#3457</a></span>`
-
+                        
                     line.bindTooltip(tooltip, {
                         sticky: true,
                         opacity: 1,
