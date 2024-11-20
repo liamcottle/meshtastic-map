@@ -2742,6 +2742,11 @@
         attribution: 'Tiles &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Data from <a target="_blank" href="https://meshtastic.org/docs/software/integrations/mqtt/">Meshtastic</a>',
     });
 
+    var openTopoMapTileLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        maxZoom: 17, // open topo map doesn't have tiles closer than this
+        attribution: 'Tiles &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    });
+
     var esriWorldImageryTileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 21, // esri doesn't have tiles closer than this
         attribution: 'Tiles &copy; <a href="https://developers.arcgis.com/documentation/mapping-apis-and-services/deployment/basemap-attribution/">Esri</a> | Data from <a target="_blank" href="https://meshtastic.org/docs/software/integrations/mqtt/">Meshtastic</a>'
@@ -2761,6 +2766,7 @@
 
     var tileLayers = {
         "OpenStreetMap": openStreetMapTileLayer,
+        "OpenTopoMap": openTopoMapTileLayer,
         "Esri Satellite": esriWorldImageryTileLayer,
         "Google Satellite": googleSatelliteTileLayer,
         "Google Hybrid": googleHybridTileLayer,
