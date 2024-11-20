@@ -120,6 +120,11 @@ const optionsList = [
         description: "If provided, position packets from firmware v2.4 and older will be truncated to this many decimal places.",
     },
     {
+        name: "forget-outdated-node-positions-after-seconds",
+        type: Number,
+        description: "If provided, nodes that haven't sent a position report in this time will have their current position cleared.",
+    },
+    {
         name: "purge-interval-seconds",
         type: Number,
         description: "How long to wait between each automatic database purge.",
@@ -221,6 +226,7 @@ const decryptionKeys = options["decryption-keys"] ?? [
 const dropPacketsNotOkToMqtt = options["drop-packets-not-ok-to-mqtt"] ?? false;
 const dropPortnumsWithoutBitfield = options["drop-portnums-without-bitfield"] ?? null;
 const oldFirmwarePositionPrecision = options["old-firmware-position-precision"] ?? null;
+const forgetOutdatedNodePositionsAfterSeconds = options["forget-outdated-node-positions-after-seconds"] ?? null;
 const purgeIntervalSeconds = options["purge-interval-seconds"] ?? 10;
 const purgeNodesUnheardForSeconds = options["purge-nodes-unheard-for-seconds"] ?? null;
 const purgeDeviceMetricsAfterSeconds = options["purge-device-metrics-after-seconds"] ?? null;
@@ -269,6 +275,7 @@ if(purgeIntervalSeconds){
         await purgeOldTextMessages();
         await purgeOldTraceroutes();
         await purgeOldWaypoints();
+        await forgetOutdatedNodePositions();
     }, purgeIntervalSeconds * 1000);
 }
 
@@ -551,6 +558,38 @@ async function purgeOldWaypoints() {
                     lt: new Date(Date.now() - purgeWaypointsAfterSeconds * 1000),
                 },
             }
+        });
+    } catch(e) {
+        // do nothing
+    }
+
+}
+
+/**
+ * Clears the current position stored for nodes if the position hasn't been updated within the configured timeframe.
+ * This allows the node position to drop off the map if the user disabled position reporting, but still wants telemetry lookup etc
+ */
+async function forgetOutdatedNodePositions() {
+
+    // make sure seconds provided
+    if(!forgetOutdatedNodePositionsAfterSeconds){
+        return;
+    }
+
+    // clear latitude/longitude/altitude for nodes that haven't updated their position in the configured timeframe
+    try {
+        await prisma.node.updateMany({
+            where: {
+                position_updated_at: {
+                    // position_updated_at before x seconds ago
+                    lt: new Date(Date.now() - forgetOutdatedNodePositionsAfterSeconds * 1000),
+                },
+            },
+            data: {
+                latitude: null,
+                longitude: null,
+                altitude: null,
+            },
         });
     } catch(e) {
         // do nothing
