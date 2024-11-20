@@ -56,6 +56,7 @@ model Node {
 
   @@index(created_at)
   @@index(updated_at)
+  @@index(position_updated_at)
   @@index(node_id)
   @@map("nodes")
 }
