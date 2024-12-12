@@ -584,6 +584,13 @@ async function forgetOutdatedNodePositions() {
                     // position_updated_at before x seconds ago
                     lt: new Date(Date.now() - forgetOutdatedNodePositionsAfterSeconds * 1000),
                 },
+                // don't forget outdated node positions for nodes that don't actually have a position set
+                // otherwise the updated_at is updated, when nothing changed
+                NOT: {
+                    latitude: null,
+                    longitude: null,
+                    altitude: null,
+                },
             },
             data: {
                 latitude: null,
