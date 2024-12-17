@@ -92,51 +92,51 @@ app.get('/api', async (req, res) => {
         },
         {
             "path": "/api/v1/nodes",
-            "description": "Meshtastic nodes in JSON format.",
+            "description": "All meshtastic nodes",
         },
         {
             "path": "/api/v1/nodes/:nodeId",
-            "description": "Meshtastic node info in JSON format.",
+            "description": "A specific meshtastic node",
         },
         {
             "path": "/api/v1/nodes/:nodeId/device-metrics",
-            "description": "Device metrics for a meshtastic node in JSON format.",
+            "description": "Device metrics for a meshtastic node",
         },
         {
             "path": "/api/v1/nodes/:nodeId/environment-metrics",
-            "description": "Environment metrics for a meshtastic node in JSON format.",
+            "description": "Environment metrics for a meshtastic node",
         },
         {
             "path": "/api/v1/nodes/:nodeId/power-metrics",
-            "description": "Power metrics for a meshtastic node in JSON format.",
+            "description": "Power metrics for a meshtastic node",
         },
         {
             "path": "/api/v1/nodes/:nodeId/neighbours",
-            "description": "Neighbours for a meshtastic node in JSON format.",
+            "description": "Neighbours for a meshtastic node",
         },
         {
             "path": "/api/v1/nodes/:nodeId/traceroutes",
-            "description": "Trace Routes for a meshtastic node in JSON format.",
+            "description": "Trace routes for a meshtastic node",
         },
         {
             "path": "/api/v1/nodes/:nodeId/position-history",
-            "description": "Position history for a meshtastic node in JSON format.",
+            "description": "Position history for a meshtastic node",
         },
         {
             "path": "/api/v1/stats/hardware-models",
-            "description": "Database statistics about hardware models in JSON format.",
+            "description": "Database statistics about known hardware models",
         },
         {
             "path": "/api/v1/text-messages",
-            "description": "Meshtastic text messages in JSON format.",
+            "description": "Text messages",
         },
         {
             "path": "/api/v1/text-messages/embed",
-            "description": "Meshtastic text messages rendered as an HTML page.",
+            "description": "Text messages rendered as an embeddable HTML page.",
         },
         {
             "path": "/api/v1/waypoints",
-            "description": "Meshtastic waypoints in JSON format.",
+            "description": "Waypoints",
         },
     ];
 
