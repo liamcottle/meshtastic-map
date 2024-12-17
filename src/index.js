@@ -93,6 +93,10 @@ app.get('/api', async (req, res) => {
         {
             "path": "/api/v1/nodes",
             "description": "All meshtastic nodes",
+            "params": {
+                "role": "Filter by role",
+                "hardware_model": "Filter by hardware model",
+            },
         },
         {
             "path": "/api/v1/nodes/:nodeId",
@@ -101,14 +105,29 @@ app.get('/api', async (req, res) => {
         {
             "path": "/api/v1/nodes/:nodeId/device-metrics",
             "description": "Device metrics for a meshtastic node",
+            "params": {
+                "count": "How many results to return",
+                "time_from": "Only include metrics created after this unix timestamp (milliseconds)",
+                "time_to": "Only include metrics created before this unix timestamp (milliseconds)",
+            },
         },
         {
             "path": "/api/v1/nodes/:nodeId/environment-metrics",
             "description": "Environment metrics for a meshtastic node",
+            "params": {
+                "count": "How many results to return",
+                "time_from": "Only include metrics created after this unix timestamp (milliseconds)",
+                "time_to": "Only include metrics created before this unix timestamp (milliseconds)",
+            },
         },
         {
             "path": "/api/v1/nodes/:nodeId/power-metrics",
             "description": "Power metrics for a meshtastic node",
+            "params": {
+                "count": "How many results to return",
+                "time_from": "Only include metrics created after this unix timestamp (milliseconds)",
+                "time_to": "Only include metrics created before this unix timestamp (milliseconds)",
+            },
         },
         {
             "path": "/api/v1/nodes/:nodeId/neighbours",
@@ -121,6 +140,10 @@ app.get('/api', async (req, res) => {
         {
             "path": "/api/v1/nodes/:nodeId/position-history",
             "description": "Position history for a meshtastic node",
+            "params": {
+                "time_from": "Only include positions created after this unix timestamp (milliseconds)",
+                "time_to": "Only include positions created before this unix timestamp (milliseconds)",
+            },
         },
         {
             "path": "/api/v1/stats/hardware-models",
@@ -129,6 +152,15 @@ app.get('/api', async (req, res) => {
         {
             "path": "/api/v1/text-messages",
             "description": "Text messages",
+            "params": {
+                "to": "Only include messages to this node id",
+                "from": "Only include messages from this node id",
+                "channel_id": "Only include messages for this channel id",
+                "gateway_id": "Only include messages gated to mqtt by this node id",
+                "last_id": "Only include messages before or after this id, based on results order",
+                "count": "How many results to return",
+                "order": "Order to return results in: asc, desc",
+            },
         },
         {
             "path": "/api/v1/text-messages/embed",
@@ -140,11 +172,21 @@ app.get('/api', async (req, res) => {
         },
     ];
 
-    const html = links.map((link) => {
-        return `<li><a href="${link.path}">${link.path}</a> - ${link.description}</li>`;
+    const linksHtml = links.map((link) => {
+        var line = `<li>`;
+        line += `<a href="${link.path}">${link.path}</a> - ${link.description}`;
+        line += `<ul>`;
+        for(const paramKey in (link.params ?? [])){
+            const paramDescription = link.params[paramKey];
+            line += "<li>";
+            line += `?${paramKey}: ${paramDescription}`;
+            line += `</li>`;
+        }
+        line += `</ul>`;
+        return line;
     }).join("");
 
-    res.send(html);
+    res.send(`<b>API Docs</b><br/><ul>${linksHtml}</ul>`);
 
 });
 
