@@ -1118,6 +1118,10 @@ client.on("message", async (topic, message) => {
                 const voltage = telemetry.environmentMetrics.voltage !== 0 ? telemetry.environmentMetrics.voltage : null;
                 const current = telemetry.environmentMetrics.current !== 0 ? telemetry.environmentMetrics.current : null;
                 const iaq = telemetry.environmentMetrics.iaq !== 0 ? telemetry.environmentMetrics.iaq : null;
+                const windDirection = telemetry.environmentMetrics.windDirection;
+                const windSpeed = telemetry.environmentMetrics.windSpeed;
+                const windGust = telemetry.environmentMetrics.windGust;
+                const windLull = telemetry.environmentMetrics.windLull;
 
                 // set metrics to update on node table
                 data.temperature = temperature;
@@ -1151,6 +1155,10 @@ client.on("message", async (topic, message) => {
                                 voltage: voltage,
                                 current: current,
                                 iaq: iaq,
+                                wind_direction: windDirection,
+                                wind_speed: windSpeed,
+                                wind_gust: windGust,
+                                wind_lull: windLull,
                             },
                         });
                     }
