@@ -755,6 +755,21 @@ message Config {
        * Singapore 923mhz
        */
       SG_923 = 18;
+
+      /*
+       * Philippines 433mhz
+       */
+      PH_433 = 19;
+
+      /*
+       * Philippines 868mhz
+       */
+      PH_868 = 20;
+
+      /*
+       * Philippines 915mhz
+       */
+      PH_915 = 21;
     }
 
     /*
