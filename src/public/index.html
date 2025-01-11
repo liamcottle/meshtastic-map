@@ -3491,6 +3491,7 @@
             // add markers for routers and repeaters to routers layer group
             if(node.role_name === "ROUTER"
                 || node.role_name === "ROUTER_CLIENT"
+                || node.role_name === "ROUTER_LATE"
                 || node.role_name === "REPEATER"){
                 nodesRouterLayerGroup.addLayer(marker);
             }
