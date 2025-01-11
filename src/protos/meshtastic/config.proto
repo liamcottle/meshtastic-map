@@ -816,6 +816,13 @@ message Config {
        * Long Range - Moderately Fast
        */
       LONG_MODERATE = 7;
+
+      /*
+       * Short Range - Turbo
+       * This is the fastest preset and the only one with 500kHz bandwidth.
+       * It is not legal to use in all regions due to this wider bandwidth.
+       */
+      SHORT_TURBO = 8;
     }
 
     /*
