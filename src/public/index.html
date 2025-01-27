@@ -2245,7 +2245,7 @@
                                 },
                             },
                             y: {
-                                min: 0,
+                                min: -20,
                                 max: 100,
                             },
                             y1: {
@@ -2718,6 +2718,11 @@
         attribution: 'Tiles &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Data from <a target="_blank" href="https://meshtastic.org/docs/software/integrations/mqtt/">Meshtastic</a>',
     });
 
+    var openTopoMapTileLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        maxZoom: 17, // open topo map doesn't have tiles closer than this
+        attribution: 'Tiles &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    });
+
     var esriWorldImageryTileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 21, // esri doesn't have tiles closer than this
         attribution: 'Tiles &copy; <a href="https://developers.arcgis.com/documentation/mapping-apis-and-services/deployment/basemap-attribution/">Esri</a> | Data from <a target="_blank" href="https://meshtastic.org/docs/software/integrations/mqtt/">Meshtastic</a>'
@@ -2737,6 +2742,7 @@
 
     var tileLayers = {
         "OpenStreetMap": openStreetMapTileLayer,
+        "OpenTopoMap": openTopoMapTileLayer,
         "Esri Satellite": esriWorldImageryTileLayer,
         "Google Satellite": googleSatelliteTileLayer,
         "Google Hybrid": googleHybridTileLayer,
@@ -3082,6 +3088,37 @@
 
     }
 
+    function getTerrainProfileImage(node1, node2) {
+
+        // line colour between nodes
+        const lineColour = "0000FF"; // blue
+
+        // node 1 (left side of image)
+        const node1MarkerColour = "0000FF"; // blue
+        const node1Latitude = node1.latitude;
+        const node1Longitude = node1.longitude;
+        const node1ElevationMSL = ""; // node1.altitude ?? "";
+
+        // node 2 (right side of image)
+        const node2MarkerColour = "0000FF"; // blue
+        const node2Latitude = node2.latitude;
+        const node2Longitude = node2.longitude;
+        const node2ElevationMSL = ""; // node2.altitude ?? "";
+
+        // generate terrain profile image url
+        return "https://heywhatsthat.com/bin/profile-0904.cgi?" + new URLSearchParams({
+            src: "meshtastic.liamcottle.net",
+            axes: 1, // include grid lines and a scale
+            metric: 1, // show metric units
+            curvature: 0, // don't include the curvature of the earth in the graphic
+            width: 500,
+            height: 200,
+            pt0: `${node1Latitude},${node1Longitude},${lineColour},${node1ElevationMSL},${node1MarkerColour}`,
+            pt1: `${node2Latitude},${node2Longitude},${lineColour},${node2ElevationMSL},${node2MarkerColour}`,
+        }).toString();
+
+    }
+
     function showNodeNeighboursThatWeHeard(id) {
 
         cleanUpNodeNeighbours();
@@ -3161,12 +3198,16 @@
                 distance = `${distanceInKilometers} kilometers`;
             }
 
+            const terrainImageUrl = getTerrainProfileImage(node, neighbourNode);
+
             const tooltip = `<b>[${escapeString(node.short_name)}] ${escapeString(node.long_name)}</b> heard <b>[${escapeString(neighbourNode.short_name)}] ${escapeString(neighbourNode.long_name)}</b>`
                 + `<br/>SNR: ${neighbour.snr}dB`
                 + `<br/>Distance: ${distance}`
                 + `<br/><br/>ID: ${node.node_id} heard ${neighbourNode.node_id}`
                 + `<br/>Hex ID: ${node.node_id_hex} heard ${neighbourNode.node_id_hex}`
-                + (node.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(node.neighbours_updated_at)).fromNow()}` : '');
+                + (node.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(node.neighbours_updated_at)).fromNow()}` : '')
+                + `<br/><br/>Terrain images from <a href="http://www.heywhatsthat.com" target="_blank">HeyWhatsThat.com</a>`
+                + `<br/><a href="${terrainImageUrl}" target="_blank"><img src="${terrainImageUrl}" width="100%"></a>`;
 
             line.bindTooltip(tooltip, {
                 sticky: true,
@@ -3278,12 +3319,16 @@
                 distance = `${distanceInKilometers} kilometers`;
             }
 
+            const terrainImageUrl = getTerrainProfileImage(neighbourNode, node);
+
             const tooltip = `<b>[${escapeString(neighbourNode.short_name)}] ${escapeString(neighbourNode.long_name)}</b> heard <b>[${escapeString(node.short_name)}] ${escapeString(node.long_name)}</b>`
                 + `<br/>SNR: ${neighbour.snr}dB`
                 + `<br/>Distance: ${distance}`
                 + `<br/><br/>ID: ${neighbourNode.node_id} heard ${node.node_id}`
                 + `<br/>Hex ID: ${neighbourNode.node_id_hex} heard ${node.node_id_hex}`
-                + (neighbourNode.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(neighbourNode.neighbours_updated_at)).fromNow()}` : '');
+                + (neighbourNode.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(neighbourNode.neighbours_updated_at)).fromNow()}` : '')
+                + `<br/><br/>Terrain images from <a href="http://www.heywhatsthat.com" target="_blank">HeyWhatsThat.com</a>`
+                + `<br/><a href="${terrainImageUrl}" target="_blank"><img src="${terrainImageUrl}" width="100%"></a>`;
 
             line.bindTooltip(tooltip, {
                 sticky: true,
@@ -3422,6 +3467,7 @@
             // add markers for routers and repeaters to routers layer group
             if(node.role_name === "ROUTER"
                 || node.role_name === "ROUTER_CLIENT"
+                || node.role_name === "ROUTER_LATE"
                 || node.role_name === "REPEATER"){
                 nodesRouterLayerGroup.addLayer(marker);
             }
@@ -3518,13 +3564,17 @@
                         distance = `${distanceInKilometers} kilometers`;
                     }
 
+                    const terrainImageUrl = getTerrainProfileImage(node, neighbourNode);
+
                     const tooltip = `<b>[${escapeString(node.short_name)}] ${escapeString(node.long_name)}</b> heard <b>[${escapeString(neighbourNode.short_name)}] ${escapeString(neighbourNode.long_name)}</b>`
                         + `<br/>SNR: ${neighbour.snr}dB`
                         + `<br/>Distance: ${distance}`
                         + `<br/><br/>ID: ${node.node_id} heard ${neighbourNode.node_id}`
                         + `<br/>Hex ID: ${node.node_id_hex} heard ${neighbourNode.node_id_hex}`
                         + (node.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(node.neighbours_updated_at)).fromNow()}` : '')
-                        
+                        + `<br/><br/>Terrain images from <a href="http://www.heywhatsthat.com" target="_blank">HeyWhatsThat.com</a>`
+                        + `<br/><a href="${terrainImageUrl}" target="_blank"><img src="${terrainImageUrl}" width="100%"></a>`;
+
                     line.bindTooltip(tooltip, {
                         sticky: true,
                         opacity: 1,

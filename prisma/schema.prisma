@@ -56,6 +56,7 @@ model Node {
 
   @@index(created_at)
   @@index(updated_at)
+  @@index(position_updated_at)
   @@index(node_id)
   @@map("nodes")
 }
@@ -132,6 +133,10 @@ model EnvironmentMetric {
   voltage             Decimal?
   current             Decimal?
   iaq                 Int?
+  wind_direction      Int?
+  wind_speed          Decimal?
+  wind_gust           Decimal?
+  wind_lull           Decimal?
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt

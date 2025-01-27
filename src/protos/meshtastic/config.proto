@@ -95,6 +95,15 @@ message Config {
        *    Uses position module configuration to determine TAK PLI broadcast interval.
        */
       TAK_TRACKER = 10;
+
+      /*
+       * Description: Will always rebroadcast packets, but will do so after all other modes.
+       * Technical Details: Used for router nodes that are intended to provide additional coverage
+       *    in areas not already covered by other routers, or to bridge around problematic terrain,
+       *    but should not be given priority over other routers in order to avoid unnecessaraily
+       *    consuming hops.
+       */
+      ROUTER_LATE = 11;
     }
 
     /*
@@ -746,6 +755,21 @@ message Config {
        * Singapore 923mhz
        */
       SG_923 = 18;
+
+      /*
+       * Philippines 433mhz
+       */
+      PH_433 = 19;
+
+      /*
+       * Philippines 868mhz
+       */
+      PH_868 = 20;
+
+      /*
+       * Philippines 915mhz
+       */
+      PH_915 = 21;
     }
 
     /*
@@ -792,6 +816,13 @@ message Config {
        * Long Range - Moderately Fast
        */
       LONG_MODERATE = 7;
+
+      /*
+       * Short Range - Turbo
+       * This is the fastest preset and the only one with 500kHz bandwidth.
+       * It is not legal to use in all regions due to this wider bandwidth.
+       */
+      SHORT_TURBO = 8;
     }
 
     /*
