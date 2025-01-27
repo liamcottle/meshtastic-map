@@ -1,0 +1,39 @@
+[Unit]
+Description=meshtastic-map-mqtt
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=liamcottle
+WorkingDirectory=/home/liamcottle/meshtastic-map
+ExecStart=/usr/bin/env node /home/liamcottle/meshtastic-map/src/mqtt.js \
+  --mqtt-broker-url mqtt://127.0.0.1 \
+  --mqtt-username username \
+  --mqtt-password password \
+  --mqtt-client-id meshtastic.example.com \
+  --mqtt-topic 'msh/#' \
+  --collect-positions \
+  --collect-text-messages \
+  --collect-waypoints \
+  --ignore-direct-messages \
+  --purge-interval-seconds 60 \
+  --purge-nodes-unheard-for-seconds 604800 \
+  --purge-device-metrics-after-seconds 604800 \
+  --purge-environment-metrics-after-seconds 604800 \
+  --purge-map-reports-after-seconds 604800 \
+  --purge-neighbour-infos-after-seconds 604800 \
+  --purge-power-metrics-after-seconds 604800 \
+  --purge-positions-after-seconds 604800 \
+  --purge-service-envelopes-after-seconds 604800 \
+  --purge-text-messages-after-seconds 604800 \
+  --purge-traceroutes-after-seconds 604800 \
+  --purge-waypoints-after-seconds 604800 \
+  --forget-outdated-node-positions-after-seconds 604800 \
+  --drop-packets-not-ok-to-mqtt \
+  --old-firmware-position-precision 16
+
+[Install]
+WantedBy=multi-user.target
