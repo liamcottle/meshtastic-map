@@ -1,5 +1,8 @@
-services:
+networks:
+  meshtastic-net:
+    driver: bridge
 
+services:
   # listens to mqtt packets and saves to database
   meshtastic-mqtt:
     container_name: meshtastic-mqtt
@@ -13,6 +16,8 @@ services:
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
       MQTT_OPTS: "" # add any custom mqtt.js options here
+    networks:
+      - meshtastic-net
 
   # runs the web map ui
   meshtastic-map:
@@ -29,13 +34,15 @@ services:
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
       MAP_OPTS: "" # add any custom index.js options here
+    networks:
+      - meshtastic-net
 
   # runs the database to store everything from mqtt
   database:
-    container_name: database
+    container_name: meshtastic-database
     image: bitnami/mariadb
     ports:
-      - 3306:3306/tcp
+      - 3307:3306/tcp  # Changed to 3307 to avoid conflicts
     environment:
       MARIADB_DATABASE: "meshtastic-map"
       MARIADB_ROOT_PASSWORD: "password"
@@ -47,6 +54,8 @@ services:
       timeout: 5s
       retries: 6
       start_interval: 5s
+    networks:
+      - meshtastic-net
 
 volumes:
   database_data:
