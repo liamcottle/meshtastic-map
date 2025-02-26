@@ -2309,14 +2309,14 @@
                             },
                             y: {
                                 min: 0,
-                                max: 30,
+                                suggestedMax: 6,
                                 ticks: {
                                     callback: (label) => `${label}V`,
                                 },
                             },
                             y1: {
-                                min: -500,
-                                max: 500,
+                                suggestedMin: -50,
+                                suggestedMax: 50,
                                 ticks: {
                                     stepSize: 50,
                                     callback: (label) => `${label}mA`,
