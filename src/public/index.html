@@ -3,15 +3,15 @@
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>Meshtastic Map</title>
+    <title>STHLM-MESH MAP</title>
     <meta name="title" content="Meshtastic Map">
     <meta name="description" content="An interactive map of all Meshtastic nodes.">
     <link rel="icon" type="image/png" href="/icon.png"/>
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://meshtastic.liamcottle.net">
-    <meta property="og:title" content="Meshtastic Map">
+    <meta property="og:url" content="https://map.sthlm-mesh.se">
+    <meta property="og:title" content="STHLM-MESH MAP">
     <meta property="og:description" content="An interactive map of all Meshtastic nodes.">
 
     <!-- tailwind css -->
@@ -146,7 +146,7 @@
         <div class="flex flex-col h-full">
 
             <!-- header -->
-            <div class="flex bg-white p-2 border-gray-300 border-b h-16">
+            <div class="flex p-3 h-16" style="background-color: 30a552;">
 
                 <!-- close mobile search button -->
                 <div v-if="isShowingMobileSearch" class="my-auto">
@@ -166,10 +166,7 @@
 
                 <!-- app info -->
                 <div v-if="!isShowingMobileSearch" class="my-auto leading-tight">
-                    <div class="font-bold">Meshtastic Map</div>
-                    <div class="text-sm">
-                        Created by <a class="link" target="_blank" href="https://liamcottle.com">Liam Cottle</a>
-                    </div>
+                    <a href="https://sthlm-mesh.se"><div class="font-bold" style="color: #ffffff; font-size: larger;">STHLM-MESH</div></a>
                 </div>
 
                 <!-- search bar -->
