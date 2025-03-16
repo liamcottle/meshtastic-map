@@ -3116,8 +3116,8 @@
 
             const tooltip = `<b>[${escapeString(node.short_name)}] ${escapeString(node.long_name)}</b> heard <b>[${escapeString(neighbourNode.short_name)}] ${escapeString(neighbourNode.long_name)}</b>`
                 + `<br/>SNR: ${neighbour.snr}dB`
-                + `<br/>Distance: ${distance}`
-                + `<br/>` (node.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(node.neighbours_updated_at)).fromNow()}` : '')
+                + `<br/>Distance: ${distance}<br/>`
+                + (node.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(node.neighbours_updated_at)).fromNow()}` : '')
                 + `<br/><br/>Terrain images from <a href="http://www.heywhatsthat.com" target="_blank">HeyWhatsThat.com</a>`
                 + `<br/><a href="${terrainImageUrl}" target="_blank"><img src="${terrainImageUrl}" width="100%"></a>`;
 
@@ -3235,9 +3235,7 @@
 
             const tooltip = `<b>[${escapeString(neighbourNode.short_name)}] ${escapeString(neighbourNode.long_name)}</b> heard <b>[${escapeString(node.short_name)}] ${escapeString(node.long_name)}</b>`
                 + `<br/>SNR: ${neighbour.snr}dB`
-                + `<br/>Distance: ${distance}`
-                + `<br/><br/>ID: ${neighbourNode.node_id} heard ${node.node_id}`
-                + `<br/>Hex ID: ${neighbourNode.node_id_hex} heard ${node.node_id_hex}`
+                + `<br/>Distance: ${distance}<br/>`
                 + (neighbourNode.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(neighbourNode.neighbours_updated_at)).fromNow()}` : '')
                 + `<br/><br/>Terrain images from <a href="http://www.heywhatsthat.com" target="_blank">HeyWhatsThat.com</a>`
                 + `<br/><a href="${terrainImageUrl}" target="_blank"><img src="${terrainImageUrl}" width="100%"></a>`;
@@ -3480,9 +3478,7 @@
 
                     const tooltip = `<b>[${escapeString(node.short_name)}] ${escapeString(node.long_name)}</b> heard <b>[${escapeString(neighbourNode.short_name)}] ${escapeString(neighbourNode.long_name)}</b>`
                         + `<br/>SNR: ${neighbour.snr}dB`
-                        + `<br/>Distance: ${distance}`
-                        + `<br/><br/>ID: ${node.node_id} heard ${neighbourNode.node_id}`
-                        + `<br/>Hex ID: ${node.node_id_hex} heard ${neighbourNode.node_id_hex}`
+                        + `<br/>Distance: ${distance}<br/>`
                         + (node.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(node.neighbours_updated_at)).fromNow()}` : '')
                         + `<br/><br/>Terrain images from <a href="http://www.heywhatsthat.com" target="_blank">HeyWhatsThat.com</a>`
                         + `<br/><a href="${terrainImageUrl}" target="_blank"><img src="${terrainImageUrl}" width="100%"></a>`;
