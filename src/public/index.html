@@ -2986,7 +2986,8 @@
 
     function getColourForSnr(snr) {
         if(snr >= 0) return "#16a34a"; // good
-        if(snr < 0) return "#dc2626"; // bad
+        if(snr > -10) return "#fff200"; // meh
+        if(snr <= -10) return "#dc2626"; // bad
     }
 
     function cleanUpNodeNeighbours() {
