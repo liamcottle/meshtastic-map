@@ -3117,7 +3117,7 @@
 
             const tooltip = `<b>[${escapeString(node.short_name)}] ${escapeString(node.long_name)}</b> heard <b>[${escapeString(neighbourNode.short_name)}] ${escapeString(neighbourNode.long_name)}</b>`
                 + `<br/>SNR: ${neighbour.snr}dB`
-                + `<br/>Distance: ${distance}<br/>`
+                + `<br/>Distance: ${distance}`
                 + (node.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(node.neighbours_updated_at)).fromNow()}` : '')
                 + `<br/><br/>Terrain images from <a href="http://www.heywhatsthat.com" target="_blank">HeyWhatsThat.com</a>`
                 + `<br/><a href="${terrainImageUrl}" target="_blank"><img src="${terrainImageUrl}" width="100%"></a>`;
@@ -3236,7 +3236,7 @@
 
             const tooltip = `<b>[${escapeString(neighbourNode.short_name)}] ${escapeString(neighbourNode.long_name)}</b> heard <b>[${escapeString(node.short_name)}] ${escapeString(node.long_name)}</b>`
                 + `<br/>SNR: ${neighbour.snr}dB`
-                + `<br/>Distance: ${distance}<br/>`
+                + `<br/>Distance: ${distance}`
                 + (neighbourNode.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(neighbourNode.neighbours_updated_at)).fromNow()}` : '')
                 + `<br/><br/>Terrain images from <a href="http://www.heywhatsthat.com" target="_blank">HeyWhatsThat.com</a>`
                 + `<br/><a href="${terrainImageUrl}" target="_blank"><img src="${terrainImageUrl}" width="100%"></a>`;
@@ -3479,7 +3479,7 @@
 
                     const tooltip = `<b>[${escapeString(node.short_name)}] ${escapeString(node.long_name)}</b> heard <b>[${escapeString(neighbourNode.short_name)}] ${escapeString(neighbourNode.long_name)}</b>`
                         + `<br/>SNR: ${neighbour.snr}dB`
-                        + `<br/>Distance: ${distance}<br/>`
+                        + `<br/>Distance: ${distance}`
                         + (node.neighbours_updated_at ? `<br/>Updated: ${moment(new Date(node.neighbours_updated_at)).fromNow()}` : '')
                         + `<br/><br/>Terrain images from <a href="http://www.heywhatsthat.com" target="_blank">HeyWhatsThat.com</a>`
                         + `<br/><a href="${terrainImageUrl}" target="_blank"><img src="${terrainImageUrl}" width="100%"></a>`;
