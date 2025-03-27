@@ -4,6 +4,7 @@ const compression = require('compression');
 const protobufjs = require("protobufjs");
 const commandLineArgs = require("command-line-args");
 const commandLineUsage = require("command-line-usage");
+const cors = require('cors');
 
 // create prisma db client
 const { PrismaClient } = require("@prisma/client");
@@ -75,6 +76,9 @@ const app = express();
 
 // enable compression
 app.use(compression());
+
+// Apply CORS only to API routes
+app.use('/api', cors());
 
 // serve files inside the public folder from /
 app.use('/', express.static(path.join(__dirname, 'public')));
