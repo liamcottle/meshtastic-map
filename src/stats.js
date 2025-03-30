@@ -1,10 +1,17 @@
+const path = require('path');
 const express = require('express');
 const router = express.Router();
+const protobufjs = require("protobufjs");
 
 // create prisma db client
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+// load protobufs
+const root = new protobufjs.Root();
+root.resolvePath = (origin, target) => path.join(__dirname, "protos", target);
+root.loadSync('meshtastic/mqtt.proto');
+const HardwareModel = root.lookupEnum("HardwareModel");
 
 router.get('/hardware-models', async (req, res) => {
     try {
