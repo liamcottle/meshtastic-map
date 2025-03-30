@@ -80,4 +80,39 @@ router.get('/messages-per-hour', async (req, res) => {
     }
 });
 
+router.get('/position-precision', async (req, res) => {
+    try {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  
+      const result = await prisma.node.groupBy({
+        by: ['position_precision'],
+        where: {
+          position_updated_at: { gte: sevenDaysAgo },
+          position_precision: { not: null },
+        },
+        _count: {
+          position_precision: true,
+        },
+        orderBy: {
+          _count: {
+            position_precision: 'desc',
+          },
+        },
+      });
+  
+      const formatted = result.map(r => ({
+        position_precision: r.position_precision,
+        count: r._count.position_precision,
+      }));
+  
+      res.set('Cache-Control', 'public, max-age=600'); // 10 min cache
+      res.json(formatted);
+  
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 module.exports = router;
