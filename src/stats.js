@@ -117,4 +117,28 @@ router.get('/position-precision', async (req, res) => {
     }
 });
 
+router.get('/most-active-nodes', async (req, res) => {
+    try {
+        const result = await prisma.$queryRaw`
+        SELECT n.long_name, COUNT(*) AS count
+        FROM service_envelopes se
+        JOIN nodes n ON se.from = n.node_id
+        WHERE 
+          se.created_at >= NOW() - INTERVAL 1 DAY
+          AND se.mqtt_topic NOT LIKE '%/map/'
+        GROUP BY n.long_name
+        ORDER BY count DESC
+        LIMIT 25;
+        `;
+  
+      res.set('Cache-Control', 'public, max-age=600'); // 10 min cache
+      res.json(result);
+  
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
 module.exports = router;
