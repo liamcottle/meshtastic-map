@@ -101,11 +101,6 @@ router.get('/position-precision', async (req, res) => {
         _count: {
           position_precision: true,
         },
-        orderBy: {
-          _count: {
-            position_precision: 'desc',
-          },
-        },
       });
   
       const formatted = result.map(r => ({
