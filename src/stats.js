@@ -240,12 +240,17 @@ router.get('/portnum-counts', async (req, res) => {
                 created_at: { gte: startTime },
                 ...(Number.isInteger(nodeId) ? { from: nodeId } : {})
             },
-            select: { protobuf: true }
+            select: { protobuf: true, mqtt_topic: true }
         });
 
         const counts = {};
         for (const row of messages) {
             try {
+                // We want to filter out any map reports.
+                if (row.mqtt_topic && row.mqtt_topic.endsWith("/map/")) {
+                    continue;
+                }
+
                 const envelope = ServiceEnvelope.decode(row.protobuf);
                 const packet = envelope.packet;
 
