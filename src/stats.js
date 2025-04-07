@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const path = require('path');
 const express = require('express');
 const router = express.Router();
@@ -11,7 +12,94 @@ const prisma = new PrismaClient();
 const root = new protobufjs.Root();
 root.resolvePath = (origin, target) => path.join(__dirname, "protos", target);
 root.loadSync('meshtastic/mqtt.proto');
+const Data = root.lookupType("Data");
 const HardwareModel = root.lookupEnum("HardwareModel");
+const ServiceEnvelope = root.lookupType("ServiceEnvelope");
+
+const decryptionKeys = [
+    "1PG7OiApB1nwvP+rz05pAQ==", // add default "AQ==" decryption key
+];
+
+function createNonce(packetId, fromNode) {
+
+    // Expand packetId to 64 bits
+    const packetId64 = BigInt(packetId);
+
+    // Initialize block counter (32-bit, starts at zero)
+    const blockCounter = 0;
+
+    // Create a buffer for the nonce
+    const buf = Buffer.alloc(16);
+
+    // Write packetId, fromNode, and block counter to the buffer
+    buf.writeBigUInt64LE(packetId64, 0);
+    buf.writeUInt32LE(fromNode, 8);
+    buf.writeUInt32LE(blockCounter, 12);
+
+    return buf;
+
+}
+
+function decrypt(packet) {
+
+    // attempt to decrypt with all available decryption keys
+    for(const decryptionKey of decryptionKeys){
+        try {
+            const key = Buffer.from(decryptionKey, "base64");
+            const nonceBuffer = createNonce(packet.id, packet.from);
+
+            // determine algorithm based on key length
+            var algorithm = null;
+            if(key.length === 16){
+                algorithm = "aes-128-ctr";
+            } else if(key.length === 32){
+                algorithm = "aes-256-ctr";
+            } else {
+                // skip this key, try the next one...
+                console.error(`Skipping decryption key with invalid length: ${key.length}`);
+                continue;
+            }
+
+            const decipher = crypto.createDecipheriv(algorithm, key, nonceBuffer);
+            const decryptedBuffer = Buffer.concat([decipher.update(packet.encrypted), decipher.final()]);
+
+            return Data.decode(decryptedBuffer);
+
+        } catch(e){}
+    }
+
+    // couldn't decrypt
+    return null;
+
+}
+
+const PORTNUM_LABELS = {
+    0: "UNKNOWN_APP",
+    1: "TEXT_MESSAGE_APP",
+    2: "REMOTE_HARDWARE_APP",
+    3: "POSITION_APP",
+    4: "NODEINFO_APP",
+    5: "ROUTING_APP",
+    6: "ADMIN_APP",
+    7: "TEXT_MESSAGE_COMPRESSED_APP",
+    8: "WAYPOINT_APP",
+    9: "AUDIO_APP",
+    10: "DETECTION_SENSOR_APP",
+    32: "REPLY_APP",
+    33: "IP_TUNNEL_APP",
+    34: "PAXCOUNTER_APP",
+    64: "SERIAL_APP",
+    65: "STORE_FORWARD_APP",
+    66: "RANGE_TEST_APP",
+    67: "TELEMETRY_APP",
+    68: "ZPS_APP",
+    69: "SIMULATOR_APP",
+    70: "TRACEROUTE_APP",
+    71: "NEIGHBORINFO_APP",
+    72: "ATAK_PLUGIN",
+    256: "PRIVATE_APP",
+    257: "ATAK_FORWARDER"
+};
 
 router.get('/hardware-models', async (req, res) => {
     try {
@@ -137,6 +225,61 @@ router.get('/most-active-nodes', async (req, res) => {
     } catch (error) {
       console.error('Error fetching data:', error);
       res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+router.get('/portnum-counts', async (req, res) => {
+    const nodeId = req.query.nodeId ? parseInt(req.query.nodeId, 10) : null;
+    const hours = 24;
+    const now = new Date();
+    const startTime = new Date(now.getTime() - hours * 60 * 60 * 1000);
+
+    try {
+        const messages = await prisma.serviceEnvelope.findMany({
+            where: {
+                created_at: { gte: startTime },
+                ...(Number.isInteger(nodeId) ? { from: nodeId } : {})
+            },
+            select: { protobuf: true }
+        });
+
+        const counts = {};
+        for (const row of messages) {
+            try {
+                const envelope = ServiceEnvelope.decode(row.protobuf);
+                const packet = envelope.packet;
+
+                if (!packet?.encrypted) {
+                    counts[0] = (counts[0] || 0) + 1;
+                    continue;
+                }
+
+                const dataMessage = decrypt(packet);
+
+                if (dataMessage?.portnum !== undefined) {
+                    const portnum = dataMessage.portnum;
+                    counts[portnum] = (counts[portnum] || 0) + 1;
+                } else {
+                    // couldn't decrypt or no portnum in decrypted message
+                    counts[0] = (counts[0] || 0) + 1;
+                }
+            } catch (err) {
+                console.warn("Decode error:", err.message);
+                counts[0] = (counts[0] || 0) + 1;
+            }
+        }
+
+        const result = Object.entries(counts).map(([portnum, count]) => ({
+            portnum: parseInt(portnum),
+            count,
+            label: PORTNUM_LABELS[portnum] || "UNKNOWN"
+        })).sort((a, b) => a.portnum - b.portnum);
+
+        res.json(result);
+
+    } catch (err) {
+        console.error("Error in /portnum-counts:", err);
+        res.status(500).json({ message: "Internal server error" });
     }
 });
 
