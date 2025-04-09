@@ -15,6 +15,7 @@ root.loadSync('meshtastic/mqtt.proto');
 const Data = root.lookupType("Data");
 const HardwareModel = root.lookupEnum("HardwareModel");
 const ServiceEnvelope = root.lookupType("ServiceEnvelope");
+const PortNum = root.lookupEnum("PortNum");
 
 const decryptionKeys = [
     "1PG7OiApB1nwvP+rz05pAQ==", // add default "AQ==" decryption key
@@ -72,34 +73,6 @@ function decrypt(packet) {
     return null;
 
 }
-
-const PORTNUM_LABELS = {
-    0: "UNKNOWN_APP",
-    1: "TEXT_MESSAGE_APP",
-    2: "REMOTE_HARDWARE_APP",
-    3: "POSITION_APP",
-    4: "NODEINFO_APP",
-    5: "ROUTING_APP",
-    6: "ADMIN_APP",
-    7: "TEXT_MESSAGE_COMPRESSED_APP",
-    8: "WAYPOINT_APP",
-    9: "AUDIO_APP",
-    10: "DETECTION_SENSOR_APP",
-    32: "REPLY_APP",
-    33: "IP_TUNNEL_APP",
-    34: "PAXCOUNTER_APP",
-    64: "SERIAL_APP",
-    65: "STORE_FORWARD_APP",
-    66: "RANGE_TEST_APP",
-    67: "TELEMETRY_APP",
-    68: "ZPS_APP",
-    69: "SIMULATOR_APP",
-    70: "TRACEROUTE_APP",
-    71: "NEIGHBORINFO_APP",
-    72: "ATAK_PLUGIN",
-    256: "PRIVATE_APP",
-    257: "ATAK_FORWARDER"
-};
 
 router.get('/hardware-models', async (req, res) => {
     try {
@@ -277,7 +250,7 @@ router.get('/portnum-counts', async (req, res) => {
         const result = Object.entries(counts).map(([portnum, count]) => ({
             portnum: parseInt(portnum),
             count,
-            label: PORTNUM_LABELS[portnum] || "UNKNOWN"
+            label: PortNum.valuesById[portnum] ?? "UNKNOWN",
         })).sort((a, b) => a.portnum - b.portnum);
 
         res.json(result);
