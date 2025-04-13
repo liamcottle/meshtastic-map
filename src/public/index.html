@@ -3012,13 +3012,13 @@
         const node1MarkerColour = "0000FF"; // blue
         const node1Latitude = node1.latitude;
         const node1Longitude = node1.longitude;
-        const node1ElevationMSL = ""; // node1.altitude ?? "";
+        const node1ElevationMSL = node1.altitude ?? "";
 
         // node 2 (right side of image)
         const node2MarkerColour = "0000FF"; // blue
         const node2Latitude = node2.latitude;
         const node2Longitude = node2.longitude;
-        const node2ElevationMSL = ""; // node2.altitude ?? "";
+        const node2ElevationMSL = node2.altitude ?? "";
 
         // generate terrain profile image url
         return "https://heywhatsthat.com/bin/profile-0904.cgi?" + new URLSearchParams({
