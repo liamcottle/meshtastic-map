@@ -600,41 +600,6 @@
                                 </ul>
                             </div>
 
-                            <!-- lora config -->
-                            <div>
-                                <div class="bg-gray-200 p-2 font-semibold">LoRa Config</div>
-                                <ul role="list" class="flex-1 divide-y divide-gray-200">
-
-                                    <!-- region -->
-                                    <li class="flex p-3">
-                                        <div class="text-sm font-medium text-gray-900">Region</div>
-                                        <div class="ml-auto text-sm text-gray-700">
-                                            <span v-if="selectedNode.region_name">{{ selectedNode.region_name }} ({{ getRegionFrequencyRange(selectedNode.region_name) }})</span>
-                                            <span v-else>???</span>
-                                        </div>
-                                    </li>
-
-                                    <!-- modem preset -->
-                                    <li class="flex p-3">
-                                        <div class="text-sm font-medium text-gray-900">Modem Preset</div>
-                                        <div class="ml-auto text-sm text-gray-700">
-                                            <span v-if="selectedNode.modem_preset_name">{{ selectedNode.modem_preset_name }}</span>
-                                            <span v-else>???</span>
-                                        </div>
-                                    </li>
-
-                                    <!-- has default channel -->
-                                    <li class="flex p-3">
-                                        <div class="text-sm font-medium text-gray-900">Has Default Channel</div>
-                                        <div class="ml-auto text-sm text-gray-700">
-                                            <span v-if="selectedNode.has_default_channel != null">{{ selectedNode.has_default_channel ? "Yes" : "No" }}</span>
-                                            <span v-else>???</span>
-                                        </div>
-                                    </li>
-
-                                </ul>
-                            </div>
-
                             <!-- position -->
                             <div>
                                 <div @click.stop class="flex bg-gray-200 p-2 font-semibold">
@@ -3818,10 +3783,7 @@
             (node.position_precision != null && node.position_precision !== 32 ? `<br/>Position Precision: ${formatPositionPrecision(node.position_precision)}` : '') +
             `<br/><br/>Role: ${node.role_name}` +
             `<br/>Hardware: ${node.hardware_model_name}` +
-            (node.firmware_version != null ? `<br/>Firmware: ${node.firmware_version}` : '') +
-            (node.region_name != null ? `<br/>LoRa Region: ${node.region_name} (${loraFrequencyRange})` : '') +
-            (node.modem_preset_name != null ? `<br/>Modem Preset: ${node.modem_preset_name}` : '') +
-            (node.has_default_channel != null ? `<br/>Has Default Channel: ${node.has_default_channel ? "Yes" : "No"}` : '');
+            (node.firmware_version != null ? `<br/>Firmware: ${node.firmware_version}` : '');
 
         if(node.battery_level){
             if(node.battery_level > 100){
