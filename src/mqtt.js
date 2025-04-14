@@ -935,6 +935,7 @@ client.on("message", async (topic, message) => {
                         hardware_model: user.hwModel,
                         is_licensed: user.isLicensed === true,
                         role: user.role,
+                        firmware_version: bitfield ? '2.5.0 or newer' : '2.4.3 or older', 
                     },
                     update: {
                         long_name: user.longName,
@@ -942,6 +943,7 @@ client.on("message", async (topic, message) => {
                         hardware_model: user.hwModel,
                         is_licensed: user.isLicensed === true,
                         role: user.role,
+                        firmware_version: bitfield ? '2.5.0 or newer' : '2.4.3 or older',
                     },
                 });
             } catch (e) {
