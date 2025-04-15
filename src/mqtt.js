@@ -942,7 +942,7 @@ client.on("message", async (topic, message) => {
                         hardware_model: user.hwModel,
                         is_licensed: user.isLicensed === true,
                         role: user.role,
-                        firmware_version: bitfield ? '2.5.0 or newer' : '2.4.3 or older', 
+                        firmware_version: (bitfield != null) ? '2.5.0 or newer' : '2.4.3 or older',
                         ok_to_mqtt: isOkToMqtt,
                     },
                     update: {
@@ -951,7 +951,7 @@ client.on("message", async (topic, message) => {
                         hardware_model: user.hwModel,
                         is_licensed: user.isLicensed === true,
                         role: user.role,
-                        firmware_version: bitfield ? '2.5.0 or newer' : '2.4.3 or older',
+                        firmware_version: (bitfield != null) ? '2.5.0 or newer' : '2.4.3 or older',
                         ok_to_mqtt: isOkToMqtt,
                     },
                 });
