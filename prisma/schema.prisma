@@ -51,6 +51,8 @@ model Node {
   // this column tracks when an mqtt gateway node uplinked a packet
   mqtt_connection_state_updated_at DateTime?
 
+  ok_to_mqtt  Boolean?
+
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
 

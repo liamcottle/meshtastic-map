@@ -914,12 +914,18 @@ client.on("message", async (topic, message) => {
         else if(portnum === 4) {
 
             const user = User.decode(envelope.packet.decoded.payload);
+            let isOkToMqtt = null
 
             if(logKnownPacketTypes) {
                 console.log("NODEINFO_APP", {
                     from: envelope.packet.from.toString(16),
                     user: user,
                 });
+            }
+
+            // check if bitfield is available, then check if ok-to-mqtt
+            if(bitfield != null){
+                isOkToMqtt = Boolean(bitfield & BITFIELD_OK_TO_MQTT_MASK);
             }
 
             // create or update node in db
@@ -936,6 +942,7 @@ client.on("message", async (topic, message) => {
                         is_licensed: user.isLicensed === true,
                         role: user.role,
                         firmware_version: bitfield ? '2.5.0 or newer' : '2.4.3 or older', 
+                        ok_to_mqtt: isOkToMqtt,
                     },
                     update: {
                         long_name: user.longName,
@@ -944,6 +951,7 @@ client.on("message", async (topic, message) => {
                         is_licensed: user.isLicensed === true,
                         role: user.role,
                         firmware_version: bitfield ? '2.5.0 or newer' : '2.4.3 or older',
+                        ok_to_mqtt: isOkToMqtt,
                     },
                 });
             } catch (e) {
