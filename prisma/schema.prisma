@@ -204,6 +204,7 @@ model ServiceEnvelope {
   gateway_id BigInt?
   to         BigInt
   from       BigInt
+  portnum    Int?
   protobuf   Bytes
 
   created_at DateTime @default(now())

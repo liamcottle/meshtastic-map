@@ -750,6 +750,7 @@ client.on("message", async (topic, message) => {
                         gateway_id: envelope.gatewayId ? convertHexIdToNumericId(envelope.gatewayId) : null,
                         to: envelope.packet.to,
                         from: envelope.packet.from,
+                        portnum: portnum,
                         protobuf: message,
                     },
                 });
