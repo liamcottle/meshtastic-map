@@ -205,6 +205,7 @@ model ServiceEnvelope {
   to         BigInt
   from       BigInt
   portnum    Int?
+  packet_id  BigInt?
   protobuf   Bytes
 
   created_at DateTime @default(now())
@@ -213,6 +214,7 @@ model ServiceEnvelope {
   @@index(created_at)
   @@index(updated_at)
   @@index(gateway_id)
+  @@index(packet_id)
   @@map("service_envelopes")
 }
 

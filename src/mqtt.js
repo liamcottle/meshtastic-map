@@ -751,6 +751,7 @@ client.on("message", async (topic, message) => {
                         to: envelope.packet.to,
                         from: envelope.packet.from,
                         portnum: portnum,
+                        packet_id: envelope.packet.id,
                         protobuf: message,
                     },
                 });
