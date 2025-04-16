@@ -128,7 +128,10 @@ router.get('/portnum-counts', async (req, res) => {
                 created_at: { gte: startTime },
                 ...(Number.isInteger(nodeId) ? { from: nodeId } : {}),
                 packet_id: { not: null },
-                portnum: { not: 73 }, // Exclude portnum 73 (e.g. map reports)
+                OR: [
+                    { portnum: { not: 73 } }, // Exclude portnum 73 (e.g. map reports)
+                    { portnum: null } // But include PKI packages, they have no portnum
+                ]
             },
             select: {from: true, packet_id: true, portnum: true, channel_id: true}
         });
