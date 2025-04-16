@@ -300,6 +300,7 @@ router.get('/portnum-counts2', async (req, res) => {
                 created_at: { gte: startTime },
                 ...(Number.isInteger(nodeId) ? { from: nodeId } : {}),
                 packet_id: { not: null },
+                portnum: { not: 73 }, // Exclude portnum 73 (e.g. map reports)
             },
             select: {from: true, packet_id: true, portnum: true, channel_id: true}
         });
