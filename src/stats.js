@@ -201,6 +201,33 @@ router.get('/most-active-nodes', async (req, res) => {
     }
 });
 
+router.get('/most-active-nodes2', async (req, res) => {
+    try {
+        const result = await prisma.$queryRaw`
+        SELECT n.long_name, COUNT(*) AS count
+        FROM (
+            SELECT DISTINCT \`from\`, packet_id
+            FROM service_envelopes
+            WHERE 
+                created_at >= NOW() - INTERVAL 1 DAY
+                AND packet_id IS NOT NULL
+                AND portnum != 73
+        ) AS unique_packets
+        JOIN nodes n ON unique_packets.from = n.node_id
+        GROUP BY n.long_name
+        ORDER BY count DESC
+        LIMIT 25;
+        `;
+  
+      res.set('Cache-Control', 'public, max-age=600'); // 10 min cache
+      res.json(result);
+  
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 router.get('/portnum-counts', async (req, res) => {
     const nodeId = req.query.nodeId ? parseInt(req.query.nodeId, 10) : null;
     const hours = 24;
@@ -251,6 +278,50 @@ router.get('/portnum-counts', async (req, res) => {
             portnum: parseInt(portnum),
             count,
             label: PortNum.valuesById[portnum] ?? "UNKNOWN",
+        })).sort((a, b) => a.portnum - b.portnum);
+
+        res.json(result);
+
+    } catch (err) {
+        console.error("Error in /portnum-counts:", err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+router.get('/portnum-counts2', async (req, res) => {
+    const nodeId = req.query.nodeId ? parseInt(req.query.nodeId, 10) : null;
+    const hours = 24;
+    const now = new Date();
+    const startTime = new Date(now.getTime() - hours * 60 * 60 * 1000);
+
+    try {
+        const envelopes = await prisma.serviceEnvelope.findMany({
+            where: {
+                created_at: { gte: startTime },
+                ...(Number.isInteger(nodeId) ? { from: nodeId } : {}),
+                packet_id: { not: null },
+            },
+            select: {from: true, packet_id: true, portnum: true, channel_id: true}
+        });
+
+        // Ensure uniqueness based on (from, packet_id)
+        const seen = new Set();
+        const counts = {};
+
+        for (const envelope of envelopes) {
+            const uniqueKey = `${envelope.from}-${envelope.packet_id}`;
+            if (seen.has(uniqueKey)) continue;
+            seen.add(uniqueKey);
+
+            // Override portnum to 512 if channel_id is "PKI"
+            const portnum = envelope.channel_id === "PKI" ? 512 : (envelope.portnum ?? 0);
+            counts[portnum] = (counts[portnum] || 0) + 1;
+        }
+
+        const result = Object.entries(counts).map(([portnum, count]) => ({
+            portnum: parseInt(portnum, 10),
+            count: count,
+            label: parseInt(portnum, 10) === 512 ? "PKI" : (PortNum.valuesById[portnum] ?? "UNKNOWN"),
         })).sort((a, b) => a.portnum - b.portnum);
 
         res.json(result);
