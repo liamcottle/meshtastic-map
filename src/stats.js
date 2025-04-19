@@ -164,7 +164,7 @@ router.get('/portnum-counts', async (req, res) => {
     }
 });
 
-app.get('/battery-stats', async (req, res) => {
+router.get('/battery-stats', async (req, res) => {
     const days = parseInt(req.query.days || '1', 10);
 
     try {
