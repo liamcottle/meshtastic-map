@@ -171,7 +171,7 @@ router.get('/battery-stats', async (req, res) => {
         const stats = await prisma.$queryRaw`
             SELECT id, recorded_at, avg_battery_level
             FROM battery_stats
-            WHERE recorded_at >= NOW() - INTERVAL ${hours} DAY
+            WHERE recorded_at >= NOW() - INTERVAL ${days} DAY
             ORDER BY recorded_at DESC;
         `;
 
