@@ -164,5 +164,23 @@ router.get('/portnum-counts', async (req, res) => {
     }
 });
 
+app.get('/battery-stats', async (req, res) => {
+    const days = parseInt(req.query.days || '1', 10);
+
+    try {
+        const stats = await prisma.$queryRaw`
+            SELECT id, recorded_at, avg_battery_level
+            FROM battery_stats
+            WHERE recorded_at >= NOW() - INTERVAL ${hours} DAY
+            ORDER BY recorded_at DESC;
+        `;
+
+        res.json(stats);
+    } catch (err) {
+        console.error('Error fetching battery stats:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 module.exports = router;
