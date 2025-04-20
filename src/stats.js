@@ -184,5 +184,22 @@ router.get('/battery-stats', async (req, res) => {
     }
 });
 
+router.get('/channel-utilization-stats', async (req, res) => {
+    const days = parseInt(req.query.days || '1', 10);
+
+    try {
+        const stats = await prisma.$queryRaw`
+            SELECT recorded_at, avg_channel_utilization
+            FROM channel_utilization_stats
+            WHERE recorded_at >= NOW() - INTERVAL ${days} DAY
+            ORDER BY recorded_at DESC;
+        `;
+
+        res.json(stats);
+    } catch (err) {
+        console.error('Error fetching channel utilization stats:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 module.exports = router;
