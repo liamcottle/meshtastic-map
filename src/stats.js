@@ -100,6 +100,7 @@ router.get('/most-active-nodes', async (req, res) => {
                 created_at >= NOW() - INTERVAL 1 DAY
                 AND packet_id IS NOT NULL
                 AND portnum != 73
+                AND \`to\` != 1
         ) AS unique_packets
         JOIN nodes n ON unique_packets.from = n.node_id
         GROUP BY n.long_name
@@ -128,6 +129,7 @@ router.get('/portnum-counts', async (req, res) => {
                 created_at: { gte: startTime },
                 ...(Number.isInteger(nodeId) ? { from: nodeId } : {}),
                 packet_id: { not: null },
+                to: { not: 1 }, // Filter out NODENUM_BROADCAST_NO_LORA
                 OR: [
                     { portnum: { not: 73 } }, // Exclude portnum 73 (e.g. map reports)
                     { portnum: null } // But include PKI packages, they have no portnum
