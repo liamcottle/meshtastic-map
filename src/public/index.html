@@ -3765,7 +3765,10 @@
         }
 
         // show lines between position history markers
-        L.polyline(positionHistoryLinesCords).addTo(nodePositionHistoryLayerGroup);
+        L.polyline(positionHistoryLinesCords, {
+            color: "#a855f7",
+            opacity: 1,
+        }).addTo(nodePositionHistoryLayerGroup);
 
     }
 
