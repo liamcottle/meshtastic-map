@@ -1490,8 +1490,8 @@
                                 <label class="block text-sm font-medium text-gray-900">Temperature Format</label>
                                 <div class="text-xs text-gray-600 mb-2">Metrics will be shown in the selected format.</div>
                                 <select v-model="configTemperatureFormat" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                    <option value="celsius">Celsius (ºC)</option>
-                                    <option value="fahrenheit">Fahrenheit (ºF)</option>
+                                    <option value="celsius">Celsius (°C)</option>
+                                    <option value="fahrenheit">Fahrenheit (°F)</option>
                                 </select>
                             </div>
 
@@ -2217,7 +2217,7 @@
                         datasets: [
                             {
                                 label: 'Temperature',
-                                suffix: 'ºC',
+                                suffix: '°C',
                                 borderColor: '#3b82f6',
                                 backgroundColor: '#3b82f6',
                                 pointStyle: false, // no points
@@ -2597,11 +2597,11 @@
             formatTemperature: function(celsius) {
                 switch(this.configTemperatureFormat){
                     case "celsius": {
-                        return `${Number(celsius).toFixed(0)}ºC`;
+                        return `${Number(celsius).toFixed(0)}°C`;
                     }
                     case "fahrenheit": {
                         const fahrenheit = this.celsiusToFahrenheit(celsius);
-                        return `${fahrenheit.toFixed(0)}ºF`;
+                        return `${fahrenheit.toFixed(0)}°F`;
                     }
                 }
             },
@@ -2617,8 +2617,8 @@
             },
             getTemperatureUnit: function() {
                 switch(this.configTemperatureFormat){
-                    case "celsius": return "ºC";
-                    case "fahrenheit": return "ºF";
+                    case "celsius": return "°C";
+                    case "fahrenheit": return "°F";
                 }
             },
             celsiusToFahrenheit: function(celsius) {
