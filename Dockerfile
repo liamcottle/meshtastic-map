@@ -4,6 +4,9 @@ FROM node:lts-alpine
 ADD ./ /app
 WORKDIR /app
 
+# add open ssl
+RUN apk add --no-cache openssl
+
 # install node dependencies
 RUN npm install
 
