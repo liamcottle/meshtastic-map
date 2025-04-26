@@ -302,6 +302,26 @@ model Waypoint {
   @@map("waypoints")
 }
 
+model NameHistory {
+  id             BigInt   @id @default(autoincrement())
+  node_id        BigInt   
+  long_name      String
+  short_name     String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@index(node_id)
+  @@index(long_name)
+
+  @@index(created_at)
+  @@index(updated_at)
+  @@map("name_history")
+
+  // We only want to keep track of unique name and node_id combinations
+  @@unique([node_id, long_name, short_name])
+}
+
 model BatteryStats {
   id                BigInt    @id @default(autoincrement())
   recorded_at       DateTime? @default(now())

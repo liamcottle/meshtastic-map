@@ -222,6 +222,7 @@ const collectNeighbourInfo = options["collect-neighbour-info"] ?? false;
 const collectMapReports = options["collect-map-reports"] ?? false;
 const decryptionKeys = options["decryption-keys"] ?? [
     "1PG7OiApB1nwvP+rz05pAQ==", // add default "AQ==" decryption key
+    "PjG/mVAqnannyvqmuYAwd0LZa1AV+wkcUQlacmexEXY=", // Årsta mesh? länkad av [x/0!] divideByZero i meshen
 ];
 const dropPacketsNotOkToMqtt = options["drop-packets-not-ok-to-mqtt"] ?? false;
 const dropPortnumsWithoutBitfield = options["drop-portnums-without-bitfield"] ?? null;
@@ -960,6 +961,28 @@ client.on("message", async (topic, message) => {
                 console.error(e);
             }
 
+            // Keep track of the names a node has been using.
+            try {
+                await prisma.NameHistory.upsert({
+                    where: {
+                      node_id_long_name_short_name: {
+                        node_id: envelope.packet.from,
+                        long_name: user.longName,
+                        short_name: user.shortName,
+                      }
+                    },
+                    create: {
+                      node_id: envelope.packet.from,
+                      long_name: user.longName,
+                      short_name: user.shortName,
+                    },
+                    update: { 
+                        updated_at: new Date(),
+                    } 
+                  });                  
+            } catch (e) {
+                console.error(e);
+            }
         }
 
         else if(portnum === 8) {
