@@ -301,3 +301,21 @@ model Waypoint {
   @@index(gateway_id)
   @@map("waypoints")
 }
+
+model BatteryStats {
+  id                BigInt    @id @default(autoincrement())
+  recorded_at       DateTime? @default(now())
+  avg_battery_level Decimal?  @db.Decimal(5, 2)
+
+  @@index([recorded_at])
+  @@map("battery_stats")
+}
+
+model ChannelUtilizationStats {
+  id                      BigInt    @id @default(autoincrement())
+  recorded_at             DateTime? @default(now())
+  avg_channel_utilization Decimal?
+
+  @@index([recorded_at])
+  @@map("channel_utilization_stats")
+}
