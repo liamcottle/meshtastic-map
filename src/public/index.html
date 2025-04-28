@@ -3393,7 +3393,6 @@
             }
 
             // add node neighbours
-            var polylineOffset = 0;
             const neighbours = node.neighbours ?? [];
             for(const neighbour of neighbours){
 
@@ -3418,6 +3417,10 @@
                         continue;
                     }
 
+                    // Check our neighour also has us as a neighbour. 
+                    const matchingNode = updatedNodes.find(n => n.node_id == neighbour.node_id);
+                    const symmetrical = matchingNode?.neighbours?.some(n => String(n.node_id) === String(node.node_id)) ?? false;
+
                     // add neighbour line to map
                     const line = L.polyline([
                         currentNode.getLatLng(),
@@ -3425,11 +3428,9 @@
                     ], {
                         color: '#2563eb',
                         opacity: 0.75,
-                        offset: polylineOffset,
+                        // if we have a symmetrical connection, offset the the line so they don't overlapp
+                        offset: symmetrical ? 3 : 0,
                     }).addTo(neighboursLayerGroup);
-
-                    // increase offset so next neighbour does not overlay other neighbours from self
-                    polylineOffset += 2;
 
                     // default to showing distance in meters
                     var distance = `${distanceInMeters} meters`;
