@@ -1318,17 +1318,6 @@
                                 <input type="number" v-model="configNeighboursMaxDistanceInMeters" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                             </div>
 
-                            <!-- configNeighboursPolylineOffset -->
-                            <div class="p-2">
-                                <div class="flex items-start">
-                                    <div class="flex items-center h-5">
-                                        <input type="checkbox" v-model="configNeighboursPolylineOffset" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300" required>
-                                    </div>
-                                    <label class="ml-2 text-sm font-medium text-gray-900">Offset Neighbour lines</label>
-                                </div>
-                                <div class="text-xs text-gray-600">Stops Neighbour lines from overlapping by offsetting their start and end positions. Reload to update map.</div>
-                            </div>
-
                             <!-- configZoomLevelGoToNode -->
                             <div class="p-2">
                                 <label class="block text-sm font-medium text-gray-900">Zoom Level (go to node)</label>
@@ -1629,20 +1618,6 @@
         return localStorage.setItem("config_neighbours_max_distance_in_meters", value);
     }
 
-    function getConfigNeighboursPolylineOffset() {
-        const value = localStorage.getItem("config_neighbours_polyline_offset");
-        //return value != null ? parseInt(value) : null;
-        if(value === null){
-            return true;
-        }
-
-        return value === "true";
-    }
-
-    function setConfigNeighboursPolylineOffset(value) {
-        return localStorage.setItem("config_neighbours_polyline_offset", value);
-    }
-
     function getConfigZoomLevelGoToNode() {
         const value = localStorage.getItem("config_zoom_level_go_to_node");
         const parsedValue = value != null ? parseInt(value) : null;
@@ -1671,7 +1646,6 @@
                 configNodesOfflineAgeInSeconds: window.getConfigNodesOfflineAgeInSeconds(),
                 configWaypointsMaxAgeInSeconds: window.getConfigWaypointsMaxAgeInSeconds(),
                 configNeighboursMaxDistanceInMeters: window.getConfigNeighboursMaxDistanceInMeters(),
-                configNeighboursPolylineOffset: window.getConfigNeighboursPolylineOffset(),
                 configZoomLevelGoToNode: window.getConfigZoomLevelGoToNode(),
                 configAutoUpdatePositionInUrl: window.getConfigAutoUpdatePositionInUrl(),
                 configEnableMapAnimations: window.getConfigEnableMapAnimations(),
@@ -2568,9 +2542,6 @@
             configNeighboursMaxDistanceInMeters() {
                 window.setConfigNeighboursMaxDistanceInMeters(this.configNeighboursMaxDistanceInMeters);
             },
-            configNeighboursPolylineOffset() {
-                window.setConfigNeighboursPolylineOffset(this.configNeighboursPolylineOffset);
-            },
             configZoomLevelGoToNode() {
                 window.setConfigZoomLevelGoToNode(this.configZoomLevelGoToNode);
             },
@@ -3302,7 +3273,6 @@
         const configNodesMaxAgeInSeconds = getConfigNodesMaxAgeInSeconds();
         const configNodesOfflineAgeInSeconds = getConfigNodesOfflineAgeInSeconds();
         const configNeighboursMaxDistanceInMeters = getConfigNeighboursMaxDistanceInMeters();
-        const configNeighboursPolylineOffset = getConfigNeighboursPolylineOffset();
 
         // add nodes
         for(const node of updatedNodes){
@@ -3459,7 +3429,7 @@
                     }).addTo(neighboursLayerGroup);
 
                     // increase offset so next neighbour does not overlay other neighbours from self
-                    polylineOffset += configNeighboursPolylineOffset ? 2 : 0;
+                    polylineOffset += 2;
 
                     // default to showing distance in meters
                     var distance = `${distanceInMeters} meters`;
