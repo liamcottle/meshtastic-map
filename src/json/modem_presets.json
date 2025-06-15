@@ -1,0 +1,11 @@
+{
+  "0": "LONG_FAST",
+  "1": "LONG_SLOW",
+  "2": "VERY_LONG_SLOW",
+  "3": "MEDIUM_SLOW",
+  "4": "MEDIUM_FAST",
+  "5": "SHORT_SLOW",
+  "6": "SHORT_FAST",
+  "7": "LONG_MODERATE",
+  "8": "SHORT_TURBO"
+}

@@ -1,7 +1,7 @@
+const fs = require("fs");
 const path = require('path');
 const express = require('express');
 const compression = require('compression');
-const protobufjs = require("protobufjs");
 const commandLineArgs = require("command-line-args");
 const commandLineUsage = require("command-line-usage");
 
@@ -50,24 +50,21 @@ if(options.help){
 // get options and fallback to default values
 const port = options["port"] ?? 8080;
 
-// load protobufs
-const root = new protobufjs.Root();
-root.resolvePath = (origin, target) => path.join(__dirname, "protos", target);
-root.loadSync('meshtastic/mqtt.proto');
-const HardwareModel = root.lookupEnum("HardwareModel");
-const Role = root.lookupEnum("Config.DeviceConfig.Role");
-const RegionCode = root.lookupEnum("Config.LoRaConfig.RegionCode");
-const ModemPreset = root.lookupEnum("Config.LoRaConfig.ModemPreset");
+// load json
+const hardwareModels = JSON.parse(fs.readFileSync(path.join(__dirname, "json/hardware_models.json"), "utf-8"));
+const roles = JSON.parse(fs.readFileSync(path.join(__dirname, "json/roles.json"), "utf-8"));
+const regionCodes = JSON.parse(fs.readFileSync(path.join(__dirname, "json/region_codes.json"), "utf-8"));
+const modemPresets = JSON.parse(fs.readFileSync(path.join(__dirname, "json/modem_presets.json"), "utf-8"));
 
 // appends extra info for node objects returned from api
 function formatNodeInfo(node) {
     return {
         ...node,
         node_id_hex: "!" + node.node_id.toString(16),
-        hardware_model_name: HardwareModel.valuesById[node.hardware_model] ?? null,
-        role_name: Role.valuesById[node.role] ?? null,
-        region_name: RegionCode.valuesById[node.region] ?? null,
-        modem_preset_name: ModemPreset.valuesById[node.modem_preset] ?? null,
+        hardware_model_name: hardwareModels[node.hardware_model] ?? null,
+        role_name: roles[node.role] ?? null,
+        region_name: regionCodes[node.region] ?? null,
+        modem_preset_name: modemPresets[node.modem_preset] ?? null,
     };
 }
 
@@ -666,7 +663,7 @@ app.get('/api/v1/stats/hardware-models', async (req, res) => {
            return {
                count: result._count.hardware_model,
                hardware_model: result.hardware_model,
-               hardware_model_name: HardwareModel.valuesById[result.hardware_model] ?? "UNKNOWN",
+               hardware_model_name: hardwareModels[result.hardware_model] ?? "UNKNOWN",
            };
         });
 
