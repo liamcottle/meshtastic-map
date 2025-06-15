@@ -1,3 +1,4 @@
+const fs = require("fs");
 const crypto = require("crypto");
 const path = require("path");
 const mqtt = require("mqtt");
@@ -20,6 +21,11 @@ const optionsList = [
         alias: 'h',
         type: Boolean,
         description: 'Display this usage guide.'
+    },
+    {
+        name: "protobufs-path",
+        type: String,
+        description: "Path to Protobufs (e.g: ../../protobufs)",
     },
     {
         name: "mqtt-broker-url",
@@ -206,6 +212,7 @@ if(options.help){
 }
 
 // get options and fallback to default values
+const protobufsPath = options["protobufs-path"] ?? path.join(path.dirname(__filename), "external/protobufs");
 const mqttBrokerUrl = options["mqtt-broker-url"] ?? "mqtt://mqtt.meshtastic.org";
 const mqttUsername = options["mqtt-username"] ?? "meshdev";
 const mqttPassword = options["mqtt-password"] ?? "large4cats";
@@ -240,6 +247,25 @@ const purgeTextMessagesAfterSeconds = options["purge-text-messages-after-seconds
 const purgeTraceroutesAfterSeconds = options["purge-traceroutes-after-seconds"] ?? null;
 const purgeWaypointsAfterSeconds = options["purge-waypoints-after-seconds"] ?? null;
 
+// ensure protobufs exist
+if(!fs.existsSync(path.join(protobufsPath, "meshtastic/mqtt.proto"))){
+    console.error([
+        "ERROR: MQTT Collector requires Meshtastic protobufs.",
+        "",
+        "This project is licensed under the MIT license to allow end users to do as they wish.",
+        "Unfortunately, the Meshtastic protobuf schema files are licensed under GPLv3, which means they can not be bundled in this project due to license conflicts.",
+        "https://github.com/liamcottle/meshtastic-map/issues/102",
+        "https://github.com/meshtastic/protobufs/issues/695",
+        "",
+        "If you clone and install the Meshtastic protobufs as described below, your use of those files will be subject to the GPLv3 license.",
+        "This does not change the license of this project being MIT. Only the parts you add from the Meshtastic project are covered under GPLv3.",
+        "",
+        "To use the MQTT Collector, please clone the Meshtastic protobufs into src/external/protobufs",
+        "git clone https://github.com/meshtastic/protobufs src/external/protobufs",
+    ].join("\n"));
+    return;
+}
+
 // create mqtt client
 const client = mqtt.connect(mqttBrokerUrl, {
     username: mqttUsername,
@@ -249,7 +275,7 @@ const client = mqtt.connect(mqttBrokerUrl, {
 
 // load protobufs
 const root = new protobufjs.Root();
-root.resolvePath = (origin, target) => path.join(__dirname, "protos", target);
+root.resolvePath = (origin, target) => path.join(protobufsPath, target);
 root.loadSync('meshtastic/mqtt.proto');
 const Data = root.lookupType("Data");
 const ServiceEnvelope = root.lookupType("ServiceEnvelope");
