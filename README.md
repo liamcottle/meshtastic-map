@@ -122,6 +122,9 @@ You will now need to restart the `index.js` and `mqtt.js` scripts.
 
 ## MQTT Collector
 
+> Please note, due to the Meshtastic protobuf schema files being locked under a GPLv3 license, these are not provided in this MIT licensed project.
+You will need to obtain these files yourself to be able to use the MQTT Collector.
+
 By default, the [MQTT Collector](./src/mqtt.js) connects to the public Meshtastic MQTT server.
 Alternatively, you may provide the relevant options shown in the help section below to connect to your own MQTT server along with your own decryption keys.
 
