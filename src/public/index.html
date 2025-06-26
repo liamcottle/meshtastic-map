@@ -758,6 +758,10 @@
                                                             <div class="my-auto w-2 h-2 bg-orange-500 rounded-full"></div>
                                                             <div class="my-auto ml-1 text-sm text-gray-500">Pressure</div>
                                                         </div>
+                                                        <div class="flex mx-auto">
+                                                            <div class="my-auto w-2 h-2 bg-pink-400 rounded-full"></div>
+                                                            <div class="my-auto ml-1 text-sm text-gray-500">IAQ</div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2057,11 +2061,13 @@
                 const temperatureMetrics = [];
                 const relativeHumidityMetrics = [];
                 const barometricPressureMetrics = [];
+                const iaqMetrics = [];
                 for(const deviceMetric of this.selectedNodeEnvironmentMetrics){
                     labels.push(moment(deviceMetric.created_at));
                     temperatureMetrics.push(deviceMetric.temperature);
                     relativeHumidityMetrics.push(deviceMetric.relative_humidity);
                     barometricPressureMetrics.push(deviceMetric.barometric_pressure);
+                    iaqMetrics.push(deviceMetric.iaq);
                 }
 
                 // create chart
@@ -2101,6 +2107,17 @@
                                 yAxisID: 'y1',
 
                             },
+                            {
+                                label: 'IAQ',
+                                suffix: 'IAQ',
+                                borderColor: '#f472b6',
+                                backgroundColor: '#f472b6',
+                                pointStyle: false, // no points
+                                fill: false,
+                                data: iaqMetrics,
+                                yAxisID: 'yIAQ',
+
+                            },
                         ],
                     },
                     options: {
@@ -2138,6 +2155,10 @@
                                 grid: {
                                     drawOnChartArea: false, // only want the grid lines for one axis to show up
                                 },
+                            },
+                            yIAQ: {
+                                type: 'linear',
+                                display: false,
                             },
                         },
                         plugins: {
