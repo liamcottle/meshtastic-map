@@ -2656,6 +2656,7 @@
     // create layer groups
     var nodesLayerGroup = new L.LayerGroup();
     var neighboursLayerGroup = new L.LayerGroup();
+    var backboneNeighboursLayerGroup = new L.LayerGroup();
     var nodeNeighboursLayerGroup = new L.LayerGroup();
     var nodesClusteredLayerGroup = L.markerClusterGroup({
         showCoverageOnHover: false,
@@ -2665,6 +2666,7 @@
         showCoverageOnHover: false,
         disableClusteringAtZoom: 10, // zoom level where node clustering is disabled
     });
+    var nodesBackboneLayerGroup = new L.LayerGroup();
     var waypointsLayerGroup = new L.LayerGroup();
     var nodePositionHistoryLayerGroup = new L.LayerGroup();
 
@@ -2724,12 +2726,14 @@
         "Nodes": {
             "All": nodesLayerGroup,
             "Routers": nodesRouterLayerGroup,
+            "Backbone": nodesBackboneLayerGroup,
             "Clustered": nodesClusteredLayerGroup,
             "None": new L.LayerGroup(),
         },
         "Overlays": {
             "Legend": legendLayerGroup,
             "Neighbours": neighboursLayerGroup,
+            "Backbone Connection": backboneNeighboursLayerGroup,
             "Waypoints": waypointsLayerGroup,
             "Position History": nodePositionHistoryLayerGroup,
         },
@@ -2748,6 +2752,9 @@
     }
     if(enabledOverlayLayers.includes("Neighbours")){
         neighboursLayerGroup.addTo(map);
+    }
+    if(enabledOverlayLayers.includes("Backbone Connection")){
+        backboneNeighboursLayerGroup.addTo(map);
     }
     if(enabledOverlayLayers.includes("Waypoints")){
         waypointsLayerGroup.addTo(map);
@@ -2894,10 +2901,12 @@
         nodesLayerGroup.clearLayers();
         nodesClusteredLayerGroup.clearLayers();
         nodesRouterLayerGroup.clearLayers();
+        nodesBackboneLayerGroup.clearLayers();
     }
 
     function clearAllNeighbours() {
         neighboursLayerGroup.clearLayers();
+        backboneNeighboursLayerGroup.clearLayers();
     }
 
     function clearAllWaypoints() {
@@ -3369,6 +3378,11 @@
                 nodesRouterLayerGroup.addLayer(marker);
             }
 
+            // add markers for backbone to layer group
+            if(node.is_backbone) {
+                nodesBackboneLayerGroup.addLayer(marker);
+            }
+
             // show tooltip on desktop only
             if(!isMobile()){
                 marker.bindTooltip(getTooltipContentForNode(node), {
@@ -3453,6 +3467,28 @@
                         offset: symmetrical ? 3 : 0,
                     }).addTo(neighboursLayerGroup);
 
+                    // additional line for backbone neighbours
+                    const backboneNeighbourLine = L.polyline([
+                        currentNode.getLatLng(),
+                        neighbourNodeMarker.getLatLng(),
+                    ], {
+                        color: getColourForSnr(neighbour.snr),
+                        opacity: 0.75,
+                        offset: symmetrical ? 3 : 0,
+                    }).arrowheads({
+                        size: '10px',
+                        fill: true,
+                        offsets: {
+                            start: '25px',
+                            end: '25px',
+                        },
+                    })
+
+                    // If both nodes are backbone nodes add to layer group
+                    if(node.is_backbone && updatedNodes.find(n => n.node_id == neighbour.node_id)?.is_backbone) {
+                        backboneNeighbourLine.addTo(backboneNeighboursLayerGroup);
+                    }
+
                     // default to showing distance in meters
                     var distance = `${distanceInMeters} meters`;
 
@@ -3472,6 +3508,17 @@
                         + `<br/><a href="${terrainImageUrl}" target="_blank"><img src="${terrainImageUrl}" width="100%"></a>`;
 
                     line.bindTooltip(tooltip, {
+                        sticky: true,
+                        opacity: 1,
+                        interactive: true,
+                    })
+                    .bindPopup(tooltip)
+                    .on('click', function(event) {
+                        // close tooltip on click to prevent tooltip and popup showing at same time
+                        event.target.closeTooltip();
+                    });
+
+                    backboneNeighbourLine.bindTooltip(tooltip, {
                         sticky: true,
                         opacity: 1,
                         interactive: true,
