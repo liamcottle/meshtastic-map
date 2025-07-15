@@ -19,7 +19,7 @@
     "protobufjs": "^7.5.3"
   },
   "devDependencies": {
-    "jest": "^29.7.0",
+    "jest": "^30.0.4",
     "prisma": "^5.10.2"
   }
 }
