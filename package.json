@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.11.0",
+    "@prisma/client": "^6.11.1",
     "command-line-args": "^6.0.1",
     "command-line-usage": "^7.0.3",
     "compression": "^1.8.0",
