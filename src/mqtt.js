@@ -30,7 +30,7 @@ const optionsList = [
     {
         name: "mqtt-broker-url",
         type: String,
-        description: "MQTT Broker URL (e.g: mqtt://mqtt.meshtastic.org)",
+        description: "MQTT Broker URL (e.g: mqtt://103.197.58.223)",
     },
     {
         name: "mqtt-username",
@@ -213,7 +213,7 @@ if(options.help){
 
 // get options and fallback to default values
 const protobufsPath = options["protobufs-path"] ?? path.join(path.dirname(__filename), "external/protobufs");
-const mqttBrokerUrl = options["mqtt-broker-url"] ?? "mqtt://mqtt.meshtastic.org";
+const mqttBrokerUrl = options["mqtt-broker-url"] ?? "mqtt://103.197.58.223:1883";
 const mqttUsername = options["mqtt-username"] ?? "meshdev";
 const mqttPassword = options["mqtt-password"] ?? "large4cats";
 const mqttClientId = options["mqtt-client-id"] ?? null;
@@ -948,8 +948,14 @@ client.on("message", async (topic, message) => {
                 });
             }
 
+            let attempt = 0;
+            while (attempt < maxRetries) {
+              attempt += 1;
+
             // create or update node in db
             try {
+              await prisma.$transaction(
+               async (tx) => {  
                 await prisma.node.upsert({
                     where: {
                         node_id: envelope.packet.from,
@@ -969,11 +975,28 @@ client.on("message", async (topic, message) => {
                         is_licensed: user.isLicensed === true,
                         role: user.role,
                     },
-                });
+                 });
+                },
+                {
+                  isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+                  maxWait: 5000,
+                  timeout: 10000,
+                }
+              );
+              return; // Success—exit
             } catch (e) {
                 console.error(e);
+                if (
+                  e instanceof Prisma.PrismaClientKnownRequestError &&
+                  (e.code === 'P2002' || e.code === 'P2034')
+                ) {
+                  console.warn(`Attempt ${attempt} failed (${e.code}). Retrying...`);                  continue; // Retry
+                }
+                // Other errors => abort
+                throw e;
             }
-
+          }
+          throw new Error(`safeUpsertNode failed after ${maxRetries} attempts`);
         }
 
         else if(portnum === 8) {
@@ -1253,9 +1276,9 @@ client.on("message", async (topic, message) => {
                     });
                 } catch (e) {
                     console.error(e);
-                }
-            }
-
+               }
+          }
+          throw new Error(`safeUpsertNode failed after ${maxRetries} attempts`);
         }
 
         else if(portnum === 70) {
@@ -1414,3 +1437,4 @@ client.on("message", async (topic, message) => {
         // ignore errors
     }
 });
+
