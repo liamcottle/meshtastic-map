@@ -20,6 +20,6 @@
   },
   "devDependencies": {
     "jest": "^30.0.4",
-    "prisma": "^6.11.1"
+    "prisma": "^6.12.0"
   }
 }
