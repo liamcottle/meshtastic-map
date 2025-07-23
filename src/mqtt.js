@@ -944,8 +944,15 @@ client.on("message", async (topic, message) => {
                         hardware_model: user.hwModel,
                         is_licensed: user.isLicensed === true,
                         role: user.role,
-                        firmware_version: (bitfield != null) ? '2.5.0 or newer' : '2.4.3 or older',
-                        ok_to_mqtt: isOkToMqtt,
+                        // Since packages beeing forwarded by older firmwars dropps the bitfield
+                        // We only want to set form nodes that have the bitfield set.
+                        // That way we can get a more correct reading firmware status in the mesh.
+                        // This works since we had the old code:
+                        // firmware_version: (bitfield != null) ? '2.5.0 or newer' : '2.4.3 or older',
+                        ...(bitfield != null && {
+                            firmware_version: '2.5.0 or newer',
+                            ok_to_mqtt: isOkToMqtt,
+                        }),                            
                     },
                     update: {
                         long_name: user.longName,
@@ -954,7 +961,10 @@ client.on("message", async (topic, message) => {
                         is_licensed: user.isLicensed === true,
                         role: user.role,
                         firmware_version: (bitfield != null) ? '2.5.0 or newer' : '2.4.3 or older',
-                        ok_to_mqtt: isOkToMqtt,
+                        ...(bitfield != null && {
+                            firmware_version: '2.5.0 or newer',
+                            ok_to_mqtt: isOkToMqtt,
+                        }),
                     },
                 });
             } catch (e) {
