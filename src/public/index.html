@@ -3855,7 +3855,8 @@
             (node.position_precision != null && node.position_precision !== 32 ? `<br/>Position Precision: ${formatPositionPrecision(node.position_precision)}` : '') +
             `<br/><br/>Role: ${node.role_name}` +
             `<br/>Hardware: ${node.hardware_model_name}` +
-            (node.firmware_version != null ? `<br/>Firmware: ${node.firmware_version}` : '');
+            (node.firmware_version != null ? `<br/>Firmware: ${node.firmware_version}` : '') +
+            `<br/>OK to MQTT: ${node.ok_to_mqtt}`;
 
         if(node.battery_level){
             if(node.battery_level > 100){
