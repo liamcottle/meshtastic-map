@@ -3354,9 +3354,15 @@
             if(nodeHasUplinkedToMqttRecently){
                 icon = iconMqttConnected;
             }
+            // To not have overlapping nodes. 
+            // Should probbably check if there is allready an other node in the same position before applying jitter.
+            var jitter = 0
+            if (node.position_precision != 32) {
+                jitter = 0.0005 * (Math.random() - 0.5);
+            }
 
             // create node marker
-            const marker = L.marker([node.latitude, longitude], {
+            const marker = L.marker([node.latitude + jitter, longitude + jitter], {
                 icon: icon,
                 tagName: node.node_id,
                 // we want to show online nodes above offline, but without needing to use separate layer groups
