@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 // load protobufs
 const root = new protobufjs.Root();
-root.resolvePath = (origin, target) => path.join(__dirname, "protos", target);
+root.resolvePath = (origin, target) => path.join(__dirname, "protobufs", target);
 root.loadSync('meshtastic/mqtt.proto');
 const HardwareModel = root.lookupEnum("HardwareModel");
 const PortNum = root.lookupEnum("PortNum");
