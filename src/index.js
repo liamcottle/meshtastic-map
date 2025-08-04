@@ -55,7 +55,7 @@ const port = options["port"] ?? 8080;
 
 // load protobufs
 const root = new protobufjs.Root();
-root.resolvePath = (origin, target) => path.join(__dirname, "protos", target);
+root.resolvePath = (origin, target) => path.join(__dirname, "protobufs", target);
 root.loadSync('meshtastic/mqtt.proto');
 const HardwareModel = root.lookupEnum("HardwareModel");
 const Role = root.lookupEnum("Config.DeviceConfig.Role");
