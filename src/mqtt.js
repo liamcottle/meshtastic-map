@@ -917,7 +917,6 @@ client.on("message", async (topic, message) => {
         else if(portnum === 4) {
 
             const user = User.decode(envelope.packet.decoded.payload);
-            let isOkToMqtt = null
 
             if(logKnownPacketTypes) {
                 console.log("NODEINFO_APP", {
@@ -926,7 +925,9 @@ client.on("message", async (topic, message) => {
                 });
             }
 
-            // check if bitfield is available, then check if ok-to-mqtt
+            // check if bitfield is available, then set ok-to-mqtt
+            // else leave undefined to let Prisma ignore it.
+            let isOkToMqtt
             if(bitfield != null){
                 isOkToMqtt = Boolean(bitfield & BITFIELD_OK_TO_MQTT_MASK);
             }
@@ -944,15 +945,17 @@ client.on("message", async (topic, message) => {
                         hardware_model: user.hwModel,
                         is_licensed: user.isLicensed === true,
                         role: user.role,
-                        // Since packages beeing forwarded by older firmwars dropps the bitfield
-                        // We only want to set form nodes that have the bitfield set.
-                        // That way we can get a more correct reading firmware status in the mesh.
-                        // This works since we had the old code:
-                        // firmware_version: (bitfield != null) ? '2.5.0 or newer' : '2.4.3 or older',
-                        ...(bitfield != null && {
-                            firmware_version: '2.5.0 or newer',
-                            ok_to_mqtt: isOkToMqtt,
-                        }),                            
+                        is_unmessagable: user.isUnmessagable,
+                        ok_to_mqtt: isOkToMqtt,
+
+                        firmware_version: '<2.5.0',
+                        ...(user.publicKey != '' && {
+                            firmware_version: '>2.5.0',
+                             public_key: user.publicKey?.toString("base64"),
+                        }),
+                        ...(user.isUnmessagable != null && {
+                            firmware_version: '>2.6.8',
+                        }),
                     },
                     update: {
                         long_name: user.longName,
@@ -960,9 +963,16 @@ client.on("message", async (topic, message) => {
                         hardware_model: user.hwModel,
                         is_licensed: user.isLicensed === true,
                         role: user.role,
-                        ...(bitfield != null && {
-                            firmware_version: '2.5.0 or newer',
-                            ok_to_mqtt: isOkToMqtt,
+                        is_unmessagable: user.isUnmessagable,
+                        ok_to_mqtt: isOkToMqtt,
+
+                        firmware_version: '<2.5.0',
+                        ...(user.publicKey != '' && {
+                            firmware_version: '>2.5.0',
+                            public_key: user.publicKey?.toString("base64"),
+                        }),
+                        ...(user.isUnmessagable != null && {
+                            firmware_version: '>2.6.8',
                         }),
                     },
                 });
@@ -1429,6 +1439,6 @@ client.on("message", async (topic, message) => {
         }
 
     } catch(e) {
-        // ignore errors
+        console.log("error", e);
     }
 });

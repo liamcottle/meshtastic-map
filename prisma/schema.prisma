@@ -21,6 +21,8 @@ model Node {
   hardware_model Int
   role           Int
   is_licensed    Boolean?
+  public_key     String?
+  is_unmessagable Boolean?
 
   firmware_version       String?
   region                 Int?
