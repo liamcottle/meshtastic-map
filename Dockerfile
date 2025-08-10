@@ -1,13 +1,16 @@
 FROM node:lts-alpine
 
-# add project files to /app
-ADD ./ /app
 WORKDIR /app
 
-# add open ssl
+# Copy only package files and install deps
+# This layer will be cached as long as package*.json don't change
+COPY package*.json package-lock.json* ./
+RUN npm ci
+
+# Copy the rest of your source
+COPY . .
+
 RUN apk add --no-cache openssl
 
-# install node dependencies
-RUN npm install
 
 EXPOSE 8080
