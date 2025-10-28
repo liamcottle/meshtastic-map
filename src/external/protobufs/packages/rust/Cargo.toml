@@ -1,0 +1,15 @@
+[package]
+name = "meshtastic_protobufs"
+edition = "2021"
+version = "__PACKAGE_VERSION__"
+description = "Meshtastic Protobuf definitions"
+repository = "https://github.com/meshtastic/protobufs"
+license-file = "LICENSE"
+include = [
+    "**/*.rs",
+    "Cargo.toml",
+]
+
+[dependencies]
+prost = "0.13.3"
+prost-types = "0.13.3"

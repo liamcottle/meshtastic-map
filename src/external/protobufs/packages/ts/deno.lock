@@ -1,0 +1,16 @@
+{
+  "version": "4",
+  "specifiers": {
+    "npm:@bufbuild/protobuf@^2.2.3": "2.2.3"
+  },
+  "npm": {
+    "@bufbuild/protobuf@2.2.3": {
+      "integrity": "sha512-tFQoXHJdkEOSwj5tRIZSPNUuXK3RaR7T1nUrPgbYX1pUbvqqaaZAsfo+NXBPsz5rZMSKVFrgK1WL8Q/MSLvprg=="
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "npm:@bufbuild/protobuf@^2.2.3"
+    ]
+  }
+}
