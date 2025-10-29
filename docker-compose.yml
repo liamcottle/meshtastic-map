@@ -42,10 +42,8 @@ services:
     environment:
       DATABASE_URL: "mysql://root:password@database:3306/meshtastic-map?connection_limit=100"
       MAP_OPTS: "" # add any custom index.js options here
-      VIRTUAL_HOST: "127.0.0.1"
-      VIRTUAL_PORT: "8080"
-    expose:
-      - "8080"
+    ports:
+      - "8080:8080"
     networks:
       - proxynet
 
@@ -53,8 +51,6 @@ services:
   database:
     container_name: database
     image: bitnami/mariadb
-    ports:
-      - 3306:3306/tcp
     environment:
       MARIADB_DATABASE: "meshtastic-map"
       MARIADB_ROOT_PASSWORD: "password"
@@ -68,23 +64,6 @@ services:
       start_interval: 5s
     networks:
       - proxynet
-
-  # nginx proxy for password protection
-  nginx-proxy:
-    container_name: nginx-proxy
-    restart: always
-    image: jwilder/nginx-proxy
-    networks:
-      - proxynet
-    ports:
-      - "8080:80"
-    volumes:
-      - /srv/docker/nginx/htpasswd:/etc/nginx/htpasswd
-      - /etc/nginx/vhost.d
-      - /usr/share/nginx/html
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-    environment:
-      DEFAULT_HOST: "127.0.0.1"
 
 networks:
   proxynet:
