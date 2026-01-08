@@ -2717,7 +2717,7 @@
     // global state
     var nodes = [];
     var nodeMarkers = {};
-    var selectedNodeOutlineCircle = null;
+    var selectedNodeOutlinePolygon = null;
     var waypoints = [];
 
     // set map bounds to be a little more than full size to prevent panning off screen
@@ -3049,9 +3049,9 @@
     }
 
     function clearNodeOutline() {
-        if(selectedNodeOutlineCircle){
-            selectedNodeOutlineCircle.removeFrom(map);
-            selectedNodeOutlineCircle = null;
+        if(selectedNodeOutlinePolygon){
+            selectedNodeOutlinePolygon.removeFrom(map);
+            selectedNodeOutlinePolygon = null;
         }
     }
 
@@ -3072,10 +3072,9 @@
             return;
         }
 
-        // add position precision circle around node
+        // add position precision polygon around node
         if(node.position_precision != null && node.position_precision > 0 && node.position_precision < 32){
-            selectedNodeOutlineCircle = L.circle(nodeMarker.getLatLng(), {
-                radius: getPositionPrecisionInMeters(node.position_precision),
+            selectedNodeOutlinePolygon = L.polygon(getPolygonPointsForNodePositionPrecision(node.latitude, wrapLongitude(node.longitude), node.position_precision), {
             }).addTo(map);
         }
 
@@ -3411,6 +3410,14 @@
         return millisecondsSinceNodeLastUplinkedToMqtt < configNodesDisconnectedAgeInSeconds * 1000;
     }
 
+    // wrap longitude for shortest path, everything to left of australia should be shown on the right
+    function wrapLongitude(longitude) {
+        if(longitude <= 100){
+            return longitude + 360;
+        }
+        return longitude;
+    }
+
     function onNodesUpdated(updatedNodes) {
 
         // clear nodes cache
@@ -3451,10 +3458,7 @@
             }
 
             // wrap longitude for shortest path, everything to left of australia should be shown on the right
-            var longitude = parseFloat(node.longitude);
-            if(longitude <= 100){
-                longitude += 360;
-            }
+            var longitude = wrapLongitude(parseFloat(node.longitude));
 
             // icon based on mqtt connection state
             var icon = iconMqttDisconnected;
@@ -3784,7 +3788,7 @@
         nodePositionHistoryLayerGroup.addTo(map);
 
     }
-    
+
     function setLoading(loading){
         var reloadButton = document.getElementById("reload-button");
         if(loading){
@@ -3863,7 +3867,7 @@
 
     }
 
-    function getPositionPrecisionInMeters(positionPrecision) {
+    function getLatitudePrecisionInMeters(positionPrecision) {
         switch(positionPrecision){
             case 2: return 5976446;
             case 3: return 2988223;
@@ -3893,22 +3897,43 @@
         return null;
     }
 
-    function formatPositionPrecision(positionPrecision) {
+    function formatLatitudePrecision(positionPrecision) {
 
-        // get position precision in meters
-        const positionPrecisionInMeters = getPositionPrecisionInMeters(positionPrecision);
-        if(positionPrecisionInMeters == null){
+        // get position precision in the North/South direction, meters
+        const latitudePrecisionInMeters = getLatitudePrecisionInMeters(positionPrecision);
+        if(latitudePrecisionInMeters == null){
             return "?";
         }
 
         // format kilometers
-        if(positionPrecisionInMeters > 1000){
-            const positionPrecisionInKilometers = Math.ceil(positionPrecisionInMeters / 1000);
-            return `±${positionPrecisionInKilometers}km`;
+        if(latitudePrecisionInMeters > 1000){
+            const latitudePrecisionInKilometers = Math.ceil(latitudePrecisionInMeters / 1000);
+            return `±${latitudePrecisionInKilometers}km`;
         }
 
         // format meters
-        return `±${positionPrecisionInMeters}m`;
+        return `±${latitudePrecisionInMeters}m`;
+
+    }
+
+    function getPolygonPointsForNodePositionPrecision(latitude, longitude, positionPrecision) {
+
+        // get position precision in the North/South direction, meters
+        const latitudePrecisionInMeters = getLatitudePrecisionInMeters(positionPrecision);
+        if(latitudePrecisionInMeters == null){
+            return null;
+        }
+
+        // calculate lat/lng deltas
+        const latDelta = latitudePrecisionInMeters / 111320; // approx meters per degree latitude
+        const lngDelta = latitudePrecisionInMeters / 2 / (40075000 * Math.cos(latitude * Math.PI / 180) / 360); // approx meters per degree longitude
+
+        return [
+            [latitude - latDelta, longitude - lngDelta], // southwest
+            [latitude - latDelta, longitude + lngDelta], // southeast
+            [latitude + latDelta, longitude + lngDelta], // northeast
+            [latitude + latDelta, longitude - lngDelta], // northwest
+        ];
 
     }
 
@@ -3933,7 +3958,7 @@
             `<br/>Short Name: ${escapeString(node.short_name)}` +
             `<br/>MQTT: ${mqttStatus}` +
             (node.num_online_local_nodes != null ? `<br/>Local Nodes Online: ${node.num_online_local_nodes}` : '') +
-            (node.position_precision != null && node.position_precision !== 32 ? `<br/>Position Precision: ${formatPositionPrecision(node.position_precision)}` : '') +
+            (node.position_precision != null && node.position_precision !== 32 ? `<br/>Latitude Precision: ${formatLatitudePrecision(node.position_precision)}` : '') +
             `<br/><br/>Role: ${node.role_name}` +
             `<br/>Hardware: ${node.hardware_model_name}` +
             (node.firmware_version != null ? `<br/>Firmware: ${node.firmware_version}` : '') +
