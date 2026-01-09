@@ -3917,24 +3917,18 @@
     }
 
     function getPolygonPointsForNodePositionPrecision(latitude, longitude, positionPrecision) {
-
-        // get position precision in the North/South direction, meters
-        const latitudePrecisionInMeters = getLatitudePrecisionInMeters(positionPrecision);
-        if(latitudePrecisionInMeters == null){
+        if (positionPrecision < 2) {
             return null;
         }
 
-        // calculate lat/lng deltas
-        const latDelta = latitudePrecisionInMeters / 111320; // approx meters per degree latitude
-        const lngDelta = latitudePrecisionInMeters / 2 / (40075000 * Math.cos(latitude * Math.PI / 180) / 360); // approx meters per degree longitude
+        const halfDeltaDegrees = (1 << (32 - positionPrecision)) * 1e-7 * 0.5;
 
         return [
-            [latitude - latDelta, longitude - lngDelta], // southwest
-            [latitude - latDelta, longitude + lngDelta], // southeast
-            [latitude + latDelta, longitude + lngDelta], // northeast
-            [latitude + latDelta, longitude - lngDelta], // northwest
+            [latitude - halfDeltaDegrees, longitude - halfDeltaDegrees], // southwest
+            [latitude - halfDeltaDegrees, longitude + halfDeltaDegrees], // southeast
+            [latitude + halfDeltaDegrees, longitude + halfDeltaDegrees], // northeast
+            [latitude + halfDeltaDegrees, longitude - halfDeltaDegrees], // northwest
         ];
-
     }
 
     function getTooltipContentForNode(node) {
